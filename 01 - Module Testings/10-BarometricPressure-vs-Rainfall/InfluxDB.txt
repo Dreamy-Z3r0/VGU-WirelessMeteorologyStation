@@ -1,0 +1,7 @@
+#define INFLUXDB_URL "https://europe-west1-1.gcp.cloud2.influxdata.com"
+#define INFLUXDB_ORG "eeit2016_hoang.dn@student.vgu.edu.vn"
+#define INFLUXDB_BUCKET "BarometricPressure"
+
+#define TZ_INFO "<-07>7"
+
+All access API token: 2gHfy65I931P33qydCua8mUD22vf3mjjPpri_SpDVWroGfE6QDC6nCa869Hhkm2POQIcIwEtW6mxAugMvLNQlg==
