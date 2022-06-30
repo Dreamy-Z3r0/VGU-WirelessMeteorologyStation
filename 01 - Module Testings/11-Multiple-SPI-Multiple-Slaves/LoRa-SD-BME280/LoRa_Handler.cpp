@@ -1,24 +1,24 @@
 #include "LoRa_Handler.h"
 
-void LoRaSettings(LoRa_Settings *user_settings) {
-  if (user_settings->new_sf) {
-    user_settings->new_sf = false;
-    LoRa.setSpreadingFactor(user_settings->spreadingFactor);
+void LoRaSettings() {
+  if (LoRa_settings.new_sf) {
+    LoRa_settings.new_sf = false;
+    LoRa.setSpreadingFactor(LoRa_settings.spreadingFactor);
   }
 
-  if (user_settings->new_sb) {
-    user_settings->new_sb = false;
-    LoRa.setSignalBandwidth(user_settings->signalBandwidth);
+  if (LoRa_settings.new_sb) {
+    LoRa_settings.new_sb = false;
+    LoRa.setSignalBandwidth(LoRa_settings.signalBandwidth);
   }
 
-  if (user_settings->new_cr) {
-    user_settings->new_cr = false;
-    LoRa.setCodingRate4(user_settings->codingRate4);
+  if (LoRa_settings.new_cr) {
+    LoRa_settings.new_cr = false;
+    LoRa.setCodingRate4(LoRa_settings.codingRate4);
   }
 
-  if (user_settings->new_sw) {
-    user_settings->new_sw = false;
-    LoRa.setSyncWord(user_settings->syncWord);
+  if (LoRa_settings.new_sw) {
+    LoRa_settings.new_sw = false;
+    LoRa.setSyncWord(LoRa_settings.syncWord);
   }
 }
 
@@ -40,17 +40,22 @@ void LoRa_sendMessage(String message) {
 }
 
 void onReceive(int packetSize) {
-  String message = "";
+  Received_over_LoRa.LoRa_message = "";
 
   while (LoRa.available()) {
-    message += (char)LoRa.read();
+    Received_over_LoRa.LoRa_message += (char)LoRa.read();
   }
 
   Serial.print("Node Receive: ");
-  Serial.println(message);
+  Serial.println(Received_over_LoRa.LoRa_message);
+
+  Received_over_LoRa.gateway_messaged = true;
 }
 
 void onTxDone() {
   Serial.println("TxDone");
   LoRa_rxMode();
 }
+
+LoRa_Settings LoRa_settings;
+LoRa_rx_handler Received_over_LoRa;

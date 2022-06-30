@@ -13,7 +13,15 @@ typedef struct {
   bool new_sw;
 } LoRa_Settings;
 
-void LoRaSettings(LoRa_Settings *user_settings);
+typedef struct {
+  String LoRa_message;
+  bool gateway_messaged;
+} LoRa_rx_handler;
+
+extern LoRa_Settings LoRa_settings;
+extern LoRa_rx_handler Received_over_LoRa;
+
+void LoRaSettings();
 void LoRa_rxMode();
 void LoRa_txMode();
 void LoRa_sendMessage(String message);

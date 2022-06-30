@@ -6,7 +6,7 @@ void setup() {
   Serial.begin(9600);
   while (!Serial);
 
-  // Initial LoRa settings
+  // Initialize LoRa settings
   LoRa_settings.spreadingFactor = 12;
   LoRa_settings.signalBandwidth = 500E3;
   LoRa_settings.codingRate4 = 5;
@@ -16,15 +16,16 @@ void setup() {
   LoRa_settings.new_sf = true; LoRa_settings.new_sb = true;
   LoRa_settings.new_cr = true; LoRa_settings.new_sw = true;
 
+  // Initialize local storage for LoRa message
+  Received_over_LoRa.LoRa_message = "";
+  Received_over_LoRa.gateway_messaged = false;
+
   // Initialize LoRa
   LoRa.setSPI(SPI_2);
   LoRa.setPins(LoRa_CS_Pin, LoRa_resetPin, LoRa_irqPin);
-  if (!LoRa.begin(LoRa_frequency)) {
+  while (!LoRa.begin(LoRa_frequency)) {
     Serial.println("LoRa init failed. Check your connections.");
-    while (!LoRa.begin(LoRa_frequency)) {
-      Serial.println("LoRa init failed. Check your connections.");
-      delay(4000);                   
-    }
+    delay(4000);                   
   }
 
   // Initiate BME280
@@ -33,6 +34,16 @@ void setup() {
   if (!status) {
     while (1);
   }
+  delay(20);
+
+  // Initialize BME280 settings
+  BME280_userSettings.Power_Mode = Adafruit_BME280::MODE_NORMAL;
+  BME280_userSettings.Temperature_Oversampling = Adafruit_BME280::SAMPLING_X2;
+  BME280_userSettings.Pressure_Oversampling = Adafruit_BME280::SAMPLING_X16;
+  BME280_userSettings.Humidity_Oversampling = Adafruit_BME280::SAMPLING_X1;
+  BME280_userSettings.Filter_Coefficient = Adafruit_BME280::FILTER_X16;
+  
+  update_BME280_settings(&bme);
 
   LoRa.onReceive(onReceive);
   LoRa.onTxDone(onTxDone);
@@ -40,12 +51,14 @@ void setup() {
 }
 
 void loop() {
+  Serial_InputHandler();
+  
   if (LoRa_settings.new_sf | LoRa_settings.new_sb | LoRa_settings.new_cr | LoRa_settings.new_sw) {    // Update LoRa settings if new input is available and valid
-    LoRaSettings(&LoRa_settings);
+    LoRaSettings();
   }
   
   if (BME280_readFlag) {
-    read_BME280(&bme, &BME280_dataStorage, &BME280_readFlag);
+    read_BME280(&bme, &BME280_readFlag);
 
     Serial.print("Ambient temperature = ");
     Serial.print(BME280_dataStorage.temperature);
@@ -68,11 +81,11 @@ void Serial_InputHandler() {
     String input = Serial.readStringUntil('\n');
     long input_StringLength = input.length();
 
-    String input_processed = input.substring(0,3);  // Identifier of input data
-    if (input_processed.equals("sf:")) {            // Input is spreading factor
-      if ((4 == input_StringLength) | (5 == input_StringLength)) {
-        input_StringLength = input.substring(3).toInt();
-        if ((6 <= input_StringLength) && (12 >= input_StringLength)) {
+    String input_processed = input.substring(0,4);  // Identifier of input data
+    if (input_processed.equals("?sf:")) {            // Input is spreading factor
+      if ((5 == input_StringLength) | (6 == input_StringLength)) {
+        input_StringLength = input.substring(4).toInt();
+        if ((7 <= input_StringLength) && (13 >= input_StringLength)) {
           Serial.print("Spreading factor: ");
           Serial.print(LoRa_settings.spreadingFactor);
           if (LoRa_settings.spreadingFactor != (int)input_StringLength) {
@@ -91,9 +104,9 @@ void Serial_InputHandler() {
       } else {
         Serial.println("Invalid input format and/or value.\n"); 
       }
-    } else if (input_processed.equals("sb:")) {     // Input is signal bandwidth
-      if ((6 <= input_StringLength) | (8 >= input_StringLength)) {
-        input_StringLength = (long)(input.substring(3).toFloat() * 1000);
+    } else if (input_processed.equals("?sb:")) {     // Input is signal bandwidth
+      if ((7 <= input_StringLength) | (9 >= input_StringLength)) {
+        input_StringLength = (long)(input.substring(4).toFloat() * 1000);
         switch (input_StringLength) {
           case (long)7.8E3:
           case (long)10.4E3:
@@ -139,10 +152,10 @@ void Serial_InputHandler() {
       } else {
         Serial.println("Invalid input format and/or value.\n"); 
       }
-    } else if (input_processed.equals("cr:")) {     // Input is coding rate
-      if (4 == input_StringLength) {
-        input_StringLength = input.substring(3).toInt();
-        if ((5 <= input_StringLength) && (8 >= input_StringLength)) {
+    } else if (input_processed.equals("?cr:")) {     // Input is coding rate
+      if (5 == input_StringLength) {
+        input_StringLength = input.substring(4).toInt();
+        if ((6 <= input_StringLength) && (9 >= input_StringLength)) {
           Serial.print("Coding rate: 4/");
           Serial.print(LoRa_settings.codingRate4);
           if (LoRa_settings.codingRate4 != (int)input_StringLength) {
@@ -161,12 +174,12 @@ void Serial_InputHandler() {
       } else {
         Serial.println("Invalid input format and/or value.\n"); 
       }
-    } else if (input_processed.equals("sw:")) {     // Input is sync word
-      if (5 != input_StringLength) {
+    } else if (input_processed.equals("?sw:")) {     // Input is sync word
+      if (6 != input_StringLength) {
         Serial.println("Invalid input format and/or value.\n"); 
       } else {
-        uint8_t char1 = input.charAt(3),
-                char2 = input.charAt(4);
+        uint8_t char1 = input.charAt(4),
+                char2 = input.charAt(5);
         bool char1_ok = true,
              char2_ok = true;
 
@@ -207,7 +220,7 @@ void Serial_InputHandler() {
           Serial.println("Invalid input format and/or value.\n"); 
         }
       }
-    } else if (input.equals("settings?")) {       // Request for current LoRa settings
+    } else if (input.equals("?settings?")) {       // Request for current LoRa settings
       Serial.println("Current LoRa settings:");
 
       // LoRa frequency
@@ -242,3 +255,5 @@ void Serial_InputHandler() {
     }
   }
 }
+
+//void 

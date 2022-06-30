@@ -26,9 +26,4 @@ Adafruit_BME280 bme(BME_CS_Pin, &SPI_2);
 /********************
  *** Data holders ***
  ********************/
-LoRa_Settings LoRa_settings;      // Local storage for LoRa settings
-
-bool gatewayMessaged = false;
-
-BME280_Data BME280_dataStorage;   // BME280 data storage instance
-bool BME280_readFlag = false;     // Read flag to handle requests in non-blocking mode
+bool BME280_readFlag = false;         // Read flag to handle requests in non-blocking mode
