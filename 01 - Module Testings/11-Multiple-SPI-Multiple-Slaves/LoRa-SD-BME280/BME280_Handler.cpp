@@ -23,5 +23,5 @@ void read_BME280(Adafruit_BME280 *bme, bool* controlFlag) {
 }
 
 
-BME280_settings BME280_userSettings;  // Create a local holder for sensor settings
-BME280_Data BME280_dataStorage;       // BME280 data storage instance
+BME280_settings BME280_userSettings;  // Holder for sensor settings
+BME280_Data BME280_dataStorage;       // BME280 data storage

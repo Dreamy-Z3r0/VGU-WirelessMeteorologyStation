@@ -52,6 +52,19 @@ void setup() {
 
 void loop() {
   Serial_InputHandler();
+
+  if (Received_over_LoRa.gateway_messaged) {
+    Received_over_LoRa.gateway_messaged = false;
+
+    bool validity_check = true;
+    if ('?' == Received_over_LoRa.LoRa_message.charAt(0)) {
+      Input_Message_Handler(Received_over_LoRa.LoRa_message, &validity_check);
+    } else if ('!' == Received_over_LoRa.LoRa_message.charAt(0)) {
+      Input_Request_Handler(Received_over_LoRa.LoRa_message, &validity_check);
+    } else {
+      Serial.println("Invalid command over LoRa.");
+    }
+  }
   
   if (LoRa_settings.new_sf | LoRa_settings.new_sb | LoRa_settings.new_cr | LoRa_settings.new_sw) {    // Update LoRa settings if new input is available and valid
     LoRaSettings();
@@ -256,4 +269,30 @@ void Serial_InputHandler() {
   }
 }
 
-//void 
+void Input_Message_Handler(String inputString, bool* validity_check) {
+  uint8_t start_index = 0;
+  uint8_t stop_index = inputString.indexOf(':');
+  if (-1 == stop_index) {
+    *validity_check = false;
+    return;
+  }
+  
+  String command = inputString.substring(0, stop_index);
+  if (command.equals("?sf") | command.equals("?sb") | command.equals("?cr") | command.equals("?sw")) {
+    start_index = stop_index + 1;
+    stop_index = inputString.indexOf('\n');
+    if (-1 == stop_index) {
+      *validity_check = false;
+      return;
+    }
+
+    command = inputString.substring(start_index);
+    String inputValue = inputString.substring(stop_index);
+  }
+}
+
+
+
+void Input_Request_Handler(String inputString, bool* validity_check) {
+  
+}
