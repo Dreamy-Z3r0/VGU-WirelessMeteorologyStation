@@ -1,36 +1,140 @@
-#define command_start_char '?'
-#define command_separator  ':'
-#define command_stop_char  ' '
+/***
+ *** LoRa connectivity test - Simple gateway
+ *** 
+ *** Microcontroller: ESP32 on NodeMCU-32S
+ *** LoRa module: SX1278
+ *** LoRa settings are input via Serial and updated with LoRaSettings(..)
+ *** Initial LoRa settings:
+ ***    + LoRa frequency: 433 MHz
+ ***    + Spreading factor: 12    
+ ***    + Signal bandwidth: 500 kHz    
+ ***    + Coding rate: 4/5 
+ ***    + Sync word: 0x12 
+ ***
+ ***      Hardware connections
+ ***      ESP32    | SX1278 |  Function
+ *** --------------|--------|----------------
+ ***     GPIO23    |  MOSI  | VSPI MOSI
+ ***     GPIO19    |  MISO  | VSPI MISO
+ ***     GPIO18    |  SCK   | VSPI CLK
+ ***     GPIO5     |  NSS   | VSPI CS0
+ *** --------------|--------|----------------
+ ***  GPIO16 / RX2 |  RST   | LoRa Reset
+ ***  GPIO17 / TX2 |  DIO0  | EXTI from LoRa
+ ***/
 
-int spreadingFactor;
-long signalBandwidth;
-int codingRate4;
-int syncWord;
+
+#include <SPI.h>
+#include <LoRa.h>
+
+const long frequency = 433E6;   // LoRa frequency
+
+const int csPin = 5;      // SPI NCSS for LoRa
+const int resetPin = 16;  // LoRa reset
+const int irqPin = 17;    // Interrupt by LoRa
+
+int spreadingFactor = 12;
+long signalBandwidth = 500E3;
+int codingRate4 = 5;
+int syncWord = 0x12;
 
 bool new_sf = false,
      new_sb = false,
      new_cr = false,
      new_sw = false;
 
-bool Input_Message_Handler(String inputString);
-bool isValidValue(String stringData, bool* isHEX, bool* isFloat);
-int HEX_to_int(uint8_t HEX_value);
+bool nodeReplied = false;
+
+unsigned long timestamp;
 
 void setup() {
+  // Initialize Serial
   Serial.begin(9600);
+  while (!Serial);
+
+  // Initialize LoRa
+  LoRa.setPins(csPin, resetPin, irqPin);
+  if (!LoRa.begin(frequency)) {
+    Serial.println("LoRa init failed. Check your connections.");
+    while (true);                       // if failed, do nothing
+  }
+  
+  Serial.println("LoRa init succeeded.");
+
+  LoRa.onReceive(onReceive);
+  LoRa.onTxDone(onTxDone);
+  LoRa_rxMode();
+
+  timestamp = millis();
 }
 
 void loop() {
-  if (Serial.available()) {
+  static int counter = 0;
+
+  Serial_InputHandler();
+  if (new_sf | new_sb | new_cr | new_sw) {
+    LoRaSettings();
+  }
+
+  String message = "Gateway counter = ";
+  message += String(counter);
+
+  counter += 1;
+  if (10 < counter) counter = 0;
+
+  LoRa_sendMessage(message);
+  
+  while (!nodeReplied) {
+    if (millis() - timestamp >= 5000) {
+      nodeReplied = true;
+      timestamp = millis();
+    }
+  }
+  
+  nodeReplied = false;
+  delay(5000);
+}
+
+void Serial_InputHandler(void) {
+  if (Serial.available()) {   // Check for user input
     String input = Serial.readString();
-
-    Serial.print("input: ");
-    Serial.print(input);
-
     bool validity_check = Input_Message_Handler(input);
-    if (validity_check) Serial.println("\nAt least 1 input is available and valid.\n");
-    else Serial.println("\nNo valid input.\n");
-    Serial.println("");
+    
+    if (validity_check) {
+      Serial.println("At least 1 input is available and valid.");
+    } else if (input.equals("settings?")) {      // Request for current LoRa settings
+      Serial.println("Current LoRa settings:");
+
+      // LoRa frequency
+      Serial.print("   + LoRa frequency: ");
+      Serial.print((int)(frequency/1E6));
+      Serial.println("MHz");
+
+      // Spreading factor
+      Serial.print("   + Spreading factor: ");
+      Serial.println(spreadingFactor);
+
+      // Signal bandwidth
+      Serial.print("   + Signal bandwidth: ");
+      if (31.25E3 == signalBandwidth)    
+        Serial.print("31.25");
+      else if (125E3 <= signalBandwidth) 
+        Serial.print((int)(signalBandwidth/1E3));
+      else 
+        Serial.print((float)(signalBandwidth/1E3), 1);
+      Serial.println("kHz");
+
+      // Coding rate
+      Serial.print("   + Coding rate: 4/");
+      Serial.println(codingRate4);
+
+      // Sync word
+      Serial.print("   + Sync word: 0x");
+      Serial.print(syncWord, HEX);
+      Serial.println("\n");
+    } else {
+      Serial.println("Invalid input.\n");
+    }
   }
 }
 
@@ -40,9 +144,9 @@ bool Input_Message_Handler(String inputString) {
   Serial.print("  String to process: ");
   Serial.println(inputString);
   
-  int command_start_index = inputString.indexOf(command_start_char),
+  int command_start_index = inputString.indexOf('?'),
       command_stop_index = -1,
-      separator_index = -1;
+      colon_index = -1;
 
   if (0 != command_start_index) {
     if (-1 == command_start_index) {
@@ -51,7 +155,7 @@ bool Input_Message_Handler(String inputString) {
     } else {
       inputString.remove(0, command_start_index);
       command_start_index = 0;
-      separator_index = inputString.indexOf(command_separator);
+      colon_index = inputString.indexOf(':');
       
       Serial.print("  Command starts at ");
       Serial.println(command_start_index);
@@ -59,16 +163,16 @@ bool Input_Message_Handler(String inputString) {
   } else {
     Serial.print("  Command starts at ");
     Serial.println(command_start_index);
-    separator_index = inputString.indexOf(command_separator);
+    colon_index = inputString.indexOf(':');
   }
 
-  if (-1 == separator_index) {
-    Serial.println("  Invalid command format: no command-value separator");
+  if (-1 == colon_index) {
+    Serial.println("  Invalid command format: no colon");
     return false;
   } else {
-    Serial.print("  Command-value separator at ");
-    Serial.println(separator_index);
-    command_stop_index = inputString.indexOf(command_stop_char);
+    Serial.print("  Colon at ");
+    Serial.println(colon_index);
+    command_stop_index = inputString.indexOf(' ');
   }    
    
   if (-1 == command_stop_index) {
@@ -79,12 +183,12 @@ bool Input_Message_Handler(String inputString) {
     Serial.println(command_stop_index);
   }
   
-  String command = inputString.substring(0, separator_index);
+  String command = inputString.substring(0, colon_index);
 
   Serial.print("  Input type: ");
   if (command.equals("?sf")) {
     Serial.print("spreading factor\n  Value: ");
-    command = inputString.substring(separator_index+1, command_stop_index);
+    command = inputString.substring(colon_index+1, command_stop_index);
     bool isHEX, isFloat;
     if (isValidValue(command, &isHEX, &isFloat)) {
       if (isHEX || isFloat) {
@@ -114,7 +218,7 @@ bool Input_Message_Handler(String inputString) {
     }
   } else if (command.equals("?sb")) {
     Serial.print("signal bandwidth\n  Value: ");
-    command = inputString.substring(separator_index+1, command_stop_index);
+    command = inputString.substring(colon_index+1, command_stop_index);
     bool isHEX, isFloat;
     if (isValidValue(command, &isHEX, &isFloat)) {
       if (isHEX) {
@@ -171,7 +275,7 @@ bool Input_Message_Handler(String inputString) {
     }
   } else if (command.equals("?cr")) {
     Serial.print("coding rate\n  Value: ");
-    command = inputString.substring(separator_index+1, command_stop_index);
+    command = inputString.substring(colon_index+1, command_stop_index);
     bool isHEX, isFloat;
     if (isValidValue(command, &isHEX, &isFloat)) {
       if (isHEX || isFloat) {
@@ -201,7 +305,7 @@ bool Input_Message_Handler(String inputString) {
     }
   }  else if (command.equals("?sw")) {
     Serial.print("sync word\n  Value: ");
-    command = inputString.substring(separator_index+1, command_stop_index);
+    command = inputString.substring(colon_index+1, command_stop_index);
     bool isHEX, isFloat;
     if (isValidValue(command, &isHEX, &isFloat)) {
       if (!isHEX) {
@@ -240,6 +344,62 @@ bool Input_Message_Handler(String inputString) {
   }
 
   return true;
+}
+
+void LoRaSettings(void) {
+  if (new_sf) {
+    new_sf = false;
+    LoRa.setSpreadingFactor(spreadingFactor);
+  }
+
+  if (new_sb) {
+    new_sb = false;
+    LoRa.setSignalBandwidth(signalBandwidth);
+  }
+
+  if (new_cr) {
+    new_cr = false;
+    LoRa.setCodingRate4(codingRate4);
+  }
+
+  if (new_sw) {
+    new_sw = false;
+    LoRa.setSyncWord(syncWord);
+  }
+}
+
+void LoRa_rxMode() {
+  LoRa.disableInvertIQ();               // normal mode
+  LoRa.receive();                       // set receive mode
+}
+
+void LoRa_txMode() {
+  LoRa.idle();                          // set standby mode
+  LoRa.enableInvertIQ();                // active invert I and Q signals
+}
+
+void LoRa_sendMessage(String message) {
+  LoRa_txMode();                        // set tx mode
+  LoRa.beginPacket();                   // start packet
+  LoRa.print(message);                  // add payload
+  LoRa.endPacket(true);                 // finish packet and send it
+}
+
+void onReceive(int packetSize) {
+  String message = "";
+
+  while (LoRa.available()) {
+    message += (char)LoRa.read();
+  }
+
+  Serial.print("Gateway Receive: ");
+  Serial.println(message);
+  nodeReplied = true;
+}
+
+void onTxDone() {
+  Serial.println("TxDone");
+  LoRa_rxMode();
 }
 
 bool isValidValue(String stringData, bool* isHEX, bool* isFloat) {
