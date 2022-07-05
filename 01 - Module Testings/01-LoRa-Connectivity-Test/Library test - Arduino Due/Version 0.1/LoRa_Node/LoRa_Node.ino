@@ -18,8 +18,8 @@
 
 const long frequency = 433E6;   // LoRa frequency
 
-const int csPin =    7;    // SPI NCSS for LoRa
-const int resetPin =   6;  // LoRa reset
+const int csPin =    4;    // SPI NCSS for LoRa
+const int resetPin =   3;  // LoRa reset
 const int irqPin =    2;   // Interrupt by LoRa
 
 int  spreadingFactor = 12;
@@ -27,10 +27,10 @@ long signalBandwidth = 500E3;
 int  codingRate4 = 5;
 int  syncWord = 0x12;
 
-bool new_sf = true,
-     new_sb = true,
-     new_cr = true,
-     new_sw = true;
+bool new_sf = false,
+     new_sb = false,
+     new_cr = false,
+     new_sw = false;
 
 bool gatewayMessaged = false;
 unsigned long timestamp;

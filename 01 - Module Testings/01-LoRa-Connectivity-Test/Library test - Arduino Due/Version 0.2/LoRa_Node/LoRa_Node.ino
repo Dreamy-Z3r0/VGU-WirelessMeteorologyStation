@@ -1,14 +1,7 @@
 /***
  *** LoRa connectivity test - Simple node
  ***
- *** Microcontroller: STM32F103CBT6 @ 72MHz with remapped SPI
- ***    + U(S)ART support: "Enabled (generic 'Serial')"
- ***    + USB support (if available): "None"    
- ***    + USB speed (if available): "Low/Full Speed"
- ***    + Optimize: "Smallest (-Os default)"
- ***    + Debug symbols: "None"
- ***    + C Runtime Library: "Newlib Nano (default)"    
- ***    
+ *** Board: Arduino Due   
  *** LoRa module: SX1278
  *** LoRa settings are input via Serial and updated with LoRaSettings(..)
  *** Initial LoRa settings:
@@ -17,35 +10,17 @@
  ***    + Signal bandwidth: 500 kHz    
  ***    + Coding rate: 4/5 
  ***    + Sync word: 0x12     
- *** 
- ***      Hardware connections
- ***  STM32  | SX1278 |  Function
- *** --------|--------|----------------
- ***   PB15  |  MOSI  | MOSI
- ***   PB14  |  MISO  | MISO
- ***   PB13  |  SCK   | CLK
- ***   PB12  |  NSS   | CS0
- *** --------|--------|----------------
- ***   PA8   |  RST   | LoRa Reset
- ***   PA11  |  DIO0  | EXTI from LoRa
- */
+ ***/
 
 
 #include <SPI.h>
 #include <LoRa.h>
 
-#define SPI2_MOSI_Pin PB15   // SPI2 MOSI pin
-#define SPI2_MISO_Pin PB14   // SPI2 MISO pin
-#define SPI2_SCLK_Pin PB13   // SPI2 SCLK pin
-//#define SPI2_SSEL_Pin PB12   // SPI2 SSEL pin -> not used
-
-SPIClass SPI_2(SPI2_MOSI_Pin, SPI2_MISO_Pin, SPI2_SCLK_Pin);
-
 const long frequency = 433E6;   // LoRa frequency
 
-const int csPin = PB12;    // SPI NCSS for LoRa
-const int resetPin = PA8;  // LoRa reset
-const int irqPin = PA11;   // Interrupt by LoRa
+const int csPin = 4;      // SPI NCSS for LoRa
+const int resetPin = 3;   // LoRa reset
+const int irqPin = 2;     // Interrupt by LoRa
 
 int spreadingFactor = 12;
 long signalBandwidth = 500E3;
@@ -66,7 +41,6 @@ void setup() {
   while (!Serial);
 
   // Initialize LoRa
-  LoRa.setSPI(SPI_2);
   LoRa.setPins(csPin, resetPin, irqPin);
   if (!LoRa.begin(frequency)) {
     Serial.println("LoRa init failed. Check your connections.");
