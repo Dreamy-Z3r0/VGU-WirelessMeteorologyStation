@@ -286,8 +286,8 @@ void Input_Message_Handler(String inputString, bool* validity_check) {
       return;
     }
 
-    command = inputString.substring(start_index);
-    String inputValue = inputString.substring(stop_index);
+    command = inputString.substring(start_index, stop_index);
+    
   }
 }
 
