@@ -202,7 +202,7 @@ bool Input_Message_Handler(String inputString) {
   } else {
     Serial.print("  Colon at ");
     Serial.println(colon_index);
-    command_stop_index = inputString.indexOf(' ');
+    command_stop_index = inputString.indexOf('_');
   }    
    
   if (-1 == command_stop_index) {
