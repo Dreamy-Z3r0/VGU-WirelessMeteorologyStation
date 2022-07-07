@@ -7,7 +7,7 @@
 
 Available commands:
 
-|Function|Syntax|Option|Example|Note|
+|**Function**|**Syntax**|***option***|**Example**|**Note**|
 |---|:---:|---|:---:|---|
 |Print current LoRa settings on Serial monitor|`settings?`|*(none)*|||
 |Change LoRa spreading factor|`sf:`*[option]*|6 / 7 / 8 / 9 / 10 / 11 / 12|`sf:10`||

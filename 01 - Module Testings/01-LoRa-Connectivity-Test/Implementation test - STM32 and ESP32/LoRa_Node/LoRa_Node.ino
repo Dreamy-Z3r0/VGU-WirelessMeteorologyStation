@@ -49,16 +49,21 @@ const int irqPin = PA11;   // Interrupt by LoRa
 
 int spreadingFactor = 12;
 long signalBandwidth = 500E3;
-int codingRate4 = 5;
-int syncWord = 0x12;
+int codingRate4 = 8;
+int syncWord = 0x3F;
 
-bool new_sf = false,
-     new_sb = false,
-     new_cr = false,
-     new_sw = false;
+bool new_sf = true,
+     new_sb = true,
+     new_cr = true,
+     new_sw = true;
 
+String gateway_msg, reply;
 bool gatewayMessaged = false;
-unsigned long timestamp;
+unsigned long timestamp, timestamp_lastmsg;
+
+int rx_packetRssi;
+float rx_packetSnr;
+long rx_packetFrequencyError;
 
 void setup() {
   // Initialize Serial
@@ -87,8 +92,6 @@ void setup() {
 }
 
 void loop() {
-  static int counter = 10;
-
   Serial_InputHandler();
   if (new_sf | new_sb | new_cr | new_sw) {
     LoRaSettings();
@@ -96,16 +99,36 @@ void loop() {
 
   if (gatewayMessaged) {
     gatewayMessaged = false;
-    String message = "Node counter = ";
-    message += String(counter);
-
-    LoRa_sendMessage(message);
     
-    counter -= 1;
-    if (0 > counter) counter = 10;
-  }
-  else if (millis() - timestamp >= 5000) {
-    Serial.println("Idle...");
+    Serial.print("\nLast message: ");
+    Serial.print((millis()-timestamp_lastmsg)/1000.0, 3);
+    Serial.println(" seconds ago.");
+    timestamp_lastmsg = millis();
+    timestamp = millis();
+
+    Serial.print("Node received: \"");
+    Serial.print(gateway_msg);
+
+    Serial.print("\"\n packet RSSI = ");
+    Serial.print(rx_packetRssi);
+    Serial.println(" dBm");
+
+    Serial.print(" packet SNR = ");
+    Serial.print(rx_packetSnr);
+    Serial.println(" dB");
+
+    Serial.print(" Frequency error = ");
+    Serial.print(rx_packetFrequencyError);
+    Serial.println(" Hz");
+
+    reply = "Received by node: ";
+    reply += gateway_msg;
+    LoRa_sendMessage(reply);
+  } else if (millis() - timestamp >= 15000) {
+    Serial.println("\nIdle...");
+    Serial.print("Last message: ");
+    Serial.print((millis()-timestamp_lastmsg)/1000.0, 3);
+    Serial.println(" seconds ago.");
     timestamp = millis();
   }
 }
@@ -118,7 +141,7 @@ void Serial_InputHandler(void) {
     if (validity_check) {
       Serial.println("At least 1 input is available and valid.");
     } else if (input.equals("settings?")) {      // Request for current LoRa settings
-      Serial.println("Current LoRa settings:");
+      Serial.println("\nCurrent LoRa settings:");
 
       // LoRa frequency
       Serial.print("   + LoRa frequency: ");
@@ -401,20 +424,23 @@ void LoRa_sendMessage(String message) {
 }
 
 void onReceive(int packetSize) {
-  String message = "";
+  gateway_msg = "";
 
   while (LoRa.available()) {
-    message += (char)LoRa.read();
+    gateway_msg += (char)LoRa.read();
   }
 
-  Serial.print("Node Receive: ");
-  Serial.println(message);
+  rx_packetRssi = LoRa.packetRssi();
+  rx_packetSnr = LoRa.packetSnr();
+  rx_packetFrequencyError = LoRa.packetFrequencyError();
 
   gatewayMessaged = true;
 }
 
 void onTxDone() {
-  Serial.println("TxDone");
+  Serial.print("TxDone: \"");
+  Serial.print(reply);
+  Serial.print("\"\n");
   LoRa_rxMode();
 }
 
