@@ -5,7 +5,7 @@
  ***                                                            ***
  *** BME280 is a temperature - humidity - barometric pressure   ***
  *** sensor which could communicate via either I2C or SPI. This ***
- *** test is designed for the default SPI on the STM32.         ***
+ *** test is designed for an alternative SPI on the STM32.      ***
  ***                                                            ***
  *** On the STM32F103CBT6, SPI2 is utilize under the API SPI_2  ***
  *** by the alternative class constructor:                      ***
