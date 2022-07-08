@@ -1,5 +1,7 @@
 # LoRa range test
 
+**Objectives:** Test the coverage of LoRa signal (by SX1278) and dynamically change LoRa parameters during field tests.
+
 **Additional URLs for Arduino IDE:**
 - ESP32: https://dl.espressif.com/dl/package_esp32_index.json
 - STM32: https://github.com/stm32duino/BoardManagerFiles/raw/main/package_stmicroelectronics_index.json
@@ -36,14 +38,16 @@ The NodeMCU-ESP32 acts as the gateway, and the BluePill F103CB is the LoRa node.
 |**Function**|**Syntax**|***option***|**Example**|**Note**|
 |---|:---:|---|:---:|---|
 |Print current LoRa settings on Serial monitor|`settings?`|*(none)*||Standalone command|
-|Change LoRa spreading factor|`?sf:`*[option]*`_`|6 / 7 / 8 / 9 / 10 / 11 / 12|`sf:10_`||
-|Change LoRa signal bandwidth|`?sb:`*[option]*`_`|7.8 / 10.4 / 15.6 / 20.8 / 31.25 / 41.7 / 62.5 / 125 / 250 / 500|`sb:62.5_`|Signal bandwidth in kHz|
-|Change LoRa coding rate|`?cr:`*[option]*`_`|5 / 6 / 7 / 8|`cr:8_`|The corresponding coding rates are 4/5, 4/6, 4/7, and 4/8|
-|Change LoRa sync word|`?sw:`*[option]*`_`|0x00-0xFF *(not case-sensitive)*|`sw:0xF4_` or `sw:0xf4_`|Not all values work|
+|Change LoRa spreading factor|`?sf:`*[option]*`_\n`|6 / 7 / 8 / 9 / 10 / 11 / 12|`sf:10_\n`||
+|Change LoRa signal bandwidth|`?sb:`*[option]*`_\n`|7.8 / 10.4 / 15.6 / 20.8 / 31.25 / 41.7 / 62.5 / 125 / 250 / 500|`sb:62.5_\n`|Signal bandwidth in kHz|
+|Change LoRa coding rate|`?cr:`*[option]*`_\n`|5 / 6 / 7 / 8|`cr:8_\n`|The corresponding coding rates are 4/5, 4/6, 4/7, and 4/8|
+|Change LoRa sync word|`?sw:`*[option]*`_\n`|0x00-0xFF *(not case-sensitive)*|`sw:0xF4_\n` or `sw:0xf4_\n`|Not all values work|
 
-***Note:*** Multiple commands could be input at once. The commands shall be processed from left to right, starting with the first valid one. Command-processing task shall stop once the last (valid) command is reached and all the previously valid commands shall be used. For example,
-- `?sf:7_?sb:10.4_?cr:8_` changes spreading factor, signal bandwidth, and coding rate to 7, 10.4kHz, and 4/8 respectively.
-- `?sf:7_?sb:10.4_?cr:8` changes spreading factor and signal bandwidth to 7 and 10.4kHz respectively. Coding rate input is discarded due to wrong input format (missing stop character ***_***).
-- `sf:7_?sb:10.4_?cr:8` changes only signal bandwidth to 10.4kHz.
-- `settings??sf:7_` is discarded since `settings?` is a standalone command.
-- `?sf:7_settings?` changes spreading factor to 7. `settings?` is discarded.
+***Note 1:*** Multiple commands could be input at once. The commands shall be processed from left to right, starting with the first valid one. Command-processing task shall stop once the last (valid) command is reached and all the previously valid commands shall be used. For example,
+- `?sf:7_?sb:10.4_?cr:8_\n` changes spreading factor, signal bandwidth, and coding rate to 7, 10.4kHz, and 4/8 respectively.
+- `?sf:7_?sb:10.4_?cr:8\n` changes spreading factor and signal bandwidth to 7 and 10.4kHz respectively. Coding rate input is discarded due to wrong input format (missing stop character ***_***).
+- `sf:7_?sb:10.4_?cr:8\n` changes only signal bandwidth to 10.4kHz.
+- `settings??sf:7_\n` is discarded since `settings?` is a standalone command.
+- `?sf:7_settings?\n` changes spreading factor to 7. `settings?` is discarded.
+
+***Note 2:*** The new line character `\n` is compulsory at the end of an input that is supposed to update LoRa settings.
