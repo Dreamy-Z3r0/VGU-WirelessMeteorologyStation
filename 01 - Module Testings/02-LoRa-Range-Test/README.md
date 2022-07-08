@@ -1,6 +1,6 @@
 # LoRa range test
 
-**Objectives:** Test the coverage of LoRa signal (by SX1278) and dynamically change LoRa parameters during field tests.
+**Objective(s):** Test the coverage of LoRa signal (by SX1278) and dynamically change LoRa parameters during field tests.
 
 **Additional URLs for Arduino IDE:**
 - ESP32: https://dl.espressif.com/dl/package_esp32_index.json
