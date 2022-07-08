@@ -1,5 +1,7 @@
 # LoRa connectivity test
 
+**Objective(s):** Test the LoRa library provided for Arduino platform by Sandeep Mistry.
+
 - Board: Arduino Due (Programming Port)  
 - LoRa module: SX1278 @ 433MHz
 
