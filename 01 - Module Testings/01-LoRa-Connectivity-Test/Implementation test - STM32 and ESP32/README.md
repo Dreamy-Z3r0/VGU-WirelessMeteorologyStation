@@ -1,5 +1,7 @@
 # LoRa connectivity test
 
+**Objective(s):** Establish a (fake) LoRa gateway and test the connectivity with a node.
+
 **Additional URLs for Arduino IDE:**
 - ESP32: https://dl.espressif.com/dl/package_esp32_index.json
 - STM32: https://github.com/stm32duino/BoardManagerFiles/raw/main/package_stmicroelectronics_index.json
