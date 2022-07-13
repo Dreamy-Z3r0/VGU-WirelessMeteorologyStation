@@ -1,7 +1,7 @@
 /***
- *** LoRa connectivity test - Simple node
- ***
- *** Board: Arduino Due   
+ *** LoRa connectivity test - Simple gateway
+ *** 
+ *** Microcontroller: ESP32 on NodeMCU-32S
  *** LoRa module: SX1278
  *** LoRa settings are input via Serial and updated with LoRaSettings(..)
  *** Initial LoRa settings:
@@ -9,7 +9,18 @@
  ***    + Spreading factor: 12    
  ***    + Signal bandwidth: 500 kHz    
  ***    + Coding rate: 4/5 
- ***    + Sync word: 0x12     
+ ***    + Sync word: 0x12 
+ ***
+ ***      Hardware connections
+ ***      ESP32    | SX1278 |  Function
+ *** --------------|--------|----------------
+ ***     GPIO23    |  MOSI  | VSPI MOSI
+ ***     GPIO19    |  MISO  | VSPI MISO
+ ***     GPIO18    |  SCK   | VSPI CLK
+ ***     GPIO5     |  NSS   | VSPI CS0
+ *** --------------|--------|----------------
+ ***  GPIO16 / RX2 |  RST   | LoRa Reset
+ ***  GPIO17 / TX2 |  DIO0  | EXTI from LoRa
  ***/
 
 
@@ -18,22 +29,26 @@
 
 const long frequency = 433E6;   // LoRa frequency
 
-const int csPin = 4;      // SPI NCSS for LoRa
-const int resetPin = 3;   // LoRa reset
-const int irqPin = 2;     // Interrupt by LoRa
+const int csPin = 5;      // SPI NCSS for LoRa
+const int resetPin = 16;  // LoRa reset
+const int irqPin = 17;    // Interrupt by LoRa
 
-int spreadingFactor = 12;
-long signalBandwidth = 500E3;
-int codingRate4 = 5;
-int syncWord = 0x12;
+int spreadingFactor = 7;
+long signalBandwidth = 10.4E3;
+int codingRate4 = 8;
+int syncWord = 0x3F;
 
-bool new_sf = false,
-     new_sb = false,
-     new_cr = false,
-     new_sw = false;
+bool new_sf = true,
+     new_sb = true,
+     new_cr = true,
+     new_sw = true;
 
-bool gatewayMessaged = false;
+String message;
+String rx_message = "";
+bool nodeReplied = true;
+
 unsigned long timestamp;
+unsigned long tx_timestamp, rx_timestamp;
 
 void setup() {
   // Initialize Serial
@@ -44,43 +59,93 @@ void setup() {
   LoRa.setPins(csPin, resetPin, irqPin);
   if (!LoRa.begin(frequency)) {
     Serial.println("LoRa init failed. Check your connections.");
-    while (!LoRa.begin(frequency)) {
-      Serial.println("LoRa init failed. Check your connections.");
-      delay(4000);                   
-    }
+    while (true);                       // if failed, do nothing
   }
-
-  // Set up LoRa parameters
-  LoRaSettings();
+  
+  Serial.println("LoRa init succeeded.");
 
   LoRa.onReceive(onReceive);
   LoRa.onTxDone(onTxDone);
   LoRa_rxMode();
-  
+
+  bool nodeIdentified = false;
+  Serial.println("Scanning channels...");
+  unsigned long T_cad[] = {640, 1152000, 2176000, 4224000, 8320000, 16512000};
+  do {
+    Serial_InputHandler();
+    if (new_sf | new_sb | new_cr | new_sw) {
+      LoRaSettings();
+    }
+
+    delayMicroseconds(T_cad[spreadingFactor-7]);
+
+    if (rx_message.equals("!Node")) {
+      nodeIdentified = true;
+      message = "ok";
+      LoRa_sendMessage(message);
+    } else {
+      nodeReplied = false;
+      new_sf = true;
+      if (12 == spreadingFactor) spreadingFactor = 7;
+      else spreadingFactor += 1;
+    }
+  } while (!nodeIdentified);
+
+  Serial.println("Node found!");
   timestamp = millis();
 }
 
 void loop() {
-  static int counter = 10;
+  static int counter = 0;
 
   Serial_InputHandler();
   if (new_sf | new_sb | new_cr | new_sw) {
     LoRaSettings();
   }
+  
+  if (!nodeReplied) { 
+    if (millis() - timestamp >= 15000) {
+      Serial.print("\nPending message: \"");
+      Serial.print(message);
+      Serial.println("\"\nResending...");
+      LoRa_sendMessage(message);
+      timestamp = millis();
+    }
+  } else {
+    nodeReplied = false;
 
-  if (gatewayMessaged) {
-    gatewayMessaged = false;
-    String message = "Node counter = ";
+    Serial.print("\nNode replied: \"");
+    Serial.print(rx_message);
+
+    Serial.print("\"\nafter ");
+    Serial.print(rx_timestamp - tx_timestamp);
+    Serial.println(" milliseconds");
+
+    Serial.print(" packet RSSI = ");
+    Serial.print(LoRa.packetRssi());
+    Serial.println(" dBm");
+
+    Serial.print(" packet SNR = ");
+    Serial.print(LoRa.packetSnr());
+    Serial.println(" dB");
+
+    Serial.print(" Frequency error = ");
+    Serial.print(LoRa.packetFrequencyError());
+    Serial.println(" Hz");
+    
+    message = "Gateway counter = ";
     message += String(counter);
 
-    LoRa_sendMessage(message);
+    delay(5000);
+    Serial.print("\nNew message: \"");
+    Serial.print(message);
+    Serial.println("\"");
     
-    counter -= 1;
-    if (0 > counter) counter = 10;
-  }
-  else if (millis() - timestamp >= 5000) {
-    Serial.println("Idle...");
+    LoRa_sendMessage(message);
     timestamp = millis();
+    
+    counter += 1;
+    if (100 < counter) counter = 0;
   }
 }
 
@@ -122,7 +187,7 @@ void Serial_InputHandler(void) {
       Serial.print(syncWord, HEX);
       Serial.println("\n");
     } else {
-    Serial.println("Invalid input.\n");
+      Serial.println("Invalid input.\n");
     }
   }
 }
@@ -357,14 +422,14 @@ void LoRaSettings(void) {
   }
 }
 
-void LoRa_rxMode(){
-  LoRa.enableInvertIQ();                // active invert I and Q signals
+void LoRa_rxMode() {
+  LoRa.disableInvertIQ();               // normal mode
   LoRa.receive();                       // set receive mode
 }
 
-void LoRa_txMode(){
+void LoRa_txMode() {
   LoRa.idle();                          // set standby mode
-  LoRa.disableInvertIQ();               // normal mode
+  LoRa.enableInvertIQ();                // active invert I and Q signals
 }
 
 void LoRa_sendMessage(String message) {
@@ -375,20 +440,20 @@ void LoRa_sendMessage(String message) {
 }
 
 void onReceive(int packetSize) {
-  String message = "";
+  rx_message = "";
 
   while (LoRa.available()) {
-    message += (char)LoRa.read();
+    rx_message += (char)LoRa.read();
   }
 
-  Serial.print("Node Receive: ");
-  Serial.println(message);
-
-  gatewayMessaged = true;
+  rx_timestamp = millis();
+  
+  nodeReplied = true;
 }
 
 void onTxDone() {
-  Serial.println("TxDone");
+  tx_timestamp = millis();
+//  Serial.println("TxDone");
   LoRa_rxMode();
 }
 
