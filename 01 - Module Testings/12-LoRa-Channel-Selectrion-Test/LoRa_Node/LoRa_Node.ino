@@ -35,6 +35,7 @@
 #include <LoRa.h>
 
 #define CHANNEL_FREQUENCY(CHANNEL) ((CHANNEL + 410) * 1E6)
+#define PREAMBLE_LENGTH_UPDATE(SF) (1 + (long)(111.75 + (3712 / pow(2,SF))))
 
 #define SPI2_MOSI_Pin PB15   // SPI2 MOSI pin
 #define SPI2_MISO_Pin PB14   // SPI2 MISO pin
@@ -49,8 +50,8 @@ const int csPin = PB12;    // SPI NCSS for LoRa
 const int resetPin = PA8;  // LoRa reset
 const int irqPin = PA11;   // Interrupt by LoRa
 
-int LoRaChannel = 23;
-int spreadingFactor = 12;
+int LoRaChannel = 100;
+int spreadingFactor = 9;
 long signalBandwidth = 500E3;
 int codingRate4 = 8;
 int syncWord = 0x3F;
@@ -64,7 +65,8 @@ bool new_ch = false,
      new_pl = false;
 
 String gateway_msg, reply;
-bool gatewayMessaged = false;
+bool gatewayMessaged = false,
+     messageSent = false;
 unsigned long timestamp, timestamp_lastmsg;
 
 int rx_packetRssi;
@@ -94,13 +96,43 @@ void setup() {
   LoRa.onReceive(onReceive);
   LoRa.onTxDone(onTxDone);
   LoRa_rxMode();
+
+  bool gatewayReached = false;
+  Serial.println("Node broadcasting...");
+  timestamp = millis();
+  do {
+    Serial_InputHandler();
+    if (new_ch | new_sf | new_sb | new_cr | new_sw | new_pl) {
+      LoRaSettings();
+    }
+    
+    reply = "!Node";
+    LoRa_sendMessage(reply);
+    while(!messageSent);
+
+    messageSent = false;
+    unsigned long t1 = millis();
+    while (millis() - t1 < 5000) {
+      if (gatewayMessaged) {
+        gatewayMessaged = false;
+        if (gateway_msg.equals("ok")) {
+          gatewayReached = true;
+          timestamp = millis() - timestamp;
+        }
+        break;
+      }
+    } 
+  } while (!gatewayReached);
+  Serial.print("Gateway reached after ");
+  Serial.print(timestamp);
+  Serial.println("ms");
   
   timestamp = millis();
 }
 
 void loop() {
   Serial_InputHandler();
-  if (new_ch | new_sf | new_sb | new_cr | new_sw) {
+  if (new_ch | new_sf | new_sb | new_cr | new_sw | new_pl) {
     LoRaSettings();
   }
 
@@ -468,7 +500,7 @@ void LoRaSettings(void) {
   }
   
   if (new_sf) {
-    new_sf = false;
+    new_pl = true;
     LoRa.setSpreadingFactor(spreadingFactor);
   }
 
@@ -489,6 +521,10 @@ void LoRaSettings(void) {
 
   if (new_pl) {
     new_pl = false;
+    if (new_sf) {
+      new_sf = false;
+      preambleLength = PREAMBLE_LENGTH_UPDATE(spreadingFactor);
+    }
     LoRa.setPreambleLength(preambleLength);
   }
 }
@@ -525,6 +561,7 @@ void onReceive(int packetSize) {
 }
 
 void onTxDone() {
+  messageSent = true;
   Serial.print("TxDone: \"");
   Serial.print(reply);
   Serial.print("\"\n");

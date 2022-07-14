@@ -29,16 +29,17 @@
 #include <LoRa.h>
 
 #define CHANNEL_FREQUENCY(CHANNEL) ((CHANNEL + 410) * 1E6)
+#define T_CAD_UPDATE(SF,BW)  ((unsigned long)((pow(2,SF) + 32) / (BW / 1E6)))
 
 long frequency = 433E6;   // LoRa frequency
 
-const int csPin = 5;          // SPI NCSS for LoRa
-const int resetPin = 16;      // LoRa reset
-const int irqPin = 17;        // Interrupt by LoRa
-const int preambleOutput = 4; // LoRa preamble detection output
+const int csPin = 5;            // SPI NCSS for LoRa
+const int resetPin = 16;        // LoRa reset
+const int irqPin = 17;          // Interrupt by LoRa
+const int preambleOutput = 22;  // LoRa preamble detection output
 
 int LoRaChannel = 23;
-int spreadingFactor = 12;
+int spreadingFactor = 9;
 long signalBandwidth = 500E3;
 int codingRate4 = 8;
 int syncWord = 0x3F;
@@ -53,7 +54,9 @@ bool new_ch = false,
 
 String message;
 String rx_message = "";
-bool nodeReplied = true;
+bool nodeReplied = false;
+
+unsigned long T_cad = T_CAD_UPDATE(spreadingFactor, signalBandwidth);
 
 unsigned long timestamp;
 unsigned long tx_timestamp, rx_timestamp;
@@ -72,10 +75,56 @@ void setup() {
   }
   
   Serial.println("LoRa init succeeded.");
+  pinMode(preambleOutput, INPUT);
 
   LoRa.onReceive(onReceive);
   LoRa.onTxDone(onTxDone);
   LoRa_rxMode();
+
+  bool nodeReached = false;
+  Serial.println("Finding node...");
+  timestamp = millis();
+  LoRaChannel = 0;
+  new_ch = true;
+  do {
+    Serial_InputHandler();
+    LoRaSettings();
+
+    unsigned long T_cad_start = micros();
+    while (micros() - T_cad_start < T_cad) {
+      if (digitalRead(preambleOutput)) {
+        nodeReached = true;
+      }
+    }
+
+    if (nodeReached) {
+      while (digitalRead(preambleOutput));
+      if (nodeReplied) {
+        nodeReplied = false;
+        if (rx_message.equals("!Node")) {
+          timestamp = millis() - timestamp;
+          message = "ok";
+          LoRa_sendMessage(message);
+        }
+      }
+    }
+
+    if (!message.equals("ok")) {
+      nodeReached = false;
+      new_ch = true;
+      LoRaChannel += 1;
+      if (115 < LoRaChannel) LoRaChannel = 0;
+    }
+  } while (!nodeReached);
+  Serial.print("Node found after ");
+  Serial.print(timestamp);
+  Serial.println("ms");
+
+  Serial.print("Node channel: ");
+  Serial.print(LoRaChannel);
+  Serial.print(" (");
+  Serial.print((int)(frequency/1E6));
+  Serial.println("MHz)");
 
   timestamp = millis();
 }
