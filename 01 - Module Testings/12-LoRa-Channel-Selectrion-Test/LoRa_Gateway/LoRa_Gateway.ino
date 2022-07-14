@@ -13,14 +13,15 @@
  ***
  ***      Hardware connections
  ***      ESP32    | SX1278 |  Function
- *** --------------|--------|----------------
+ *** --------------|--------|---------------------------
  ***     GPIO23    |  MOSI  | VSPI MOSI
  ***     GPIO19    |  MISO  | VSPI MISO
  ***     GPIO18    |  SCK   | VSPI CLK
  ***     GPIO5     |  NSS   | VSPI CS0
- *** --------------|--------|----------------
+ *** --------------|--------|---------------------------
  ***  GPIO16 / RX2 |  RST   | LoRa Reset
  ***  GPIO17 / TX2 |  DIO0  | EXTI from LoRa
+ ***     GPIO4     |  DIO3  | Preamble detection output
  ***/
 
 
@@ -31,9 +32,10 @@
 
 long frequency = 433E6;   // LoRa frequency
 
-const int csPin = 5;      // SPI NCSS for LoRa
-const int resetPin = 16;  // LoRa reset
-const int irqPin = 17;    // Interrupt by LoRa
+const int csPin = 5;          // SPI NCSS for LoRa
+const int resetPin = 16;      // LoRa reset
+const int irqPin = 17;        // Interrupt by LoRa
+const int preambleOutput = 4; // LoRa preamble detection output
 
 int LoRaChannel = 23;
 int spreadingFactor = 12;

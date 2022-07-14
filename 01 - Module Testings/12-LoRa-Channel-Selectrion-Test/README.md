@@ -2,14 +2,9 @@
 
 **Objective(s):** Establish a (fake) LoRa gateway and test the channel selection feature.
 
-**Additional URLs for Arduino IDE:**
-- ESP32: https://dl.espressif.com/dl/package_esp32_index.json
-- STM32: https://github.com/stm32duino/BoardManagerFiles/raw/main/package_stmicroelectronics_index.json
-
-
-**Board options:**
-- ESP32: NodeMCU-32S
-- STM32: Generic STM32F1 series - BluePill F103CB (or C8 with 128k)
+**Additional URLs for Arduino IDE and Board options:**
+- [ESP32](https://dl.espressif.com/dl/package_esp32_index.json): NodeMCU-32S
+- [STM32](https://github.com/stm32duino/BoardManagerFiles/raw/main/package_stmicroelectronics_index.json): Generic STM32F1 series - BluePill F103CB (or C8 with 128k)
 
 
 **Tools and documentation:**
@@ -31,6 +26,7 @@ The NodeMCU-ESP32 acts as the gateway, and the BluePill F103CB is the LoRa node.
 |||||
 |GPIO16 / RX2|PA8|RST|LoRa Reset|
 |GPIO17 / TX2|PA11|DIO0|EXTI from LoRa|
+|GPIO4|DIO3||Preamble detection output|
 
 **Commands:** The LoRa settings could be changed via Serial.
 
