@@ -27,21 +27,27 @@
 #include <SPI.h>
 #include <LoRa.h>
 
-const long frequency = 433E6;   // LoRa frequency
+#define CHANNEL_FREQUENCY(CHANNEL) ((CHANNEL + 410) * 1E6)
+
+long frequency = 433E6;   // LoRa frequency
 
 const int csPin = 5;      // SPI NCSS for LoRa
 const int resetPin = 16;  // LoRa reset
 const int irqPin = 17;    // Interrupt by LoRa
 
+int LoRaChannel = 23;
 int spreadingFactor = 12;
 long signalBandwidth = 500E3;
 int codingRate4 = 8;
 int syncWord = 0x3F;
+long preambleLength = 8;
 
-bool new_sf = true,
+bool new_ch = false,
+     new_sf = true,
      new_sb = true,
      new_cr = true,
-     new_sw = true;
+     new_sw = true,
+     new_pl = false;
 
 String message;
 String rx_message = "";
@@ -57,6 +63,7 @@ void setup() {
 
   // Initialize LoRa
   LoRa.setPins(csPin, resetPin, irqPin);
+  frequency = CHANNEL_FREQUENCY(LoRaChannel);
   if (!LoRa.begin(frequency)) {
     Serial.println("LoRa init failed. Check your connections.");
     while (true);                       // if failed, do nothing
@@ -75,7 +82,7 @@ void loop() {
   static int counter = 0;
 
   Serial_InputHandler();
-  if (new_sf | new_sb | new_cr | new_sw) {
+  if (new_ch | new_sf | new_sb | new_cr | new_sw) {
     LoRaSettings();
   }
   
@@ -136,9 +143,11 @@ void Serial_InputHandler(void) {
       Serial.println("Current LoRa settings:");
 
       // LoRa frequency
-      Serial.print("   + LoRa frequency: ");
+      Serial.print("   + LoRa channel: ");
+      Serial.print(LoRaChannel);
+      Serial.print(" (");
       Serial.print((int)(frequency/1E6));
-      Serial.println("MHz");
+      Serial.println("MHz)");
 
       // Spreading factor
       Serial.print("   + Spreading factor: ");
@@ -216,7 +225,37 @@ bool Input_Message_Handler(String inputString) {
   String command = inputString.substring(0, colon_index);
 
   Serial.print("  Input type: ");
-  if (command.equals("?sf")) {
+  if (command.equals("?ch")) {
+    Serial.print("LoRa channel\n  Value: ");
+    command = inputString.substring(colon_index+1, command_stop_index);
+    bool isHEX, isFloat;
+    if (isValidValue(command, &isHEX, &isFloat)) {
+      if (isHEX || isFloat) {
+        Serial.println(" (invalid - float or hex input)");
+        return false;
+      } else {
+        int value = command.toInt();
+        if ((0 <= value) && (115 >= value)) {
+          Serial.print(LoRaChannel);
+          if (LoRaChannel == value) {
+            if (new_ch) Serial.println(" (duplicated input)");
+            else Serial.println(" (unchanged)");
+          } else {
+            new_ch = true;
+            LoRaChannel = value;
+            Serial.print(" -> ");
+            Serial.println(LoRaChannel);
+          }
+        } else {
+          Serial.println(" (invalid - out of range)");
+          return false;
+        }
+      }
+    } else {
+      Serial.println(" (invalid value)");
+      return false;
+    }
+  } else if (command.equals("?sf")) {
     Serial.print("spreading factor\n  Value: ");
     command = inputString.substring(colon_index+1, command_stop_index);
     bool isHEX, isFloat;
@@ -363,6 +402,36 @@ bool Input_Message_Handler(String inputString) {
       Serial.println(" (invalid)");
       return false;
     }
+  } else if (command.equals("?pl")) {
+    Serial.print("preamble length\n  Value: ");
+    command = inputString.substring(colon_index+1, command_stop_index);
+    bool isHEX, isFloat;
+    if (isValidValue(command, &isHEX, &isFloat)) {
+      if (isHEX || isFloat) {
+        Serial.println(" (invalid - float or hex input)");
+        return false;
+      } else {
+        int value = command.toInt();
+        if ((6 <= value) && (65535 >= value)) {
+          Serial.print(preambleLength);
+          if (preambleLength == value) {
+            if (new_pl) Serial.println(" (duplicated input)");
+            else Serial.println(" (unchanged)");
+          } else {
+            new_pl = true;
+            preambleLength = value;
+            Serial.print(" -> ");
+            Serial.println(preambleLength);
+          }
+        } else {
+          Serial.println(" (invalid - out of range)");
+          return false;
+        }
+      }
+    } else {
+      Serial.println(" (invalid value)");
+      return false;
+    }
   }
 
   inputString.remove(0, command_stop_index);
@@ -377,6 +446,12 @@ bool Input_Message_Handler(String inputString) {
 }
 
 void LoRaSettings(void) {
+  if (new_ch) {
+    new_ch = false;
+    frequency = CHANNEL_FREQUENCY(LoRaChannel);
+    LoRa.setFrequency(frequency);
+  }
+  
   if (new_sf) {
     new_sf = false;
     LoRa.setSpreadingFactor(spreadingFactor);
@@ -395,6 +470,11 @@ void LoRaSettings(void) {
   if (new_sw) {
     new_sw = false;
     LoRa.setSyncWord(syncWord);
+  }
+
+  if (new_pl) {
+    new_pl = false;
+    LoRa.setPreambleLength(preambleLength);
   }
 }
 
