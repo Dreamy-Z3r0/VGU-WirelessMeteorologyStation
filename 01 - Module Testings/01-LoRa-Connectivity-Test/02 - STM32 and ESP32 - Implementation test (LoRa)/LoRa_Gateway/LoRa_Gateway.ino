@@ -449,7 +449,9 @@ void LoRaSettings(void) {
   if (new_ch) {
     new_ch = false;
     frequency = CHANNEL_FREQUENCY(LoRaChannel);
+    LoRa.sleep();
     LoRa.setFrequency(frequency);
+    LoRa_rxMode();
   }
   
   if (new_sf) {
