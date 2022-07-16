@@ -6,30 +6,54 @@ float   ADC_stepValue;      // Step value = V_ref / (2^ADC_resolution - 1)
 #define R 3.3E3
 #define input_WindVane PB1
 
+#define SAMPLE_QUANTITY 100
+
+bool samplingPeriod = false;
+uint8_t minuteCounter = 0;
+uint16_t rawData[SAMPLE_QUANTITY];
+
 float R_in_given[] = {33.1, 6.57, 8.19, 0.89, 1, 0.69, 2.19, 1.4, 3.88, 3.12, 15.98, 14.1, 119.6, 42.07, 64.9, 21.92};
 
 void setup() {
   Serial.begin(9600);
   analogReadResolution(ADC_resolution);   // Overwrite the default 10-bit resolution
   ADC_stepValue = V_ref / (pow(2,ADC_resolution)-1);
+
+  HardwareTimer *sensorRoutine = new HardwareTimer(TIM4);
+  sensorRoutine->setOverflow(1, HERTZ_FORMAT);
+  sensorRoutine->attachInterrupt(enableSensorSampling);
+  sensorRoutine->resume();
+
+  samplingPeriod = true;
 }
 
 void loop() {
-  float Vin, windDir;
-  readRawInstance(&Vin, input_WindVane);
-  WindDirectionInstance(&Vin, &windDir);
+  if (samplingPeriod) {
+    samplingPeriod = false;
+    for (uint8_t index = 0; index < SAMPLE_QUANTITY; index += 1) {
+      rawData[index] = analogRead(input_WindVane);
+    }
 
-  Serial.print("Wind direction: ");
-  Serial.print(windDir, 2);
-  Serial.println("º");
-//  Serial.println(Vin, 4);
-
-  delay(100);
+    float Vin, windDir;
+    DataFilter(&Vin);    
+    WindDirectionInstance(&Vin, &windDir);
+    
+    Serial.print("Wind direction: ");
+    Serial.print(windDir, 2);
+    Serial.println("º");
+  }
 }
 
-void readRawInstance(float* data, uint32_t inputPin) {
-  uint16_t raw = analogRead(inputPin);
-  *data = raw * ADC_stepValue;
+void enableSensorSampling(void) {
+  minuteCounter += 1;
+  if (60 == minuteCounter) {
+    minuteCounter = 0;
+    samplingPeriod = true;
+  }
+}
+
+void DataFilter(float* read_Vin) {
+  
 }
 
 void WindDirectionInstance(float* read_Vin, float* WindDirection) {
