@@ -41,13 +41,15 @@
 #define timeBetweenReadingPeriods 1  // minutes
 unsigned long idleTimeInMilliseconds;
 
-#define sampleDuration 30        // seconds per sample
+#define rawSampleQuantity 20    // number of sampling slots per sensor reading period
+#define sampleDuration 5        // seconds per sample
 uint8_t secondCounter = 0;
 
-float windSpeed;
-unsigned int rawData;
+unsigned int rawData[rawSampleQuantity];
+uint8_t rawData_index = 0;
 bool rawData_ready = false;
 
+double windSpeed;
 bool sensorReadingRequested = false;
 bool idlePeriod = false;
 
@@ -58,7 +60,7 @@ unsigned long timestamp;
 
 void setup() {
   Serial.begin(9600);
-  idleTimeInMilliseconds = timeBetweenReadingPeriods * 60E3;
+  idleTimeInMilliseconds = timeBetweenReadingPeriods * 60000;
 
   pinMode(input_Anemometer, INPUT);
 
@@ -83,7 +85,7 @@ void loop() {
   if (sensorReadingRequested) {
     sensorReadingRequested = false;  // clear request
     
-    rawData = 0;                     // reset raw data holder
+    rawData[rawData_index] = 0;      // reset raw data at array index 0
     InputRoutineTim->setCount(0);    // reset timer counter
     secondCounter = 0;               // make sure second counter starts at 0
     
@@ -112,7 +114,7 @@ void loop() {
 }
 
 void anemometerEdgeDetected(void) {
-  rawData += 1;
+  rawData[rawData_index] += 1;
 }
 
 void samplingTimeSlot() {     // time the [sampleDuration] second slot of 1 raw data
@@ -125,10 +127,24 @@ void samplingTimeSlot() {     // time the [sampleDuration] second slot of 1 raw 
     InputRoutineTim->setCount(0);   // reset timer counter
     
     secondCounter = 0;      // reset second counter
-    rawData_ready = true;   // indicates raw data is ready
+    rawData_index += 1;     // increment raw data array index
+    
+    if (rawSampleQuantity == rawData_index) {   // raw data array is full 
+      rawData_index = 0;      // reset array index
+      rawData_ready = true;   // indicates raw data array is full
+    }
+    else {
+      rawData[rawData_index] = 0;   // reset raw data holder slot
+      InputRoutineTim->resume();    // resume timer counter
+      attachInterrupt(digitalPinToInterrupt(input_Anemometer), anemometerEdgeDetected, CHANGE);   // resume sampling raw data
+    }
   }
 }
 
-void windSpeed_update(void) {   // update the wind speed value after the sampling period of [sampleDuration] seconds is over
-  windSpeed = (rawData / (3.0 * sampleDuration));
+void windSpeed_update(void) {   // update the wind speed value after the total sampling period of [rawSampleQuantity] * [sampleDuration] seconds is over
+  windSpeed = 0;
+  for (uint8_t i = 0; i < rawSampleQuantity; i += 1) {    // take the sum of [sampleDuration]-second wind speed values from raw data
+    windSpeed += (rawData[i] / (3.0 * sampleDuration));
+  }
+  windSpeed /= rawSampleQuantity;   // take the mean value of wind speed over the [rawSampleQuantity] samples
 }
