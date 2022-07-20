@@ -23,13 +23,16 @@
  *** Note: DS3231M belongs to the DS3231 family. However, it    ***
  ***       lacks temperature compensation, thus unreliable time ***
  ***       data produced. Therefore, this RTC IC branch may be  ***
- ***       suggested for software testing at early stages only. ***
+ ***       suggested for software testing at early stages of    ***
+ ***       the project only.                                    ***
  ******************************************************************
  ******************************************************************/
  
 
 #include <Wire.h>
 #include <DS3231.h>
+
+#define AlarmInput PB8
 
 bool readRTC_control_flag = false;  // true every 1 second to request a date-time reading from the RTC
 
@@ -61,10 +64,22 @@ void setup() {
   Serial.begin(9600);
   Wire.begin();
 
+  pinMode(AlarmInput, INPUT_PULLUP);
+
+  DS3231 clock;
+  clock.setA1Time(1, 1, 0, 0, 0xE, false, false, false);
+  clock.turnOnAlarm(1);
+
+  if (!digitalRead(AlarmInput)) {
+    clock.checkIfAlarm(1);
+  }
+
   HardwareTimer *fetch_RTC = new HardwareTimer(TIM4);
   fetch_RTC->setOverflow(1, HERTZ_FORMAT);  // callback runs every 1 second
   fetch_RTC->attachInterrupt(std::bind(request_from_RTC, &readRTC_control_flag));
   fetch_RTC->resume();
+
+  attachInterrupt(digitalPinToInterrupt(AlarmInput), Alarm_Callback, FALLING);
 
   readRTC(RTC_data);
 }
@@ -296,4 +311,18 @@ void update_RTC(int* newData, int type) {
 
 void request_from_RTC(bool* controlFlag) {
   *controlFlag = true;
+}
+
+void Alarm_Callback(void) {
+  Serial.print("Alarm!");
+  
+  DS3231 alarm;
+  bool alarm_1 = alarm.checkIfAlarm(1);
+
+  if (alarm_1) {
+    Serial.println(" It's alarm 1!");
+  }
+  else {
+    Serial.println("");
+  }
 }
