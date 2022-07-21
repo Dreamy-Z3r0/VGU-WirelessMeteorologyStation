@@ -36,6 +36,8 @@ double Rainfall_Data;
 bool RainGauge_DailyAlarm;
 
 void setup() {
+  Serial.begin(9600);
+  while (!Serial);
   Wire.begin();   // Starting I2C
   
   pinMode(AlarmInput, INPUT_PULLUP);    // Initialize alarm pin
@@ -43,7 +45,6 @@ void setup() {
   DS3231 clock;
   clock.setA1Time(1, 9, 0, 0, 0x8, false, false, false);    // Set up daily alarm at 9 am sharp
   clock.turnOnAlarm(1);     // Enable alarm 1
-  clock.turnOffAlarm(2);    // Make sure only alarm 1 could enable interrupt
 
   if (!digitalRead(AlarmInput)) {   // Make sure there is no alarm present initially
     clock.checkIfAlarm(1);
@@ -51,11 +52,11 @@ void setup() {
 
   attachInterrupt(digitalPinToInterrupt(AlarmInput), Alarm_Callback, FALLING);    // Enable interrupt from alarm
   
-  pinMode(input_RainGauge, INPUT);  // Initialize rain gauge input
+  pinMode(input_RainGauge, INPUT_PULLUP);  // Initialize rain gauge input
   attachInterrupt(digitalPinToInterrupt(input_RainGauge), RainGauge_Tipping_Callback, FALLING);   // Routine on a bucket tip
 }
 
-void loop() {
+void loop() {   
   if (RainGauge_DailyAlarm) {
     unsigned long Lastest_Record = Daily_Counter;   // Store Daily_Counter to a temporary variable to reset it
     Daily_Counter = 0;                              // for the next daily count in case it's still counting.
