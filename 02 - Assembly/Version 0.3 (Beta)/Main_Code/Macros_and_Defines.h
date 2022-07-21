@@ -13,12 +13,6 @@
 
 bool newLine = false;
 
-// SPI
-#define default_MOSI_Pin PB15   // Re-define SPI MOSI pin
-#define default_MISO_Pin PB14   // Re-define SPI MISO pin
-#define default_SCLK_Pin PB13   // Re-define SPI SCLK pin
-#define default_SSEL_Pin PB12   // Re-define SPI SSEL pin
-
 
 /********************************
  *** SD card's requirement(s) ***

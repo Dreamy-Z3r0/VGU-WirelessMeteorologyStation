@@ -6,11 +6,6 @@ void setup() {
   Serial.begin(BAUD_RATE);
   #endif
 
-  SPI.setMOSI(default_MOSI_Pin);
-  SPI.setMISO(default_MISO_Pin);
-  SPI.setSCLK(default_SCLK_Pin);
-  SPI.setSSEL(default_SSEL_Pin);
-
   Wire.begin();
 
 //  pinMode(SD_CS_Pin, OUTPUT);
