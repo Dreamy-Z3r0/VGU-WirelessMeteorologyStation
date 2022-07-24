@@ -13,10 +13,12 @@ void setup() {
 //    return;     // do nothing more
 //  }
 
+  delay(10);
   if (!bme280.begin()) {
     Serial.println("Problem initializing BME280.");
     return;
   }
+  delay(20);
 
   HardwareTimer *fetch_RTC = new HardwareTimer(TIM4);
   fetch_RTC->setOverflow(1, HERTZ_FORMAT);  // callback runs every 1 second
@@ -30,7 +32,6 @@ void setup() {
   BME280_Device.new_FilterCoefficient(Adafruit_BME280::FILTER_X16);
   
   BME280_Device.update_BME280_settings();
-  startup_timestamp = millis();
 }
 
 void loop() {
@@ -40,15 +41,6 @@ void loop() {
     BME280_Device.set_readFlag();
     DateTime_Display();
   }
-  
-  #ifdef BME280_starting
-  if (20 <= (millis() - startup_timestamp)) {
-    #undef BME280_starting
-  } else if (BME280_Device.is_readFlag_set()) {
-    BME280_Device.clear_readFlag();
-    Serial.println("     BME280 is in startup period...\n");
-  }
-  #endif
   
   BME280_Update();
 }
