@@ -1,27 +1,38 @@
 #include "Wind_Monitoring.h"
 
+uint16_t ADC_MAX_VALUE = (12 == ADC_resolution ? 4095 : 1023);
+
+float Vcc = 3.3,      // Initial value for Vcc
+      AVref = 3.3;    // Initial value for AVref
 
 void read_Wind_Direction(float* V_in, float* R_in, float* windDir, uint32_t ADC_input_pin) {
-  read_raw_ADC(raw_data, ADC_input_pin, numberOfDataPoints);    // Take ADC samples
-  RawDataProcessing(raw_data, V_in, numberOfDataPoints);        // Process raw data: digital filter -> take mean value -> 
+  uint16_t *raw_data = new uint16_t[numberOfDataPoints];
   
+  read_raw_ADC(raw_data, ADC_input_pin, numberOfDataPoints);    // Take ADC samples
+  RawDataProcessing(raw_data, V_in, numberOfDataPoints);        // Process raw data: digital filter -> reconstruct voltage signal -> take mean voltage value
+  WindDirectionInstance(R_in, V_in, windDir);
+
+  delete[] raw_data;
 }
 
 void read_raw_ADC(uint16_t* storage, uint32_t ADC_input_pin, unsigned int storage_size) {
+  AVref = (VREFINT * (ADC_MAX_VALUE+1) / analogRead(AVREF)) / 1000.0;   // Take the AVref
+  
   for (unsigned int i = 0; i < storage_size; i += 1) {
     storage[i] = analogRead(ADC_input_pin);
   }
 }
 
 void RawDataProcessing(uint16_t* raw_data, float* voltage_output, unsigned int InputQuantity) {
+  float reconstructed_signal;
+  
   IIR_Filter(raw_data, InputQuantity);    // Apply IIR filter direct form I for raw ADC values
 
-  float *reconstructed_signals[
-  for (unsigned int i = 0; i < InputQuantity; i += 1) {   // Take mean value
-    mean_rawData += (raw_data[i] / (1.0 * InputQuantity));
+  *voltage_output = 0;
+  for (unsigned int i = 0; i < InputQuantity; i += 1) {   
+    reconstructed_signal = (float)((AVref * raw_data[i]) / ADC_MAX_VALUE);    // Reconstruct voltage signal from each filtered ADC input
+    *voltage_output += reconstructed_signal / InputQuantity;    // Take mean value of reconstructed voltage signals
   }
-
-  *voltage_output = (float)((AVref * mean_rawData) / (pow(2, ADC_resolution) - 1));   // Convert from mean filtered ADC data to voltage
 }
 
 void WindDirectionInstance(float* R_in, float* V_in, float* windDir) {
@@ -54,7 +65,7 @@ void IIR_Filter(uint16_t* data, unsigned int storage_size) {
          a1 = 0.92218606833315153;
 
   uint16_t x = 0, y = 0;    // x[n-1] and y[n-1] 
-  for (unsigned int i = 0; i < arraySize; i += 1) {
+  for (unsigned int i = 0; i < storage_size; i += 1) {
     uint16_t x_temp = data[i];    // Save the value for x[n-1]
     data[i] = (uint16_t)(b0*x_temp + b1*x - a1*y);
 

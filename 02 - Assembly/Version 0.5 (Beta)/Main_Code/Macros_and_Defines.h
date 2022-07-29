@@ -68,10 +68,7 @@ bool DS18B20_readFlag = false;    // set "true" to request a data reading from t
 
 #define input_WindVane PB1
 
-#define SAMPLE_QUANTITY 100
-
-uint16_t rawData[SAMPLE_QUANTITY];
-float R, Vin, windDir;
+float Vin, windDir;
 
 bool WindVane_sampling = false;
 bool WindVane_readFlag = false;
