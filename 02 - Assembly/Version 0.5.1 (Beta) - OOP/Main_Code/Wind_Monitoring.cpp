@@ -66,7 +66,7 @@ void WindVane_Control::WindDirectionInstance(void) {
 }
 
 void WindVane_Control::IIR_Filter(uint16_t* data) {
-  // IIR Filter direct form I
+  // IIR Filter direct form I output function:
   //    y[n] = (b0 * x[n] + b1 * x[n-1] + b2 * x[n-2]) - (a1 * y[n-1] + a2 * y[n-2])
   //
   // Since b2 = 0 and a2 = 0 by design, x[n-2] and y[n-2] are removed from the implementation:
