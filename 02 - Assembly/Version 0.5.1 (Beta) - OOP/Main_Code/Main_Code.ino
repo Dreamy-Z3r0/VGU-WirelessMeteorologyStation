@@ -8,7 +8,7 @@ void setup() {
 
   Wire.begin();
   RainGauge.init(RainGauge_InputPin, Alarm_InputPin);
-  RainGauge.set_DailyAlarm(12, 14, 45);
+//  RainGauge.set_DailyAlarm(12, 14, 45);
 
   delay(2);
   if (!bme280.begin()) {
