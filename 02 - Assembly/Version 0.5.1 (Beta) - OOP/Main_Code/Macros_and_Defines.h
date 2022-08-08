@@ -48,3 +48,10 @@ DS18B20_Control DS18B20_Device(OneWireBus);
  ******************/
 #define RainGauge_InputPin PA1
 Precipitation RainGauge;
+
+
+/*****************
+ *** Wind vane ***
+ *****************/
+#define WindVane_InputPin PB1
+WindVane_Control WindVane(WindVane_InputPin);

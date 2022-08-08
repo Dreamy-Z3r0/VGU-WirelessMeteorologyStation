@@ -39,8 +39,10 @@ void loop() {
   DateTime_InputHandler();
   
   if (RTC_DS3231.is_RTC_requested()) {
+    unsigned long elapsed_time = micros();
     DS18B20_Device.set_readFlag();
     BME280_Device.set_readFlag();
+    WindVane.set_readFlag();
     DateTime_Display();
   
     if (RainGauge.is_DailyAlarm_available()) {
@@ -52,17 +54,24 @@ void loop() {
       Serial.println(" mm");
       #endif
     }
-  }
-  
-  DS18B20_Update();
-  BME280_Update();
 
-  #ifdef DEBUGGING_OVER_SERIAL 
-  if (newLine) {
-    Serial.println("");
-    newLine = false;
+    DS18B20_Update();
+    BME280_Update();
+    WindVane_Update();
+
+    elapsed_time = micros() - elapsed_time;
+
+    #ifdef DEBUGGING_OVER_SERIAL 
+    Serial.print("  Elapsed time: ");
+    Serial.print(elapsed_time);
+    Serial.println(" us");
+    
+    if (newLine) {
+      Serial.println("");
+      newLine = false;
+    }
+    #endif
   }
-  #endif
 }
 
 void DateTime_InputHandler() {
@@ -219,5 +228,22 @@ void BME280_Update() {
     // Add an empty line for visual purpose
     newLine = true;
     #endif
+  }
+}
+
+void WindVane_Update() {
+  if (WindVane.is_readFlag_set()) {
+    // Print sensor values
+    #ifdef DEBUGGING_OVER_SERIAL
+
+    Serial.print("     Wind direction = ");      // Print wind direction
+    Serial.print(WindVane.read_Wind_Direction(), 1);
+    Serial.println("º");
+
+    // Add an empty line for visual purpose
+    newLine = true;
+    #endif
+    
+    WindVane.clear_readFlag();
   }
 }

@@ -21,4 +21,4 @@
 #include "RTC.h"
 #include "Thermometer_Hygrometer_Barometer.h"
 #include "Precipitation.h"
-#include "Wind_Monitoring.h"
+#include "Wind_Vane.h"

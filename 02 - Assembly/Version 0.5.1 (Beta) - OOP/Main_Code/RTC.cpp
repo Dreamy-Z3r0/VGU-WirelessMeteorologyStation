@@ -1,5 +1,7 @@
 #include "RTC.h"
 
+uint8_t counter = 0;
+
 
 DS3231_Control::DS3231_Control() {
   readRTC_control_flag = false;
@@ -173,5 +175,10 @@ void DS3231_Control::clearRTC_request(void) {
 
 
 void request_from_RTC(DS3231_Control* RTC_DS3231) {
-  RTC_DS3231->request_from_RTC();
+  counter += 1;
+
+  if (5 == counter) {
+    counter = 0;
+    RTC_DS3231->request_from_RTC();
+  }
 }
