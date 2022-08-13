@@ -10,6 +10,7 @@ void setup() {
 
   Wire.begin();
   RainGauge.init(RainGauge_InputPin, Alarm_InputPin);
+  Anemometer_Device.Init();
 //  RainGauge.set_DailyAlarm(12, 14, 45);
 
   delay(2);
@@ -46,10 +47,7 @@ void loop() {
     BME280_Device.set_readFlag();
     WindVane.set_readFlag();
     
-    if (Anemometer_Device.is_idle() && (!Anemometer_Device.is_readFlag_set())) {
-      Anemometer_Device.set_readFlag();
-      anemometer_read = false;
-    }
+    
     
     DateTime_Display();
   }
@@ -250,31 +248,5 @@ void WindVane_Update() {
 }
 
 void Anemometer_Update() {
-  if (Anemometer_Device.is_readFlag_set()) {
-    Anemometer_Device.read_Wind_Speed();
-    Anemometer_Device.clear_readFlag();
-  }
   
-  if (Anemometer_Device.is_idle() && (!anemometer_read)) {
-    anemometer_read = true;
-    
-    float windSpeed = Anemometer_Device.get_Wind_Speed();
-    // Print sensor values
-    #ifdef DEBUGGING_OVER_SERIAL
-
-    if (0 <= windSpeed) {
-      Serial.print("     Wind speed = ");      // Print wind direction
-      Serial.print(windSpeed, 2);
-      Serial.print(" km/h - ");
-      Serial.print(KMPH_TO_MPS(windSpeed), 2);
-      Serial.println(" m/s - ");
-    }
-    else {
-      Serial.println("     Error detected.");
-    }
-
-    // Add an empty line for visual purpose
-    newLine = true;
-    #endif 
-  }
 }

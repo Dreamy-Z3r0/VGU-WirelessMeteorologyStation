@@ -12,36 +12,39 @@
 
 class Anemometer_Control {
   public:
-    unsigned long overflow_counter;
-  
-    Anemometer_Control(uint32_t Input_Pin, TIM_TypeDef *Instance_TIM = TIM1);
-    void Init(void);
+    Anemometer_Control(uint32_t Input_Pin);
 
-    void read_Wind_Speed(void);
-    void Anemometer_Input_Routine(void);
+    void Init(TIM_TypeDef* EdgePeriodTimer_Instance = TIM1, TIM_TypeDef* CalmAirTimer_Instance = TIM2);
 
-    float get_Wind_Speed(void);
+    void Anemometer_Reading_Routine(void);
 
-    void set_readFlag(void);
-    bool is_readFlag_set(void);
-    void clear_readFlag(void);
-
-    bool is_idle(void);
-
+    void Timer_Callback(HardwareTimer* OverflownTimer);
+    void Input_Callback(void);
+    
   private:
     uint32_t Input_Pin;
-    HardwareTimer *InputRoutineTim;
+    unsigned long idleTimeInMilliseconds;
     
-    bool readFlag, ongoingMeasurement, endOfMeasurement;
+    HardwareTimer* EdgePeriodTimer;
+    HardwareTimer* CalmAirTimer;
+    
+    bool idlePeriod, readFlag;
+    bool isTakingFirstEdge, isSecondEdgeDetected;
+    bool CalmAir;
 
-    float windSpeed;
-    bool idlePeriod, calmAir;
-    unsigned long Sampling_Window_Tracker;
+    unsigned long EdgeTiming_Overflow;
+    uint8_t CalmAirTiming_Overflow,
+            CalmAirTiming_MaxValue;
 
-    void Calm_Air_Detection(void);
-    void Initiate_Data_Point_Read(void);
-    void End_Of_Sampling_Window_Routine(float* windSpeed, uint8_t* arrayIndex);
+    float windSpeed[dataPointsPerMeasurement];
+    uint8_t arr_index;
+
+    uint8_t fault_count;
+
+    float meanWindSpeed;
+
+    void Initialise_New_Timing_Period(void);
 };
 
-void TIM_Ovf_callback(Anemometer_Control* Anemometer_Instance);
+void TIM_Ovf_callback(Anemometer_Control* Anemometer_Instance, HardwareTimer* OverflownTimer);
 void anemometerInput_Detected(Anemometer_Control* Anemometer_Instance);

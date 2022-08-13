@@ -61,5 +61,4 @@ WindVane_Control WindVane(WindVane_InputPin);
  *** Anemometer ***
  ******************/
 #define Anemometer_InputPin PA3
-TIM_TypeDef *Instance_TIM1 = TIM1;
-Anemometer_Control Anemometer_Device(Anemometer_InputPin, Instance_TIM1);
+Anemometer_Control Anemometer_Device(Anemometer_InputPin);
