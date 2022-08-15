@@ -3,7 +3,7 @@
 #define AVG_SLOPE 4300
 #define VREFINT   1200
 
-#define ADC_input PA7
+#define ADC_input PB1
 
 unsigned long NumberOfPoints = 100;
 bool ADC_12bit = true;

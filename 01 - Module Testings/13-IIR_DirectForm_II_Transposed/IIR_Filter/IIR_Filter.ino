@@ -4,7 +4,7 @@
 #define VREFINT   1200
 #define ADC_RANGE 4096
 
-#define ADC_Input PA7
+#define ADC_Input PB1
 #define numberOfDataPoints 50
 
 float AVref = 3.3;
@@ -151,8 +151,8 @@ void voltage_conversion(uint16_t* ADC_arr, float* voltage_arr, uint8_t arraySize
 
 void print_ADC(uint16_t* ADC_arr, uint8_t arraySize) {
   for (uint8_t i = 0; i < arraySize; i += 1) {
-    Serial.print(ADC_arr[i]);
-    Serial.print(" ");
+    Serial.println(ADC_arr[i]);
+//    Serial.print(" ");
   }
   Serial.println();
 }
