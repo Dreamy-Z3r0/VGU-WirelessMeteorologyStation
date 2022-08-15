@@ -1,7 +1,7 @@
 #include "Libraries.h"
 #include "Macros_and_Defines.h"
 
-bool anemometer_read = false;
+bool Print_WindSpeed = false;
 
 void setup() {
   #ifdef DEBUGGING_OVER_SERIAL
@@ -25,12 +25,12 @@ void setup() {
   BME280_Device.new_SensorMode(Adafruit_BME280::MODE_NORMAL);
   BME280_Device.new_TemperatureOversampling(Adafruit_BME280::SAMPLING_X2);
   BME280_Device.new_PressureOversampling(Adafruit_BME280::SAMPLING_X16);
-  BME280_Device.new_HumidityOversampling(Adafruit_BME280::SAMPLING_X16);
+  BME280_Device.new_HumidityOversampling(Adafruit_BME280::SAMPLING_X1);
   BME280_Device.new_FilterCoefficient(Adafruit_BME280::FILTER_X16);
   
   BME280_Device.update_BME280_settings();
 
-  DS18B20_Device.update_DS18B20_settings(R_9BIT);
+//  DS18B20_Device.update_DS18B20_settings(R_9BIT);
 
   HardwareTimer *fetch_RTC = new HardwareTimer(TIM4);
   fetch_RTC->setOverflow(1, HERTZ_FORMAT);  // callback runs every 1 second
@@ -47,9 +47,12 @@ void loop() {
     BME280_Device.set_readFlag();
     WindVane.set_readFlag();
     
-    
+    if (!Anemometer_Device.is_readFlag_set() && Anemometer_Device.is_idlePeriod()) {
+      Anemometer_Device.set_readFlag();
+    }
     
     DateTime_Display();
+    Print_WindSpeed = true;
   }
   
   if (RainGauge.is_DailyAlarm_available()) {
@@ -248,5 +251,20 @@ void WindVane_Update() {
 }
 
 void Anemometer_Update() {
+  Anemometer_Device.Anemometer_Reading_Routine();
+
+  if (Print_WindSpeed) {
+    Print_WindSpeed = false;
+
+    #ifdef DEBUGGING_OVER_SERIAL
+
+    Serial.print("     Wind speed = ");      // Print wind speed
+    Serial.print(Anemometer_Device.read_Wind_Speed(), 2);
+    Serial.println(" km/h");
   
+    // Add an empty line for visual purpose
+    newLine = true;
+  
+    #endif
+  }
 }

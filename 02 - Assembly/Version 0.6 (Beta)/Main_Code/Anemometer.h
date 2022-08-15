@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include "stdint.h"
 
+#define NOP __asm__ __volatile__ ("nop\n\t")
+
 #define KMPH_TO_MPS(KMPH) (KMPH / 3.6)
 #define KMPH_TO_MPH(KMPH) (KMPH / 1.609344)
 
@@ -17,6 +19,13 @@ class Anemometer_Control {
     void Init(TIM_TypeDef* EdgePeriodTimer_Instance = TIM1, TIM_TypeDef* CalmAirTimer_Instance = TIM2);
 
     void Anemometer_Reading_Routine(void);
+    float read_Wind_Speed(void);
+
+    void set_readFlag(void);
+    bool is_readFlag_set(void);
+    void clear_readFlag(void);
+
+    bool is_idlePeriod(void);
 
     void Timer_Callback(HardwareTimer* OverflownTimer);
     void Input_Callback(void);
@@ -40,10 +49,11 @@ class Anemometer_Control {
     uint8_t arr_index;
 
     uint8_t fault_count;
-
     float meanWindSpeed;
 
     void Initialise_New_Timing_Period(void);
+    void WindSpeed_Array_Update_Routine(void);
+    void WindSpeed_MeanValue_Update_Routine(void);
 };
 
 void TIM_Ovf_callback(Anemometer_Control* Anemometer_Instance, HardwareTimer* OverflownTimer);

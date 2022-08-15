@@ -37,6 +37,16 @@ void Anemometer_Control::Init(TIM_TypeDef* EdgePeriodTimer_Instance, TIM_TypeDef
   readFlag = true;
 }
 
+void Anemometer_Control::Anemometer_Reading_Routine(void) {
+  if (readFlag && idlePeriod) {   // A new reading routine begins
+    idlePeriod = false;
+    arr_index = 0;
+    fault_count = 0;
+
+    Initialise_New_Timing_Period();
+  }
+}
+
 void Anemometer_Control::Initialise_New_Timing_Period(void) {
   isTakingFirstEdge = true;
   isSecondEdgeDetected = false;
@@ -52,54 +62,69 @@ void Anemometer_Control::Initialise_New_Timing_Period(void) {
   CalmAirTimer->resume();
 }
 
-void Anemometer_Control::Anemometer_Reading_Routine(void) {
-  if (readFlag) {
-    if (idlePeriod) {   // A new reading routine begins
-      idlePeriod = false;
-      fault_count = 0;
-
-      Initialise_New_Timing_Period();
-    }
-    else {
-      if ((!isTakingFirstEdge) && isSecondEdgeDetected) {
-        if (CalmAir) {
-          windSpeed[arr_index] = 0;
-        }
-        else {
-          float measured_input_frequency;
-          measured_input_frequency = 1 / ((EdgePeriodTimer->getCount(MICROSEC_FORMAT) * 1E-6) + (EdgeTiming_Overflow * 10E-3));
+void Anemometer_Control::WindSpeed_Array_Update_Routine(void) {
+  if (CalmAir) {
+    windSpeed[arr_index] = 0;
+  }
+  else {
+    float measured_input_frequency;
+    measured_input_frequency = 1 / ((EdgePeriodTimer->getCount(MICROSEC_FORMAT) * 1E-6) + (EdgeTiming_Overflow * 10E-3));
           
-          windSpeed[arr_index] = measured_input_frequency * 2.4;
-          if (maxKnown_windSpeed < windSpeed[arr_index]) {
-            windSpeed[arr_index] = 0;
-            fault_count += 1;
-          }
-        }
-
-        arr_index += 1;
-        if (dataPointsPerMeasurement == arr_index) {
-          if (fault_count < dataPointsPerMeasurement) {
-            // Calculate mean wind speed
-            meanWindSpeed = 0;
-            uint8_t denominator = dataPointsPerMeasurement - fault_count;
-            for (arr_index = 0; arr_index < dataPointsPerMeasurement; arr_index += 1) {
-              meanWindSpeed += (windSpeed[arr_index] / denominator);
-            }
-
-            // Update new wind speed timestamp
-            // -> do it here <-
-          }
-
-          // End of the reading routine
-          readFlag = false;
-          idlePeriod = true;
-        }
-        else {
-          Initialise_New_Timing_Period();
-        }
-      }
+    windSpeed[arr_index] = measured_input_frequency * 2.4;
+    if (maxKnown_windSpeed < windSpeed[arr_index]) {
+      windSpeed[arr_index] = 0;
+      fault_count += 1;
     }
   }
+
+  arr_index += 1;
+  if (dataPointsPerMeasurement == arr_index) {
+    WindSpeed_MeanValue_Update_Routine();
+  }
+  else {
+    Initialise_New_Timing_Period();
+  }
+}
+
+void Anemometer_Control::WindSpeed_MeanValue_Update_Routine(void) {
+  if (fault_count < dataPointsPerMeasurement) {
+    // Calculate mean wind speed
+    meanWindSpeed = 0;
+    uint8_t denominator = dataPointsPerMeasurement - fault_count;
+    for (arr_index = 0; arr_index < dataPointsPerMeasurement; arr_index += 1) {
+      meanWindSpeed += (windSpeed[arr_index] / denominator);
+    }
+
+    // Update new wind speed timestamp
+    // -> do it here <-
+  }
+  else {
+    NOP;
+  }
+
+  // End of the reading routine
+  readFlag = false;
+  idlePeriod = true;
+}
+
+float Anemometer_Control::read_Wind_Speed(void) {
+  return meanWindSpeed;
+}
+
+void Anemometer_Control::set_readFlag(void) {
+  readFlag = true;
+}
+
+bool Anemometer_Control::is_readFlag_set(void) {
+  return readFlag;
+}
+
+void Anemometer_Control::clear_readFlag(void) {
+  readFlag = false;
+}
+
+bool Anemometer_Control::is_idlePeriod(void) {
+  return idlePeriod;
 }
 
 void Anemometer_Control::Timer_Callback(HardwareTimer* OverflownTimer) {
@@ -124,6 +149,8 @@ void Anemometer_Control::Timer_Callback(HardwareTimer* OverflownTimer) {
       isTakingFirstEdge = false;
       isSecondEdgeDetected = true;
       CalmAir = true;
+
+      WindSpeed_Array_Update_Routine();
     }
   }
 }
@@ -138,6 +165,8 @@ void Anemometer_Control::Input_Callback(void) {
     isSecondEdgeDetected = true;      // 2 edges timed
     
     CalmAir = false;    // Fail-safe only
+
+    WindSpeed_Array_Update_Routine();
   }
   else {   
     CalmAirTimer->setCount(0);    // Reset CalmAir timer
