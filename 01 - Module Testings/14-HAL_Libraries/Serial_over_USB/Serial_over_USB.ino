@@ -10,9 +10,18 @@
 
 void setup() {
   Serial.begin(9600);
+  while (!Serial);
+
+  pinMode(PC13, OUTPUT);
 }
 
 void loop() {
-  Serial.printf("Hello world!\n");
+  static bool LED_STATE = false;
+  
+  Serial.println("Hello world!");
+
+  digitalWrite(PC13, LED_STATE);
+  LED_STATE = !LED_STATE;
+  
   HAL_Delay(1000);
 }
