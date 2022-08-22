@@ -17,7 +17,7 @@ Test results:
       <th colspan=5>ADC sampling rates by mode<br/>(buffer_size = 50, Code-based sampling rate = 1.5 cycles></th>
     <tr>
     <tr>
-      <th colspan=2></th>
+      <th colspan=2>Test mode</th>
       <th>Read time</th>
       <th colspan=2>Sampling rate</th>
     </tr>
