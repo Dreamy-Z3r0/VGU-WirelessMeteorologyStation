@@ -21,7 +21,7 @@ Test results:
   </thead>
   <tbody>
     <tr>
-      <td colspan=2>Arduino API<br/>analogRead()</td>
+      <td colspan=2>Arduino API: analogRead()</td>
       <td>3.80 ms</td>
       <td>75.96 us/sample</td>
       <td>13.1648 kHz</td>
