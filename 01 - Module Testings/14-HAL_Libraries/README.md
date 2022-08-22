@@ -10,9 +10,12 @@ Test sequence:
 
 Test results:
 
+<br/>
 <table>
-  <caption>ADC sampling rates by mode<br/>(buffer_size = 50, Code-based sampling rate = 1.5 cycles></caption>
   <thead>
+    <tr>
+      <th colspan=5>ADC sampling rates by mode<br/>(buffer_size = 50, Code-based sampling rate = 1.5 cycles></th>
+    <tr>
     <tr>
       <th colspan=2></th>
       <th>Read time</th>
@@ -48,10 +51,12 @@ Test results:
   </tbody>
 </table>
 
-
+<br/>
 <table>
-  <caption>ADC sampling rates in non-blocking mode with DMA (buffer_size = 50)</caption>
   <thead>
+    <tr>
+      <th colspan=4>ADC sampling rates in non-blocking mode with DMA (buffer_size = 50)</th>
+    </tr>
     <tr>
       <th rowspan=2>Code-based sampling rate<br \>(cycles)</th>
       <th rowspan=2>Read time<br \>(us)</th>
