@@ -9,6 +9,7 @@ void setup() {
   #endif
 
   Wire.begin();
+  WindVane.init();
   RainGauge.init(RainGauge_InputPin, Alarm_InputPin);
   Anemometer_Device.init();
 //  RainGauge.set_DailyAlarm(12, 14, 45);
@@ -22,7 +23,7 @@ void setup() {
   }
   delay(20);
 
-  BME280_Device.new_SensorMode(Adafruit_BME280::MODE_NORMAL);
+  BME280_Device.new_SensorMode(Adafruit_BME280::MODE_FORCED);
   BME280_Device.new_TemperatureOversampling(Adafruit_BME280::SAMPLING_X2);
   BME280_Device.new_PressureOversampling(Adafruit_BME280::SAMPLING_X16);
   BME280_Device.new_HumidityOversampling(Adafruit_BME280::SAMPLING_X1);
@@ -215,17 +216,14 @@ void BME280_Update() {
     // Print sensor values
     #ifdef DEBUGGING_OVER_SERIAL
 
-    Serial.print("     Ambient temperature = ");      // Print temperature
-    Serial.print(BME280_Device.get_Temperature());
-    Serial.println(" ºC (BME280)");
+    // Print temperature
+    Serial.printf("     Ambient temperature = %.2f ºC (BME280)\n", BME280_Device.get_Temperature());    
 
-    Serial.print("     Relative humidity = ");        // Print humidity
-    Serial.print(BME280_Device.get_Humidity());
-    Serial.println(" %RH");
-      
-    Serial.print("     Atmospheric pressure = ");     // Print barometric pressure
-    Serial.print(BME280_Device.get_Pressure());
-    Serial.println(" hPa");
+    // Print humidity  
+    Serial.printf("     Relative humidity = %.2f %%RH\n", BME280_Device.get_Humidity());       
+
+    // Print barometric pressure 
+    Serial.printf("     Atmospheric pressure = %.2f hPa\n", BME280_Device.get_Pressure());     
 
     // Add an empty line for visual purpose
     newLine = true;
@@ -236,18 +234,21 @@ void BME280_Update() {
 void WindVane_Update() {
   if (WindVane.is_readFlag_set()) {
     WindVane.Wind_Direction_Reading_Routine();
-    WindVane.clear_readFlag();
-    
-    // Print sensor values
-    #ifdef DEBUGGING_OVER_SERIAL
 
-    Serial.print("     Wind direction = ");      // Print wind direction
-    Serial.print(WindVane.read_Wind_Direction(), 1);
-    Serial.println("º");
+    if (WindVane.is_Data_Ready()) {
+      WindVane.clear_readFlag();
+      
+      // Print sensor values
+      #ifdef DEBUGGING_OVER_SERIAL
+   
+      Serial.printf("     Wind direction = %.1f ", WindVane.read_Wind_Direction());  // Print wind direction
+      Serial.print("°");
+      Serial.println();
 
-    // Add an empty line for visual purpose
-    newLine = true;
-    #endif
+      // Add an empty line for visual purpose
+      newLine = true;
+      #endif
+    }
   }
 }
 
