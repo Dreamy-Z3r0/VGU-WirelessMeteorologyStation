@@ -128,7 +128,7 @@ void WindVane_Control::rawData_to_voltage(uint16_t* raw_data, float* voltage) {
 }
 
 // Apply IIR filter and take the mean value of the filtered data
-float WindVane_Control::IIR_Mean(float* data) {
+float WindVane_Control::IIR_Mean(float* x) {
   // IIR Filter direct form I output function:
   //    y[n] = (b0 * x[n] + b1 * x[n-1] + b2 * x[n-2]) - (a1 * y[n-1] + a2 * y[n-2])
   //
@@ -139,18 +139,40 @@ float WindVane_Control::IIR_Mean(float* data) {
   
   double b0 = 1,
          b1 = 1, 
-         a1 = 0.99919607551456557000;
+         b2 = 0,        
+         a1 = 0.99919607551456557000,
+         a2 = 0;         
 
-  float x = 0, y = 0;    // x[n-1] and y[n-1] 
-  for (unsigned int i = 0; i < storage_size; i += 1) {
-    float x_temp = data[i];    // Save the value for x[n-1]
-    data[i] = (float)(b0*x_temp + b1*x - a1*y);
+  float y,        // y[n]
+        y1 = 0,   // y[n-1]
+        y2 = 0;   // y[n-2]
+        
+  // for (unsigned int n = 0; n < storage_size; n += 1) {
+  //   float x1 = ((n >= 1) ? x[n-1] : 0);
+  //   float x2 = ((n >= 2) ? x[n-2] : 0);
+    
+  //   y = (float)(b0*x[n] + b1*x1 + b2*x2 - (a1*y1 + a2*y2));
 
-    x = x_temp;
-    y = data[i];
+  //   y2 = y1;
+  //   y1 = y;  
+                                                                                                
+  //   output += (y / storage_size);
+  // }
 
-    output += (data[i] / storage_size);
-  }
+  unsigned int n = 0;  
+  do {
+    float x1 = ((n >= 1) ? x[n-1] : 0);
+    float x2 = ((n >= 2) ? x[n-2] : 0);
+    
+    y = (float)(b0*x[n] + b1*x1 + b2*x2 - (a1*y1 + a2*y2));
+
+    y2 = y1;
+    y1 = y;  
+                                                                                                
+    output += (y / storage_size);
+
+    n += 1;
+  } while (n < storage_size);
 
   return output;
 }
