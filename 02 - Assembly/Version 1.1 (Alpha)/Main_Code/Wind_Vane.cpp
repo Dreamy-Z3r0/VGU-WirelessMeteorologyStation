@@ -175,6 +175,7 @@ void WindVane_Control::WindDirectionInstance(float V_in) {
   }
 
   windDir = 22.5 * output_index; 
+  readRTC();
 }
 
 

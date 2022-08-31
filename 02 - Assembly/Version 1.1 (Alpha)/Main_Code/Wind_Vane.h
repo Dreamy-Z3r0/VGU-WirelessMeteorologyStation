@@ -10,6 +10,8 @@
 #include "stm32f1xx_hal_conf_default.h"
 #endif
 
+#include "RTC.h"
+
 /* Constants from datasheet */
 #define CALX_TEMP 25      // Reference temperature (25ºC)
 #define V25       1430    // Vnternal voltage signal (V_sense) at reference temperature in mV
@@ -28,7 +30,7 @@ extern DMA_HandleTypeDef hdma_adc1;
 #define NumberOfDirection 16
 const float R_in_given[] = {33.1, 6.57, 8.19, 0.89, 1, 0.69, 2.19, 1.4, 3.88, 3.12, 15.98, 14.1, 119.6, 42.07, 64.9, 21.92};
 
-class WindVane_Control {
+class WindVane_Control : public DS3231_Control {
   public:
     // Class constructor(s)
     WindVane_Control(unsigned int storage_size = numberOfDataPoints);
