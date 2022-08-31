@@ -120,8 +120,6 @@ void WindVane_Control::read_reference(void) {
   
   AVref = (VREFINT * (ADC_MAX_VALUE+1) / raw_VREFINT) / 1000.0;   // Take the AVref
   Vcc = AVref;
-
-  Serial.printf("AVref = %.3f V\n", AVref);
 }
 
 // Sample input signal from the wind vane
@@ -175,6 +173,8 @@ void WindVane_Control::WindDirectionInstance(float V_in) {
   }
 
   windDir = 22.5 * output_index; 
+
+  // Update timestamp
   readRTC();
 }
 
