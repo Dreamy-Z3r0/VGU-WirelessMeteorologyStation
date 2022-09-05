@@ -47,6 +47,9 @@ void WindVane_Control::init(void) {
   MX_DMA_Init();
   MX_ADC1_Init(INTERNAL_REFERENCE_VOLTAGE);
   HAL_ADCEx_Calibration_Start(&hadc1);
+
+  readFlag = true;
+  Wind_Direction_Reading_Routine();
 }
 
 

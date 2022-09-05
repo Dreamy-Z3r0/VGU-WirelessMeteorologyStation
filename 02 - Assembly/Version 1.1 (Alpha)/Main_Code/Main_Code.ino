@@ -43,7 +43,6 @@ void loop() {
   DateTime_InputHandler();
   
   if (RTC_DS3231.is_RTC_requested()) {
-    unsigned long elapsed_time = micros();
     DS18B20_Device.set_readFlag();
     BME280_Device.set_readFlag();
     WindVane.set_readFlag();
@@ -122,38 +121,26 @@ void DateTime_Display() {
     // Print day
     int RTC_data = RTC_DS3231.readDay();
     Serial.printf("%s%d", RTC_data < 10 ? "0" : "\0", RTC_data);
-//    Serial.print(RTC_data < 10 ? "0" : "\0");
-//    Serial.print(RTC_data);
 
     // Print month
     RTC_data = RTC_DS3231.readMonth();
     Serial.printf("/%s%d", RTC_data < 10 ? "0" : "\0", RTC_data);
-//    Serial.print(RTC_data < 10 ? "/0" : "/");
-//    Serial.print(RTC_data);
 
     // Print year
     RTC_data = RTC_DS3231.readYear();
     Serial.printf("/%d", RTC_data);
-//    Serial.print("/");
-//    Serial.print(RTC_data);
 
     // Print hour
     RTC_data = RTC_DS3231.readHour();
     Serial.printf(" %s%d", RTC_data < 10 ? "0" : "\0", RTC_data);
-//    Serial.print(RTC_data < 10 ? " 0" : " ");
-//    Serial.print(RTC_data);
 
     // Print minute
     RTC_data = RTC_DS3231.readMinute();
     Serial.printf(":%s%d", RTC_data < 10 ? "0" : "\0", RTC_data);
-//    Serial.print(RTC_data < 10 ? ":0" : ":");
-//    Serial.print(RTC_data);
 
     // Print second
     RTC_data = RTC_DS3231.readSecond();
     Serial.printf(":%s%d", RTC_data < 10 ? "0" : "\0", RTC_data);
-//    Serial.print(RTC_data < 10 ? ":0" : ":");
-//    Serial.print(RTC_data);
 
     // Check and print the validity of RTC data
     DS3231 RTC_quality;
