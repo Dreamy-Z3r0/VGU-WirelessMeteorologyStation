@@ -1,5 +1,5 @@
 # Assembly
-### Alpha release - Version 1.0
+### Alpha release - Version 1.1
 *(From the latest beta release: version 0.6)*
 
 Features available:
@@ -10,4 +10,4 @@ Features available:
   - Precipitation: *Tipping bucket as rain gauge*
   - Wind monitoring: Wind speed with *Anemometer* and wind direction with *Wind vane*
 
-*Note:*
+*Note:* First time applying class inheritance.
