@@ -117,7 +117,7 @@ void Anemometer_Control::WindSpeed_MeanValue_Update_Routine(void) {
     meanWindSpeed = meanWindSpeed_temp;
 
     // Update new wind speed timestamp
-    // -> do it here <-
+    readRTC();
   }
 
   // End of the reading routine

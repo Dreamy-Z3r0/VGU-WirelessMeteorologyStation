@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include "RTC.h"
 
 
 /* Speed conversion methods */
@@ -27,7 +28,7 @@
 /***********************************
  *** Anemometer class definition ***
  ***********************************/
-class Anemometer_Control {
+class Anemometer_Control : public DS3231_Control {
   public:
     // Class constructor(s)
     Anemometer_Control(uint32_t Input_Pin);

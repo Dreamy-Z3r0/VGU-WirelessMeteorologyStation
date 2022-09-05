@@ -10,6 +10,9 @@
 /* DS18B20 */
 #include <OneWire.h>
 
+/* Custom access for DS3231 RTC */
+#include "RTC.h"
+
 
 
 /**********************************************
@@ -77,7 +80,7 @@ enum CONVERT_T_DELAY {ENABLE_DELAY = 1, DISABLE_DELAY = 0};     // Valid values 
  *************************/
 
 /* BME280 */
-class BME280_Control {    
+class BME280_Control : public DS3231_Control {    
   public:
     // Class constructor(s)
     BME280_Control(Adafruit_BME280* bme280_instance);
@@ -112,7 +115,7 @@ class BME280_Control {
 
 
 /* DS18B20 */
-class DS18B20_Control {
+class DS18B20_Control : public DS3231_Control {
   public:
     // Class constructor(s)
     DS18B20_Control(uint32_t OneWireBus, PRECISION thermometerResolution = R_12BIT, bool sharedBus = false);   // Constructor

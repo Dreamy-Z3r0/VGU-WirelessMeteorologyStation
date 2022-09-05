@@ -31,7 +31,7 @@ void setup() {
   
   BME280_Device.update_BME280_settings();
 
-//  DS18B20_Device.update_DS18B20_settings(R_9BIT);
+  DS18B20_Device.update_DS18B20_settings(R_10BIT);
 
   HardwareTimer *fetch_RTC = new HardwareTimer(TIM4);
   fetch_RTC->setOverflow(1, HERTZ_FORMAT);  // callback runs every 1 second
@@ -60,9 +60,7 @@ void loop() {
     RainGauge.clear_DailyAlarm();
 
     #ifdef DEBUGGING_OVER_SERIAL
-    Serial.print("Daily alarm! Precipitation (rainfall): ");
-    Serial.print(RainGauge.get_Rainfall_Data(), 4);
-    Serial.println(" mm");
+    Serial.printf("Daily alarm! Precipitation (rainfall): %.4f mm\n", RainGauge.get_Rainfall_Data());
     #endif
   }
 
@@ -72,7 +70,7 @@ void loop() {
   Anemometer_Update();
     
   if (newLine) {
-    Serial.println("");
+    Serial.println();
     newLine = false;
   }
 }
@@ -107,8 +105,7 @@ void DateTime_InputHandler() {
         Serial.println("Invalid format. Time should be input in HH:MM or HH:MM:SS formats.");
       }
     } else {  // Invalid data input
-      Serial.print("Unrecogised input identifier: ");
-      Serial.println(input.substring(0,4));
+      Serial.printf("Unrecogised input identifier: %s\n", input.substring(0,4));
     }
   }
   #endif
@@ -124,33 +121,39 @@ void DateTime_Display() {
     #ifdef DEBUGGING_OVER_SERIAL
     // Print day
     int RTC_data = RTC_DS3231.readDay();
-    Serial.print(RTC_data < 10 ? "0" : "\0");
-    Serial.print(RTC_data);
+    Serial.printf("%s%d", RTC_data < 10 ? "0" : "\0", RTC_data);
+//    Serial.print(RTC_data < 10 ? "0" : "\0");
+//    Serial.print(RTC_data);
 
     // Print month
     RTC_data = RTC_DS3231.readMonth();
-    Serial.print(RTC_data < 10 ? "/0" : "/");
-    Serial.print(RTC_data);
+    Serial.printf("/%s%d", RTC_data < 10 ? "0" : "\0", RTC_data);
+//    Serial.print(RTC_data < 10 ? "/0" : "/");
+//    Serial.print(RTC_data);
 
     // Print year
     RTC_data = RTC_DS3231.readYear();
-    Serial.print("/");
-    Serial.print(RTC_data);
+    Serial.printf("/%d", RTC_data);
+//    Serial.print("/");
+//    Serial.print(RTC_data);
 
     // Print hour
     RTC_data = RTC_DS3231.readHour();
-    Serial.print(RTC_data < 10 ? " 0" : " ");
-    Serial.print(RTC_data);
+    Serial.printf(" %s%d", RTC_data < 10 ? "0" : "\0", RTC_data);
+//    Serial.print(RTC_data < 10 ? " 0" : " ");
+//    Serial.print(RTC_data);
 
     // Print minute
     RTC_data = RTC_DS3231.readMinute();
-    Serial.print(RTC_data < 10 ? ":0" : ":");
-    Serial.print(RTC_data);
+    Serial.printf(":%s%d", RTC_data < 10 ? "0" : "\0", RTC_data);
+//    Serial.print(RTC_data < 10 ? ":0" : ":");
+//    Serial.print(RTC_data);
 
     // Print second
     RTC_data = RTC_DS3231.readSecond();
-    Serial.print(RTC_data < 10 ? ":0" : ":");
-    Serial.print(RTC_data);
+    Serial.printf(":%s%d", RTC_data < 10 ? "0" : "\0", RTC_data);
+//    Serial.print(RTC_data < 10 ? ":0" : ":");
+//    Serial.print(RTC_data);
 
     // Check and print the validity of RTC data
     DS3231 RTC_quality;
@@ -241,9 +244,7 @@ void WindVane_Update() {
       // Print sensor values
       #ifdef DEBUGGING_OVER_SERIAL
    
-      Serial.printf("     Wind direction = %.1f ", WindVane.read_Wind_Direction());  // Print wind direction
-      Serial.print("°");
-      Serial.println();
+      Serial.printf("     Wind direction = %.1f°\n", WindVane.read_Wind_Direction());  // Print wind direction
 
       // Add an empty line for visual purpose
       newLine = true;
@@ -260,9 +261,7 @@ void Anemometer_Update() {
 
     #ifdef DEBUGGING_OVER_SERIAL
 
-    Serial.print("     Wind speed = ");      // Print wind speed
-    Serial.print(Anemometer_Device.read_Wind_Speed(), 2);
-    Serial.println(" km/h");
+    Serial.printf("     Wind speed = %.2f km/h\n", Anemometer_Device.read_Wind_Speed());      // Print wind speed
   
     // Add an empty line for visual purpose
     newLine = true;

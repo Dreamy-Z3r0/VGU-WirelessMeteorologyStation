@@ -60,6 +60,7 @@ void WindVane_Control::Wind_Direction_Reading_Routine(void) {
     if (!sampling) {
       if (!sample_ready) {
         sampling = true;
+        half_complete = false;
 
         read_reference();   // Read the ADC reference voltage of the microcontroller
         
@@ -73,24 +74,39 @@ void WindVane_Control::Wind_Direction_Reading_Routine(void) {
   }
 }
 
-void WindVane_Control::End_Of_Sampling_Routine(void) {
+void WindVane_Control::End_Of_Sampling_Routine(bool half_complete) {
   sampling = false;
   sample_ready = true;
+
+  this->half_complete = half_complete;
 }
 
 // Manages all the data-processing sub-routines at the end of a sampling routine
 void WindVane_Control::Data_Processing_Routine(uint16_t* raw_data) {
-  if (sample_ready) {
-    float* voltage_from_rawData = new float[storage_size];  // Temporary storage for voltage values converted from raw ADC data
-    rawData_to_voltage(raw_data, voltage_from_rawData);     // Reconstruct voltage signals
-    delete[] raw_data;    // Free up the heap
+  float *x = new float[3],    // Stores voltage from raw ADC data / inputs for IIR filter
+        *y = new float[3];    // Stores outputs of IIR filter
 
-    float V_in = IIR_Mean(voltage_from_rawData);    // Apply IIR filter, then take the mean value of voltage
-    delete[] voltage_from_rawData;   // Free up the heap
-    
-    WindDirectionInstance(V_in);     // Take the final estimation of the wind direction
-    sample_ready = false;
-  }
+  float voltage_mean_value = 0;
+  
+  unsigned int n = 0,
+               half_storage_size = (unsigned int)(storage_size / 2);
+  do {    
+    *x = rawData_to_voltage(raw_data+n);   // Convert the ADC value at index n of raw_data[] array to voltage value
+    IIR_Filter(x, y);   // Apply IIR filter for the newly converted voltage value
+                                                                                                
+    voltage_mean_value += (*y / storage_size);
+
+    n += 1;
+    if (n == half_storage_size) 
+      while (half_complete);
+  } while (n < storage_size);
+
+  delete[] x;   // Free up the heap
+  delete[] y;
+  delete[] raw_data;
+
+  WindDirectionInstance(voltage_mean_value);
+  sample_ready = false;
 }
 
 // Read the reference voltage for ADC
@@ -105,8 +121,6 @@ void WindVane_Control::read_reference(void) {
   
   AVref = (VREFINT * (ADC_MAX_VALUE+1) / raw_VREFINT) / 1000.0;   // Take the AVref
   Vcc = AVref;
-
-  Serial.printf("AVref = %.3f V\n", AVref);
 }
 
 // Sample input signal from the wind vane
@@ -120,61 +134,23 @@ void WindVane_Control::read_raw_ADC(uint16_t* storage) {
   HAL_ADC_Start_DMA(&hadc1, (uint32_t*)storage, (uint32_t)storage_size);
 }
 
-// Convert raw ADC data to voltage values
-void WindVane_Control::rawData_to_voltage(uint16_t* raw_data, float* voltage) {
-  for (unsigned int i = 0; i < storage_size; i += 1) {
-    *(voltage+i) = (AVref * (*(raw_data+i))) / ADC_MAX_VALUE;
-  }
+// Convert an instance of raw ADC values to voltage value
+float WindVane_Control::rawData_to_voltage(uint16_t* raw_data) {
+  return ((AVref * (*raw_data)) / ADC_MAX_VALUE);
 }
 
-// Apply IIR filter and take the mean value of the filtered data
-float WindVane_Control::IIR_Mean(float* x) {
+// Apply IIR filter
+void WindVane_Control::IIR_Filter(float* x, float* y) {
   // IIR Filter direct form I output function:
   //    y[n] = (b0 * x[n] + b1 * x[n-1] + b2 * x[n-2]) - (a1 * y[n-1] + a2 * y[n-2])
-  //
-  // Since b2 = 0 and a2 = 0 by design, x[n-2] and y[n-2] are removed from the implementation:
-  //    y[n] = (b0 * x[n] + b1 * x[n-1]) - a1 * y[n-1]
 
-  float output = 0;
-  
-  double b0 = 1,
-         b1 = 1, 
-         b2 = 0,        
-         a1 = 0.99919607551456557000,
-         a2 = 0;         
+  *y = (float)(b0*(*x) + b1*(*(x+1)) + b2*(*(x+2)) - (a1*(*(y+1)) + a2*(*(y+2))));
 
-  float y,        // y[n]
-        y1 = 0,   // y[n-1]
-        y2 = 0;   // y[n-2]
-        
-  // for (unsigned int n = 0; n < storage_size; n += 1) {
-  //   float x1 = ((n >= 1) ? x[n-1] : 0);
-  //   float x2 = ((n >= 2) ? x[n-2] : 0);
-    
-  //   y = (float)(b0*x[n] + b1*x1 + b2*x2 - (a1*y1 + a2*y2));
+  *(x+2) = *(x+1);
+  *(x+1) = *x;
 
-  //   y2 = y1;
-  //   y1 = y;  
-                                                                                                
-  //   output += (y / storage_size);
-  // }
-
-  unsigned int n = 0;  
-  do {
-    float x1 = ((n >= 1) ? x[n-1] : 0);
-    float x2 = ((n >= 2) ? x[n-2] : 0);
-    
-    y = (float)(b0*x[n] + b1*x1 + b2*x2 - (a1*y1 + a2*y2));
-
-    y2 = y1;
-    y1 = y;  
-                                                                                                
-    output += (y / storage_size);
-
-    n += 1;
-  } while (n < storage_size);
-
-  return output;
+  *(y+2) = *(y+1);
+  *(y+1) = *y;
 }
 
 // Take the final estimation of the wind direction
@@ -198,6 +174,9 @@ void WindVane_Control::WindDirectionInstance(float V_in) {
   }
 
   windDir = 22.5 * output_index; 
+
+  // Update timestamp
+  readRTC();
 }
 
 
@@ -406,6 +385,11 @@ static void MX_DMA_Init(void)
 /****************************************************
  *** Callback function(s) required by HAL modules ***
  ****************************************************/
+
+// Callback function when DMA has filled half of the ADC buffer
+void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef* hadc) {
+  WindVane.End_Of_Sampling_Routine(true);
+}
 
 // Callback function when DMA has filled the ADC buffer
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {

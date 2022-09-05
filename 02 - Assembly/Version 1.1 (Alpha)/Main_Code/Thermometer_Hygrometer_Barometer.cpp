@@ -88,6 +88,9 @@ void BME280_Control::read_BME280(void) {
   BME280_dataStorage.temperature = bme280_instance->readTemperature();         // Read temperature data in degree Celsius
   BME280_dataStorage.pressure    = bme280_instance->readPressure() / 100.0F;   // Read barometric data in hPa
   BME280_dataStorage.humidity    = bme280_instance->readHumidity();            // Read relative humidity data in %RH
+
+  // Update timestamp
+  readRTC();
 }
 
 
@@ -269,6 +272,9 @@ void DS18B20_Control::convert_Temperature(uint8_t* present) {
 
   // Calculate temperature in degree Celsius
   temperature = (float)raw / 16.0;
+
+  // Update timestamp
+  readRTC();
 }
 
 /* Perform a full functional communication cycle with a DS18B20 
