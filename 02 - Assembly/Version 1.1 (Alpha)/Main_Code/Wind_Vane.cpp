@@ -103,6 +103,7 @@ void WindVane_Control::Data_Processing_Routine(uint16_t* raw_data) {
 
   delete[] x;   // Free up the heap
   delete[] y;
+  delete[] raw_data;
 
   WindDirectionInstance(voltage_mean_value);
   sample_ready = false;

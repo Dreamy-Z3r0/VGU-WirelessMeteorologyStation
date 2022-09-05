@@ -31,7 +31,7 @@ void setup() {
   
   BME280_Device.update_BME280_settings();
 
-//  DS18B20_Device.update_DS18B20_settings(R_9BIT);
+  DS18B20_Device.update_DS18B20_settings(R_10BIT);
 
   HardwareTimer *fetch_RTC = new HardwareTimer(TIM4);
   fetch_RTC->setOverflow(1, HERTZ_FORMAT);  // callback runs every 1 second
@@ -121,13 +121,13 @@ void DateTime_Display() {
     #ifdef DEBUGGING_OVER_SERIAL
     // Print day
     int RTC_data = RTC_DS3231.readDay();
-    Serial.printf("%c%d", RTC_data < 10 ? '0' : '\0', RTC_data);
+    Serial.printf("%s%d", RTC_data < 10 ? "0" : "\0", RTC_data);
 //    Serial.print(RTC_data < 10 ? "0" : "\0");
 //    Serial.print(RTC_data);
 
     // Print month
     RTC_data = RTC_DS3231.readMonth();
-    Serial.printf("/%c%d", RTC_data < 10 ? '0' : '\0', RTC_data);
+    Serial.printf("/%s%d", RTC_data < 10 ? "0" : "\0", RTC_data);
 //    Serial.print(RTC_data < 10 ? "/0" : "/");
 //    Serial.print(RTC_data);
 
@@ -139,19 +139,19 @@ void DateTime_Display() {
 
     // Print hour
     RTC_data = RTC_DS3231.readHour();
-    Serial.printf(" %c%d", RTC_data < 10 ? '0' : '\0', RTC_data);
+    Serial.printf(" %s%d", RTC_data < 10 ? "0" : "\0", RTC_data);
 //    Serial.print(RTC_data < 10 ? " 0" : " ");
 //    Serial.print(RTC_data);
 
     // Print minute
     RTC_data = RTC_DS3231.readMinute();
-    Serial.printf(":%c%d", RTC_data < 10 ? '0' : '\0', RTC_data);
+    Serial.printf(":%s%d", RTC_data < 10 ? "0" : "\0", RTC_data);
 //    Serial.print(RTC_data < 10 ? ":0" : ":");
 //    Serial.print(RTC_data);
 
     // Print second
     RTC_data = RTC_DS3231.readSecond();
-    Serial.printf(":%c%d", RTC_data < 10 ? '0' : '\0', RTC_data);
+    Serial.printf(":%s%d", RTC_data < 10 ? "0" : "\0", RTC_data);
 //    Serial.print(RTC_data < 10 ? ":0" : ":");
 //    Serial.print(RTC_data);
 
@@ -244,7 +244,7 @@ void WindVane_Update() {
       // Print sensor values
       #ifdef DEBUGGING_OVER_SERIAL
    
-      Serial.printf("     Wind direction = %.1f °\n", WindVane.read_Wind_Direction());  // Print wind direction
+      Serial.printf("     Wind direction = %.1f°\n", WindVane.read_Wind_Direction());  // Print wind direction
 
       // Add an empty line for visual purpose
       newLine = true;
