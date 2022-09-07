@@ -13,6 +13,10 @@ void Sensor_General::set_SensorPin(uint32_t SensorPin) {
   this->SensorPin = SensorPin;
 }
 
+uint32_t Sensor_General::get_SensorPin(void) {
+  return SensorPin;
+}
+
 void Sensor_General::update_sensor_data(void) {
   
 }
@@ -21,7 +25,7 @@ void Sensor_General::update_timestamp(void) {
   readRTC();
 }
 
-void Sensor_General::read_sensor_data(void) {
+void Sensor_General::read_sensor_data(float *external_storage) {
   
 }
 
@@ -64,4 +68,22 @@ bool Sensor_General::is_samplingFlag_set(void) {
 // Clear samplingFlag
 void Sensor_General::clear_samplingFlag(void) {
   samplingFlag = false;
+}
+
+
+/* standbyFlag */
+
+// Set standbyFlag
+void Sensor_General::set_standbyFlag(void) {
+  standbyFlag = true;
+}
+
+// Return standbyFlag value
+bool Sensor_General::is_standbyFlag_set(void) {
+  return standbyFlag;
+}
+
+// Clear standbyFlag
+void Sensor_General::clear_standbyFlag(void) {
+  standbyFlag = false;
 }

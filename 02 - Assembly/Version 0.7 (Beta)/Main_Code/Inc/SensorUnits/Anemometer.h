@@ -1,5 +1,4 @@
-#include <Arduino.h>
-#include "../RTC.h"
+#include "../Sensor_General.h"
 
 
 /* Speed conversion methods */
@@ -28,38 +27,28 @@
 /***********************************
  *** Anemometer class definition ***
  ***********************************/
-class Anemometer_Control : public DS3231_Control {
+class Anemometer_Control : public Sensor_General {
   public:
     // Class constructor(s)
-    Anemometer_Control(uint32_t Input_Pin);
+    Anemometer_Control(uint32_t SensorPin);
 
     // Device initialization
     void init(TIM_TypeDef* EdgePeriodTimer_Instance = TIM1, TIM_TypeDef* CalmAirTimer_Instance = TIM2);
 
     // Public operations
-    void Anemometer_Reading_Routine(void);    // Continuously called to perform wind speed reading
-    float read_Wind_Speed(void);    // Accessed externally, returns the latest valid wind speed result
-
-    // readFlag operations
-    void set_readFlag(void);      // Set readFlag
-    bool is_readFlag_set(void);   // Return value
-    void clear_readFlag(void);    // Clear readFlag
-
-    // Check for idlePeriod 
-    bool is_idlePeriod(void);
+    void update_sensor_data(void);    // Continuously called to perform wind speed reading
+    void read_sensor_data(float *external_storage);    // Returns the latest wind speed value
 
     // Internal operations for external interrupt service routines
     void Timer_Callback(HardwareTimer* OverflownTimer);   // Timer counter overflow callback
     void Input_Callback(void);    // Edge presence callback
     
   private:
-    uint32_t Input_Pin;   // Anemometer input pin
     unsigned long idleTimeInMilliseconds;   // Duration between 2 consecutive readings
     
     HardwareTimer* EdgePeriodTimer;   // Timer timing 2 consecutive edges
     HardwareTimer* CalmAirTimer;      // Timer timing calm air period
     
-    bool idlePeriod, readFlag;        // Operation-controlling flag(s)
     bool isTakingFirstEdge, isSecondEdgeDetected;  // Edge-controlling flags 
     bool CalmAir;   // Calm air detection
 

@@ -9,10 +9,11 @@ class Sensor_General : public DS3231_Control {
     void init(void);
 
     void set_SensorPin(uint32_t SensorPin);
+    uint32_t get_SensorPin(void);
 
     void update_sensor_data(void);
 
-    void read_sensor_data(void);
+    void read_sensor_data(float *external_storage);
 
     // readFlag operations
     void set_readFlag(void);      // Set readFlag
@@ -24,9 +25,14 @@ class Sensor_General : public DS3231_Control {
     bool is_samplingFlag_set(void);   // Return samplingFlag value
     void clear_samplingFlag(void);    // Clear samplingFlag
 
+    // standbyFlag operations
+    void set_standbyFlag(void);      // Set samplingFlag
+    bool is_standbyFlag_set(void);   // Return samplingFlag value
+    void clear_standbyFlag(void);    // Clear samplingFlag
+
   protected:
     void update_timestamp(void);
-  
+
   private:
     uint32_t SensorPin;
 

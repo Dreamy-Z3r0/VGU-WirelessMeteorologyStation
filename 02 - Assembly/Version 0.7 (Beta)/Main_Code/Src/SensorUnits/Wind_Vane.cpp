@@ -193,7 +193,7 @@ void WindVane_Control::WindDirectionInstance(float V_in) {
   clear_readFlag();
 
   // Update timestamp
-  update_sensor_data();
+  update_timestamp();
 
   standby_counter = 0;
   StandbyTimer->setCount(0);

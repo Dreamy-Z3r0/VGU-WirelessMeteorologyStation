@@ -30,7 +30,7 @@ extern DMA_HandleTypeDef hdma_adc1;
 #define NumberOfDirection 16
 const float R_in_given[] = {33.1, 6.57, 8.19, 0.89, 1, 0.69, 2.19, 1.4, 3.88, 3.12, 15.98, 14.1, 119.6, 42.07, 64.9, 21.92};
 
-class WindVane_Control : protected Sensor_General {
+class WindVane_Control : public Sensor_General {
   public:
     // Class constructor(s)
     WindVane_Control(unsigned int storage_size = numberOfDataPoints);

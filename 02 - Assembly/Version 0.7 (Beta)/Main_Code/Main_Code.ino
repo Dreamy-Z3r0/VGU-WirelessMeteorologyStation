@@ -46,7 +46,7 @@ void loop() {
     DS18B20_Device.set_readFlag();
     BME280_Device.set_readFlag();
     
-    if (!Anemometer_Device.is_readFlag_set() && Anemometer_Device.is_idlePeriod()) {
+    if (!Anemometer_Device.is_readFlag_set() && Anemometer_Device.is_standbyFlag_set()) {
       Anemometer_Device.set_readFlag();
     }
     
@@ -233,7 +233,29 @@ void WindVane_Update() {
       float wind_direction;
       WindVane.read_sensor_data(&wind_direction);
       
-      Serial.printf("     Wind direction = %.1f°\n", wind_direction);  // Print wind direction
+      Serial.printf("     Wind direction = %.1f°", wind_direction);  // Print wind direction
+
+      // Print timestamp
+    int timestamp_buffer;
+    Serial.printf(" (");
+
+    timestamp_buffer = Anemometer_Device.readYear();
+    Serial.printf("%d", timestamp_buffer);
+
+    timestamp_buffer = Anemometer_Device.readMonth();
+    Serial.printf("-%s%d", timestamp_buffer > 10 ? "\0" : "0", timestamp_buffer);
+
+    timestamp_buffer = Anemometer_Device.readDay();
+    Serial.printf("-%s%d", timestamp_buffer > 10 ? "\0" : "0", timestamp_buffer);
+
+    timestamp_buffer = Anemometer_Device.readHour();
+    Serial.printf(" %s%d", timestamp_buffer > 10 ? "\0" : "0", timestamp_buffer);
+
+    timestamp_buffer = Anemometer_Device.readMinute();
+    Serial.printf(":%s%d", timestamp_buffer > 10 ? "\0" : "0", timestamp_buffer);
+
+    timestamp_buffer = Anemometer_Device.readSecond();
+    Serial.printf(":%s%d)\n", timestamp_buffer > 10 ? "\0" : "0", timestamp_buffer);
 
       // Add an empty line for visual purpose
       newLine = true;
@@ -243,14 +265,40 @@ void WindVane_Update() {
 }
 
 void Anemometer_Update() {
-  Anemometer_Device.Anemometer_Reading_Routine();
+  Anemometer_Device.update_sensor_data();
 
   if (Print_WindSpeed) {
     Print_WindSpeed = false;
 
     #ifdef DEBUGGING_OVER_SERIAL
 
-    Serial.printf("     Wind speed = %.2f km/h\n", Anemometer_Device.read_Wind_Speed());      // Print wind speed
+    float windSpeed;
+    Anemometer_Device.read_sensor_data(&windSpeed);
+    
+    Serial.printf("     Wind speed = %.2f km/h", windSpeed);      // Print wind speed
+
+    // Print timestamp
+    int timestamp_buffer;
+    Serial.printf(" (");
+
+    timestamp_buffer = Anemometer_Device.readYear();
+    Serial.printf("%d", timestamp_buffer);
+
+    timestamp_buffer = Anemometer_Device.readMonth();
+    Serial.printf("-%s%d", timestamp_buffer > 10 ? "\0" : "0", timestamp_buffer);
+
+    timestamp_buffer = Anemometer_Device.readDay();
+    Serial.printf("-%s%d", timestamp_buffer > 10 ? "\0" : "0", timestamp_buffer);
+
+    timestamp_buffer = Anemometer_Device.readHour();
+    Serial.printf(" %s%d", timestamp_buffer > 10 ? "\0" : "0", timestamp_buffer);
+
+    timestamp_buffer = Anemometer_Device.readMinute();
+    Serial.printf(":%s%d", timestamp_buffer > 10 ? "\0" : "0", timestamp_buffer);
+
+    timestamp_buffer = Anemometer_Device.readSecond();
+    Serial.printf(":%s%d)\n", timestamp_buffer > 10 ? "\0" : "0", timestamp_buffer);
+    
   
     // Add an empty line for visual purpose
     newLine = true;

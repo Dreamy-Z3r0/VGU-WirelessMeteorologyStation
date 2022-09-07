@@ -6,13 +6,13 @@
  *********************/
 
 // Accept input pin parameter and set (initial) values of variables and class constants
-Anemometer_Control::Anemometer_Control(uint32_t Input_Pin) {    
-  this->Input_Pin = Input_Pin;
+Anemometer_Control::Anemometer_Control(uint32_t SensorPin) {    
+  set_SensorPin(SensorPin);
 
   idleTimeInMilliseconds = timeBetweenReadingPeriods * 60E3;
 
-  idlePeriod = true;
-  readFlag = false;
+  set_standbyFlag();
+  clear_readFlag();
 
   isTakingFirstEdge = false;
   isSecondEdgeDetected = false;
@@ -45,7 +45,7 @@ void Anemometer_Control::init(TIM_TypeDef* EdgePeriodTimer_Instance, TIM_TypeDef
   CalmAirTimer->setOverflow(10000, MICROSEC_FORMAT);      // Timer overflows every 10ms
   CalmAirTimer->attachInterrupt(2, std::bind(TIM_Ovf_callback, this, CalmAirTimer));  // ISR run whenever timer overflows for channel 1
 
-  readFlag = true;
+  set_readFlag();
 }
 
 
@@ -54,9 +54,9 @@ void Anemometer_Control::init(TIM_TypeDef* EdgePeriodTimer_Instance, TIM_TypeDef
  **************************/
 
 // Continuously called to perform wind speed reading
-void Anemometer_Control::Anemometer_Reading_Routine(void) {
-  if (readFlag && idlePeriod) {   // A new reading routine begins
-    idlePeriod = false;
+void Anemometer_Control::update_sensor_data(void) {
+  if (is_readFlag_set() && is_standbyFlag_set()) {   // A new reading routine begins
+    clear_standbyFlag();
     arr_index = 0;
     fault_count = 0;
 
@@ -76,7 +76,7 @@ void Anemometer_Control::Initialise_New_Timing_Period(void) {
   CalmAirTimer->pause();    // Make sure the timer is not running, then reset counter register
   CalmAirTimer->setCount(0);
 
-  attachInterrupt(digitalPinToInterrupt(Input_Pin), std::bind(anemometerInput_Detected, this), RISING);
+  attachInterrupt(digitalPinToInterrupt(get_SensorPin()), std::bind(anemometerInput_Detected, this), RISING);
   CalmAirTimer->resume();
 }
 
@@ -117,12 +117,12 @@ void Anemometer_Control::WindSpeed_MeanValue_Update_Routine(void) {
     meanWindSpeed = meanWindSpeed_temp;
 
     // Update new wind speed timestamp
-    readRTC();
+    update_timestamp();
   }
 
   // End of the reading routine
-  readFlag = false;
-  idlePeriod = true;
+  clear_readFlag();
+  set_standbyFlag();
 }
 
 
@@ -130,40 +130,11 @@ void Anemometer_Control::WindSpeed_MeanValue_Update_Routine(void) {
  *** Data-returning operation(s) ***
  ***********************************/
 
-// Accessed externally, returns the latest valid wind speed result
-float Anemometer_Control::read_Wind_Speed(void) {
-  return meanWindSpeed;
+// Returns the latest wind speed value
+void Anemometer_Control::read_sensor_data(float *external_storage) {    // Returns the latest wind direction value
+  *external_storage = meanWindSpeed;
 }
 
-
-/*****************************
- *** readFlag operation(s) ***
- *****************************/
-
-// Set readFlag
-void Anemometer_Control::set_readFlag(void) {
-  readFlag = true;
-}
-
-// Return value
-bool Anemometer_Control::is_readFlag_set(void) {
-  return readFlag;
-}
-
-// Clear readFlag
-void Anemometer_Control::clear_readFlag(void) {
-  readFlag = false;
-}
-
-
-/*******************************
- *** idlePeriod operation(s) ***
- *******************************/
-
-// Check for idlePeriod
-bool Anemometer_Control::is_idlePeriod(void) {
-  return idlePeriod;
-}
 
 
 /*******************************************************************
@@ -182,7 +153,7 @@ void Anemometer_Control::Timer_Callback(HardwareTimer* OverflownTimer) {
       EdgePeriodTimer->pause();         // Pause (running) timers
       CalmAirTimer->pause();
 
-      detachInterrupt(digitalPinToInterrupt(Input_Pin));   // Stop taking inputs
+      detachInterrupt(digitalPinToInterrupt(get_SensorPin()));   // Stop taking inputs
 
       EdgePeriodTimer->setCount(0);     // Reset timer counters
       CalmAirTimer->setCount(0);
@@ -206,7 +177,7 @@ void Anemometer_Control::Input_Callback(void) {
   if (!isTakingFirstEdge) {
     EdgePeriodTimer->pause();   // Pause running EdgePeriod timer
     
-    detachInterrupt(digitalPinToInterrupt(Input_Pin));   // Stop taking inputs
+    detachInterrupt(digitalPinToInterrupt(get_SensorPin()));   // Stop taking inputs
     isSecondEdgeDetected = true;      // 2 edges timed
     
     CalmAir = false;    // Fail-safe only
