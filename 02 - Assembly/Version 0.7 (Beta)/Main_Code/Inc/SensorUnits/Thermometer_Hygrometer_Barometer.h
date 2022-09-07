@@ -11,7 +11,7 @@
 #include <OneWire.h>
 
 /* Custom access for DS3231 RTC */
-#include "RTC.h"
+#include "../RTC.h"
 
 
 

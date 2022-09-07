@@ -1,4 +1,4 @@
-#include "Sensor_General.h"
+#include "../Inc/Sensor_General.h"
 
 
 Sensor_General::Sensor_General(void) {

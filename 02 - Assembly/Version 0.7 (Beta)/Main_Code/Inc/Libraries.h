@@ -18,8 +18,8 @@
 #include <OneWire.h>
 
 // Custom functions
-#include "RTC.h"
-#include "Thermometer_Hygrometer_Barometer.h"
-#include "Precipitation.h"
-#include "Wind_Vane.h"
-#include "Anemometer.h"
+#include "../Inc/RTC.h"
+#include "../Inc/SensorUnits/Thermometer_Hygrometer_Barometer.h"
+#include "../Inc/SensorUnits/Precipitation.h"
+#include "../Inc/SensorUnits/Wind_Vane.h"
+#include "../Inc/SensorUnits/Anemometer.h"

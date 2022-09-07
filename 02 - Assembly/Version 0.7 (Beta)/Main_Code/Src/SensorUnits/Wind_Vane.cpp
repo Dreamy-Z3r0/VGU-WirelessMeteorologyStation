@@ -1,4 +1,4 @@
-#include "Wind_Vane.h"
+#include "../../Inc/SensorUnits/Wind_Vane.h"
 
 
 WindVane_Control WindVane;

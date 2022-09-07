@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include "RTC.h"
+#include "../RTC.h"
 
 
 /* Speed conversion methods */
