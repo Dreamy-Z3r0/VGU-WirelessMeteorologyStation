@@ -10,8 +10,7 @@
 /* DS18B20 */
 #include <OneWire.h>
 
-/* Custom access for DS3231 RTC */
-#include "../RTC.h"
+#include "../Sensor_General.h"
 
 
 
@@ -80,7 +79,7 @@ enum CONVERT_T_DELAY {ENABLE_DELAY = 1, DISABLE_DELAY = 0};     // Valid values 
  *************************/
 
 /* BME280 */
-class BME280_Control : public DS3231_Control {    
+class BME280_Control : public Sensor_General {    
   public:
     // Class constructor(s)
     BME280_Control(Adafruit_BME280* bme280_instance);
@@ -95,47 +94,36 @@ class BME280_Control : public DS3231_Control {
     void new_StandbyDuration(Adafruit_BME280::standby_duration newValue);           // Set standby duration for normal mode
 
     // Public operations
-    void read_BME280(void);       // Fetch latest readings from sensor
-    float get_Temperature(void);  // Return latest ambient temperature reading   
-    float get_Pressure(void);     // Return latest barometric pressure reading
-    float get_Humidity(void);     // Return latest relative humidity reading
+    void update_sensor_data(void);       // Fetch latest readings from sensor
 
-    // readFlag operations
-    void set_readFlag(void);      // Set readFlag
-    bool is_readFlag_set(void);   // Return value
-    void clear_readFlag(void);    // Clear readFlag
+    // Data-returning methods
+    void read_sensor_data(float *external_storage);
+    float get_Temperature(void);  // Only return latest ambient temperature reading   
+    float get_Pressure(void);     // Only return latest barometric pressure reading
+    float get_Humidity(void);     // Only return latest relative humidity reading
 
   private:
     Adafruit_BME280* bme280_instance;       // Pointer to global device instance
     BME280_settings BME280_userSettings;    // Stores the latest (user-input) settings for sensor
     BME280_Data BME280_dataStorage;         // Stores the latest sensor readings
-    
-    bool readFlag;    // Operation-controlling flag(s)
 };
 
 
 /* DS18B20 */
-class DS18B20_Control : public DS3231_Control {
+class DS18B20_Control : public Sensor_General {
   public:
     // Class constructor(s)
     DS18B20_Control(uint32_t OneWireBus, PRECISION thermometerResolution = R_12BIT, bool sharedBus = false);   // Constructor
 
-    void update_DS18B20_OneWireBus(uint32_t OneWireBus);  // Change OneWire bus of the DS18B20 device
     void update_DS18B20_addr(uint8_t* addr);  // Update DS18B20 ROM code
 
     void update_DS18B20_settings(PRECISION thermometerResolution);    // Update DS18B20 thermometer resolution and delay settings
     PRECISION get_thermometerResolution(void);    // Return the current thermometer resolution setting
 
-    void convert_Temperature(uint8_t* present);   // Enable a temperature conversion
-    float get_Temperature(void);      // Return the latest temperature conversion result
-
-    // readFlag operations
-    void set_readFlag(void);      // Set readFlag
-    bool is_readFlag_set(void);   // Return value
-    void clear_readFlag(void);    // Clear readFlag
+    void update_sensor_data(uint8_t* present);      // Enable a temperature conversion
+    void read_sensor_data(float *external_storage);  // Return the latest temperature conversion result
 
   private:
-    uint32_t OneWireBus;    // Digital pin as the one-wire bus of the DS18B20 device
     bool sharedBus;         // Indicates whether there are other devices on the same One-Wire bus
     uint8_t addr[8];        // Device ROM code
     
@@ -143,7 +131,6 @@ class DS18B20_Control : public DS3231_Control {
     unsigned int Conversion_delayTime;  // Delay time for a temperature conversion to complete, used mostly in parasitic power mode
     
     float temperature;      // Temperature output of the last conversion
-    bool readFlag;          // Set to enable a temperature conversion
   
     /* Perform a full functional communication cycle with a DS18B20 
      * 

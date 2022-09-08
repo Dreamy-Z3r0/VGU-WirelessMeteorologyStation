@@ -58,7 +58,9 @@ void loop() {
     RainGauge.clear_DailyAlarm();
 
     #ifdef DEBUGGING_OVER_SERIAL
-    Serial.printf("Daily alarm! Precipitation (rainfall): %.4f mm\n", RainGauge.get_Rainfall_Data());
+    float Rainfall_amount;
+    RainGauge.read_sensor_data(&Rainfall_amount);
+    Serial.printf("Daily alarm! Precipitation (rainfall): %.4f mm\n", Rainfall_amount);
     #endif
   }
 
@@ -156,7 +158,7 @@ void DS18B20_Update() {
     DS18B20_Device.clear_readFlag();   // Clear the request
 
     uint8_t present = 0;    // Guards the one-wire bus; if present == 0, no further action shall be taken within this scope.
-    DS18B20_Device.convert_Temperature(&present);  // Gets sensor readings
+    DS18B20_Device.update_sensor_data(&present);  // Gets sensor readings
 
     if (0 == present) {
       #ifdef DEBUGGING_OVER_SERIAL
@@ -170,8 +172,11 @@ void DS18B20_Update() {
       present = (uint8_t)(((thermometerResolution >> 4) + 1) / 2); 
 
       // Print temperature
+      float Sensor_Data;
+      DS18B20_Device.read_sensor_data(&Sensor_Data);
+      
       Serial.print("     Ambient temperature = ");
-      Serial.print(DS18B20_Device.get_Temperature(), present);
+      Serial.print(Sensor_Data, present);
 
       switch (thermometerResolution) {
         case R_9BIT:
@@ -200,19 +205,24 @@ void DS18B20_Update() {
 void BME280_Update() {
   if (BME280_Device.is_readFlag_set()) {
     BME280_Device.clear_readFlag();
-    BME280_Device.read_BME280();
+    BME280_Device.update_sensor_data();
 
     // Print sensor values
     #ifdef DEBUGGING_OVER_SERIAL
 
+    float *Sensor_Data = new float[3];   // Temperature - Pressure - Humidity
+    BME280_Device.read_sensor_data(Sensor_Data);
+
     // Print temperature
-    Serial.printf("     Ambient temperature = %.2f ºC (BME280)\n", BME280_Device.get_Temperature());    
+    Serial.printf("     Ambient temperature = %.2f ºC (BME280)\n", *Sensor_Data);    
 
     // Print humidity  
-    Serial.printf("     Relative humidity = %.2f %%RH\n", BME280_Device.get_Humidity());       
+    Serial.printf("     Relative humidity = %.2f %%RH\n", *(Sensor_Data+2));       
 
     // Print barometric pressure 
-    Serial.printf("     Atmospheric pressure = %.2f hPa\n", BME280_Device.get_Pressure());     
+    Serial.printf("     Atmospheric pressure = %.2f hPa\n", *(Sensor_Data+1)); 
+
+    delete[] Sensor_Data;
 
     // Add an empty line for visual purpose
     newLine = true;

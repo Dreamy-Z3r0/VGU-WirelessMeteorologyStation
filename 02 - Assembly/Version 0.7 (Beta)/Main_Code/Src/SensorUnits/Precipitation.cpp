@@ -55,8 +55,8 @@ void Precipitation::set_DailyAlarm(byte hour, byte minute, byte second) {
  ***********************************/
 
 // Return the latest calculated rainfall amount
-float Precipitation::get_Rainfall_Data(void) {   // Return the latest calculated rainfall amount
-  return Rainfall_Data;
+void Precipitation::read_sensor_data(float *external_storage) {   // Return the latest calculated rainfall amount
+  *external_storage = Rainfall_Data;
 }
 
 

@@ -22,7 +22,7 @@ BME280_Control::BME280_Control(Adafruit_BME280* bme280_instance) {
   BME280_userSettings.Filter_Coefficient = Adafruit_BME280::FILTER_OFF;
   BME280_userSettings.Standby_Duration = Adafruit_BME280::STANDBY_MS_0_5;
 
-  readFlag = false;
+  clear_readFlag();
 }
 
 
@@ -80,7 +80,7 @@ void BME280_Control::new_StandbyDuration(Adafruit_BME280::standby_duration newVa
  **************************/
 
 // Fetch latest readings from sensor
-void BME280_Control::read_BME280(void) {
+void BME280_Control::update_sensor_data(void) {
   if (BME280_userSettings.Sensor_Mode == Adafruit_BME280::MODE_FORCED) {
     bme280_instance->takeForcedMeasurement();
   }
@@ -98,39 +98,25 @@ void BME280_Control::read_BME280(void) {
  *** Data-returning operation(s) ***
  ***********************************/
 
-// Return latest ambient temperature reading  
+void BME280_Control::read_sensor_data(float *external_storage) {
+  *external_storage = get_Temperature();
+  *(external_storage + 1) = get_Pressure();
+  *(external_storage + 2) = get_Humidity();
+}
+
+// Only return latest ambient temperature reading  
 float BME280_Control::get_Temperature(void) {
   return BME280_dataStorage.temperature;
 }
 
-// Return latest barometric pressure reading
+// Only return latest barometric pressure reading
 float BME280_Control::get_Pressure(void) {
   return BME280_dataStorage.pressure;
 }
 
-// Return latest relative humidity reading
+// Only return latest relative humidity reading
 float BME280_Control::get_Humidity(void) {
   return BME280_dataStorage.humidity;
-}
-
-
-/*****************************
- *** readFlag operation(s) ***
- *****************************/
-
-// Set readFlag
-void BME280_Control::set_readFlag(void) {
-  readFlag = true;
-}
-
-// Return value
-bool BME280_Control::is_readFlag_set(void) {
-  return readFlag;
-}
-
-// Clear readFlag
-void BME280_Control::clear_readFlag(void) {
-  readFlag = false;
 }
 
 
@@ -146,8 +132,8 @@ void BME280_Control::clear_readFlag(void) {
  *********************/
 
 // Accept input pin for One-Wire bus; (optional) thermometer resolution and shared bus indicator
-DS18B20_Control::DS18B20_Control(uint32_t OneWireBus, PRECISION thermometerResolution, bool sharedBus) {
-  update_DS18B20_OneWireBus(OneWireBus);
+DS18B20_Control::DS18B20_Control(uint32_t SensorPin, PRECISION thermometerResolution, bool sharedBus) {
+  set_SensorPin(SensorPin);
   update_DS18B20_settings(thermometerResolution);
 
   this->sharedBus = sharedBus;
@@ -157,11 +143,6 @@ DS18B20_Control::DS18B20_Control(uint32_t OneWireBus, PRECISION thermometerResol
 /********************************
  *** Device parameter storage ***
  ********************************/
-
-// Change OneWire bus of the DS18B20 device
-void DS18B20_Control::update_DS18B20_OneWireBus(uint32_t OneWireBus) {
-  this->OneWireBus = OneWireBus;
-}
 
 // Store DS18B20 ROM code
 void DS18B20_Control::update_DS18B20_addr(uint8_t* addr) {
@@ -208,8 +189,8 @@ PRECISION DS18B20_Control::get_thermometerResolution(void) {
  **************************/
 
 // Enable a temperature conversion
-void DS18B20_Control::convert_Temperature(uint8_t* present) {
-  OneWire ds(OneWireBus);
+void DS18B20_Control::update_sensor_data(uint8_t* present) {
+  OneWire ds(get_SensorPin());
   uint8_t powerMode;
   uint8_t data[9];
 
@@ -373,26 +354,6 @@ void DS18B20_Control::pushCommands_Full(OneWire* device, uint8_t* present,
  ***********************************/
 
 // Return the latest temperature conversion result
-float DS18B20_Control::get_Temperature(void) {
-  return temperature;
-}
-
-
-/*****************************
- *** readFlag operation(s) ***
- *****************************/
-
-// Set readFlag
-void DS18B20_Control::set_readFlag(void) {
-  readFlag = true;
-}
-
-// Return value
-bool DS18B20_Control::is_readFlag_set(void) {
-  return readFlag;
-}
-
-// Clear readFlag
-void DS18B20_Control::clear_readFlag(void) {
-  readFlag = false;
+void DS18B20_Control::read_sensor_data(float *external_storage) {
+  *external_storage = temperature;
 }

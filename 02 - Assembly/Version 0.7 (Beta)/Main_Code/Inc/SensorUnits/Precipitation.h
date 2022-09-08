@@ -1,4 +1,5 @@
 #include "DS3231.h"
+#include "../Sensor_General.h"
 
 #define RainfallPerTip  0.2794  // mm
 
@@ -6,7 +7,7 @@
 /**************************************
  *** Precipitation class definition ***
  **************************************/
-class Precipitation {   
+class Precipitation : public Sensor_General {   
   public:
     // Constructor
     Precipitation(byte hour = 9, byte minute = 0, byte second = 0);
@@ -16,7 +17,7 @@ class Precipitation {
     void set_DailyAlarm(byte hour = 9, byte minute = 0, byte second = 0);   // Set daily alarm (Default: 9 A.M)
 
     // Data-returning method
-    float get_Rainfall_Data(void);   // Return the latest calculated rainfall amount
+    void read_sensor_data(float *external_storage);   // Return the latest calculated rainfall amount
 
     // Internal operation(s) for external interrupt service routine(s)
     void Increment_Counter(void);       // Increment internal count whenever the bucket tips
