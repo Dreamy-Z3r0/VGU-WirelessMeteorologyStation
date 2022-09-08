@@ -45,55 +45,93 @@ int DS3231_Control::readSecond(void) {
   return RTC_data[5];
 }
 
+// Process input data for date/time as String
+void DS3231_Control::DateTime_InputString_Processing(String input_data) {
+  bool inputVerification;
+
+  String input_processed = input_data.substring(0, input_data.indexOf(':'));  // Identifier of input data
+  if (input_processed.equals("Date")) {    // Input is date data
+    if (15 != input_data.length()) {   // Expected input length for DD-MM-YYYY format
+      #ifdef DEBUGGING_OVER_SERIAL
+      Serial.println("Invalid format. Date should be input in DD-MM-YYYY format.");
+      #endif
+    } else {
+      input_processed = input_data.substring(5);   // Extract the data string
+      input_DateTime(input_processed, day|month|year, &inputVerification);  // Process the extracted data and verify
+      if (inputVerification) update_RTC(day|month|year);  // Update RTC if the extracted data is valid
+    }
+  } else if (input_processed.equals("Time")) {   // Input is time data
+    if ((13 == input_data.length()) || (10 == input_data.length())) {   // Expected input lengths for HH:MM:SS and HH:MM formats
+      input_processed = input_data.substring(5);   // Extract the data string
+
+      if (13 == input_data.length()) {   // HH:MM:SS format
+        input_DateTime(input_processed, hour|minute|second, &inputVerification);  // Process the extracted data and verify
+        if (inputVerification) update_RTC(hour|minute|second);  // Update RTC if the extracted data is valid
+      } else {    // HH:MM format
+        input_DateTime(input_processed, hour|minute, &inputVerification);  // Process the extracted data and verify
+        if (inputVerification) update_RTC(hour|minute);  // Update RTC if the extracted data is valid
+      }
+    } else {
+      #ifdef DEBUGGING_OVER_SERIAL
+      Serial.println("Invalid format. Time should be input in HH:MM or HH:MM:SS formats.");
+      #endif
+    }
+  } else {  // Invalid data input
+    #ifdef DEBUGGING_OVER_SERIAL
+    Serial.printf("Unrecogised input identifier: %s\n", input_data.substring(0,4));
+    #endif
+  }
+}
+
 // Extract the input data and check the validity before storing for updating
 void DS3231_Control::input_DateTime(String input_data, int type, bool* entryVerification) {
   *entryVerification = false;
 
   switch (type) {
     case (day|month|year): { // DD-MM-YYYY or DD/MM/YYYY
-        Date DateFromInput;
-        DateFromInput.year = input_data.substring(6).toInt();
-        DateFromInput.month = input_data.substring(3, 5).toInt();
-        DateFromInput.day = input_data.substring(0, 2).toInt();
+      Date DateFromInput;
+      DateFromInput.year = input_data.substring(6).toInt();
+      DateFromInput.month = input_data.substring(3, 5).toInt();
+      DateFromInput.day = input_data.substring(0, 2).toInt();
 
-        *entryVerification = isValidDate(&DateFromInput);
+      *entryVerification = isValidDate(&DateFromInput);
 
-        if (*entryVerification) {
-          RTC_data[0] = DateFromInput.day;
-          RTC_data[1] = DateFromInput.month;
-          RTC_data[2] = DateFromInput.year;
-        }
-        break;
+      if (*entryVerification) {
+        RTC_data[0] = DateFromInput.day;
+        RTC_data[1] = DateFromInput.month;
+        RTC_data[2] = DateFromInput.year;
       }
+      break;
+    }
     case (hour|minute|second): {
-        Time TimeFromInput;
-        TimeFromInput.hour = input_data.substring(0, 2).toInt();
-        TimeFromInput.minute = input_data.substring(3, 5).toInt();
-        TimeFromInput.second = input_data.substring(6, 8).toInt();
+      Time TimeFromInput;
+      TimeFromInput.hour = input_data.substring(0, 2).toInt();
+      TimeFromInput.minute = input_data.substring(3, 5).toInt();
+      TimeFromInput.second = input_data.substring(6, 8).toInt();
 
-        *entryVerification = isValidTime(&TimeFromInput);
+      *entryVerification = isValidTime(&TimeFromInput);
 
-        if (*entryVerification) {
-          RTC_data[3] = TimeFromInput.hour;
-          RTC_data[4] = TimeFromInput.minute;
-          RTC_data[5] = TimeFromInput.second;
-        }
-        break;
+      if (*entryVerification) {
+        RTC_data[3] = TimeFromInput.hour;
+        RTC_data[4] = TimeFromInput.minute;
+        RTC_data[5] = TimeFromInput.second;
       }
+      break;
+    }
     case (hour|minute): {
-        Time TimeFromInput;
-        TimeFromInput.hour = input_data.substring(0, 2).toInt();
-        TimeFromInput.minute = input_data.substring(3, 5).toInt();
-        TimeFromInput.second = 0;
+      Time TimeFromInput;
+      TimeFromInput.hour = input_data.substring(0, 2).toInt();
+      TimeFromInput.minute = input_data.substring(3, 5).toInt();
+      TimeFromInput.second = 0;
 
-        *entryVerification = isValidTime(&TimeFromInput);
+      *entryVerification = isValidTime(&TimeFromInput);
 
-        if (*entryVerification) {
-          RTC_data[3] = TimeFromInput.hour;
-          RTC_data[4] = TimeFromInput.minute;
-        }
-        break;
+      if (*entryVerification) {
+        RTC_data[3] = TimeFromInput.hour;
+        RTC_data[4] = TimeFromInput.minute;
       }
+      break;
+    }
     default:
       break;
   }
@@ -129,33 +167,39 @@ void DS3231_Control::update_RTC(int type) {
 
   switch (type) {
     case (day|month|year): {  // Update RTC date
-        RTC_update_func.setYear((byte)(RTC_data[2]) % 100);  // new year
-        RTC_update_func.setMonth((byte)(RTC_data[1]));        // new month
-        RTC_update_func.setDate((byte)(RTC_data[0]));         // new date
-#ifdef DEBUGGING_OVER_SERIAL
-        Serial.println("Date updated.");
-#endif
-        break;
-      }
+      RTC_update_func.setYear((RTC_data[2]) % 100);  // new year
+      RTC_update_func.setMonth(RTC_data[1]);        // new month
+      RTC_update_func.setDate(RTC_data[0]);         // new date
+
+      #ifdef DEBUGGING_OVER_SERIAL
+      Serial.println("Date updated.");
+      #endif
+      
+      break;
+    }
     case (hour|minute|second): {  // Update time in full format
-        RTC_update_func.setClockMode(false);  // set to 24h
-        RTC_update_func.setHour((byte)(RTC_data[3]));        // new hour
-        RTC_update_func.setMinute((byte)(RTC_data[4]));      // new minute
-        RTC_update_func.setSecond((byte)(RTC_data[5]));      // new second
-#ifdef DEBUGGING_OVER_SERIAL
-        Serial.println("Time updated.");
-#endif
-        break;
-      }
+      RTC_update_func.setClockMode(false);  // set to 24h
+      RTC_update_func.setHour(RTC_data[3]);        // new hour
+      RTC_update_func.setMinute(RTC_data[4]);      // new minute
+      RTC_update_func.setSecond(RTC_data[5]);      // new second
+
+      #ifdef DEBUGGING_OVER_SERIAL
+      Serial.println("Time updated.");
+      #endif
+
+      break;
+    }
     case (hour|minute): {   // Update time without second
-        RTC_update_func.setClockMode(false);  // set to 24h
-        RTC_update_func.setHour((byte)(RTC_data[3]));        // new hour
-        RTC_update_func.setMinute((byte)(RTC_data[4]));      // new minute
-#ifdef DEBUGGING_OVER_SERIAL
-        Serial.println("Time updated.");
-#endif
-        break;
-      }
+      RTC_update_func.setClockMode(false);  // set to 24h
+      RTC_update_func.setHour(RTC_data[3]);        // new hour
+      RTC_update_func.setMinute(RTC_data[4]);      // new minute
+
+      #ifdef DEBUGGING_OVER_SERIAL
+      Serial.println("Time updated.");
+      #endif
+        
+      break;
+    }
     default:  // Default case never occurs
       break;
   }
@@ -175,10 +219,12 @@ void DS3231_Control::clearRTC_request(void) {
 
 
 void request_from_RTC(DS3231_Control* RTC_DS3231) {
-  counter += 1;
+  // counter += 1;
 
-  if (5 == counter) {
-    counter = 0;
-    RTC_DS3231->request_from_RTC();
-  }
+  // if (5 == counter) {
+  //   counter = 0;
+  //   RTC_DS3231->request_from_RTC();
+  // }
+
+  RTC_DS3231->request_from_RTC();
 }

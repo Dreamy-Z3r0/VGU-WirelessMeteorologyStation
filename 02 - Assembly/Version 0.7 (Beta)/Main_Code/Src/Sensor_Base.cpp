@@ -14,7 +14,7 @@ void Sensor_Base::set_SensorPin(uint32_t SensorPin) {
 }
 
 uint32_t Sensor_Base::get_SensorPin(void) {
-  return SensorPin;
+  return SensorPin; 
 }
 
 void Sensor_Base::update_sensor_data(void) {

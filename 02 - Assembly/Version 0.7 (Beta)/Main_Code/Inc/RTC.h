@@ -26,24 +26,30 @@ class DS3231_Control {
   
     // Fetch time kept by the DS3231
     void readRTC(void);
-    // Extract the input data and check the validity before storing for updating
-    void input_DateTime(String input_data, int type, bool* entryVerification);
-    // Update the RTC
-    void update_RTC(int type);
+    // Process String input data for date/time
+    void DateTime_InputString_Processing(String input_data);
 
-    int readDay(void);
-    int readMonth(void);
-    int readYear(void);
+    // Return date data
+    int readDay(void);    // Day of month
+    int readMonth(void);  // Month
+    int readYear(void);   // Year
 
-    int readHour(void);
-    int readMinute(void);
-    int readSecond(void);
+    // Return time data
+    int readHour(void);     // Hour
+    int readMinute(void);   // Minute
+    int readSecond(void);   // Second
     
     void request_from_RTC(void);
     bool is_RTC_requested(void);
     void clearRTC_request(void);
 
   protected:
+    // Update the RTC
+    void update_RTC(int type);
+
+    // Extract the input data and check the validity before storing for updating
+    void input_DateTime(String input_data, int type, bool* entryVerification);
+
     // Validate input date
     bool isValidDate(Date* inputDate);
     // Validate input time

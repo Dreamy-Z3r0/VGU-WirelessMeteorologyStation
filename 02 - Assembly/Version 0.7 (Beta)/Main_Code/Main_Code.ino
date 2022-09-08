@@ -79,33 +79,11 @@ void DateTime_InputHandler() {
   #ifdef DEBUGGING_OVER_SERIAL
   if (Serial.available()) {   // Check for user input
     String input = Serial.readStringUntil('\n');
-    bool inputVerification;
-    
-    String input_processed = input.substring(0, input.indexOf(':'));  // Identifier of input data
-    if (input_processed.equals("Date")) {    // Input is date data
-      if (15 != input.length()) {   // Expected input length for DD-MM-YYYY format
-        Serial.println("Invalid format. Date should be input in DD-MM-YYYY format.");
-      } else {
-        input_processed = input.substring(5);   // Extract the data string
-        RTC_DS3231.input_DateTime(input_processed, day|month|year, &inputVerification);  // Process the extracted data and verify
-        if (inputVerification) RTC_DS3231.update_RTC(day|month|year);  // Update RTC if the extracted data is valid
-      }
-    } else if (input_processed.equals("Time")) {   // Input is time data
-      if ((13 == input.length()) || (10 == input.length())) {   // Expected input lengths for HH:MM:SS and HH:MM formats
-        input_processed = input.substring(5);   // Extract the data string
 
-        if (13 == input.length()) {   // HH:MM:SS format
-          RTC_DS3231.input_DateTime(input_processed, hour|minute|second, &inputVerification);  // Process the extracted data and verify
-          if (inputVerification) RTC_DS3231.update_RTC(hour|minute|second);  // Update RTC if the extracted data is valid
-        } else {    // HH:MM format
-          RTC_DS3231.input_DateTime(input_processed, hour|minute, &inputVerification);  // Process the extracted data and verify
-          if (inputVerification) RTC_DS3231.update_RTC(hour|minute);  // Update RTC if the extracted data is valid
-        }
-      } else {
-        Serial.println("Invalid format. Time should be input in HH:MM or HH:MM:SS formats.");
-      }
-    } else {  // Invalid data input
-      Serial.printf("Unrecogised input identifier: %s\n", input.substring(0,4));
+    if (input.substring(0,4).equals("Date") | input.substring(0,4).equals("Time")) {
+      RTC_DS3231.DateTime_InputString_Processing(input);
+    } else {
+      Serial.println("Unrecognised input data.");
     }
   }
   #endif
