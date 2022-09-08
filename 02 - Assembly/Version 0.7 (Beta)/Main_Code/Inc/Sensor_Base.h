@@ -2,9 +2,9 @@
 
 #include "RTC.h"
 
-class Sensor_General : public DS3231_Control {
+class Sensor_Base : public DS3231_Control {
   public:
-    Sensor_General(void);
+    Sensor_Base(void);
 
     void init(void);
 

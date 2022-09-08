@@ -1,5 +1,5 @@
 #include "DS3231.h"
-#include "../Sensor_General.h"
+#include "../Sensor_Base.h"
 
 #define RainfallPerTip  0.2794  // mm
 
@@ -7,7 +7,7 @@
 /**************************************
  *** Precipitation class definition ***
  **************************************/
-class Precipitation : public Sensor_General {   
+class Precipitation : public Sensor_Base {   
   public:
     // Constructor
     Precipitation(byte hour = 9, byte minute = 0, byte second = 0);

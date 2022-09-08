@@ -10,7 +10,7 @@
 /* DS18B20 */
 #include <OneWire.h>
 
-#include "../Sensor_General.h"
+#include "../Sensor_Base.h"
 
 
 
@@ -79,7 +79,7 @@ enum CONVERT_T_DELAY {ENABLE_DELAY = 1, DISABLE_DELAY = 0};     // Valid values 
  *************************/
 
 /* BME280 */
-class BME280_Control : public Sensor_General {    
+class BME280_Control : public Sensor_Base {    
   public:
     // Class constructor(s)
     BME280_Control(Adafruit_BME280* bme280_instance);
@@ -110,7 +110,7 @@ class BME280_Control : public Sensor_General {
 
 
 /* DS18B20 */
-class DS18B20_Control : public Sensor_General {
+class DS18B20_Control : public Sensor_Base {
   public:
     // Class constructor(s)
     DS18B20_Control(uint32_t OneWireBus, PRECISION thermometerResolution = R_12BIT, bool sharedBus = false);   // Constructor

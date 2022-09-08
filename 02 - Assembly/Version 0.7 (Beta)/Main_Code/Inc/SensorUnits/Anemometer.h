@@ -1,4 +1,4 @@
-#include "../Sensor_General.h"
+#include "../Sensor_Base.h"
 
 
 /* Speed conversion methods */
@@ -27,7 +27,7 @@
 /***********************************
  *** Anemometer class definition ***
  ***********************************/
-class Anemometer_Control : public Sensor_General {
+class Anemometer_Control : public Sensor_Base {
   public:
     // Class constructor(s)
     Anemometer_Control(uint32_t SensorPin);

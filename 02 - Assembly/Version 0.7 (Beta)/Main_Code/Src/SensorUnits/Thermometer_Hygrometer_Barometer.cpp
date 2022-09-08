@@ -284,7 +284,7 @@ void DS18B20_Control::pushCommands_Full(OneWire* device, uint8_t* present,
   *present = device->reset();   
   if (0 == *present) return;
 
-  // Writre ROM command, then the follow-up operations (if any)
+  // Write ROM command, then the follow-up operations (if any)
   switch (ROMCommand) { 
     case MATCH_ROM: { // MATCH_ROM (0x55) is issued, followed by the ROM code of a specific slave
       device->write(ROMCommand);
