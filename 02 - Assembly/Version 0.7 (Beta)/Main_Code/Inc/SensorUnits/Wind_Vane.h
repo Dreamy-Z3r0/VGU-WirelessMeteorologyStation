@@ -1,5 +1,3 @@
-#include "Arduino.h"
-
 /* STM32F1xx specific HAL configuration options. */
 #if __has_include("hal_conf_custom.h")
 #include "hal_conf_custom.h"

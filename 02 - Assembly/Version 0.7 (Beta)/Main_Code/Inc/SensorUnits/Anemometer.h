@@ -30,6 +30,7 @@
 class Anemometer_Control : public Sensor_Base {
   public:
     // Class constructor(s)
+    Anemometer_Control(void);
     Anemometer_Control(uint32_t SensorPin);
 
     // Device initialization

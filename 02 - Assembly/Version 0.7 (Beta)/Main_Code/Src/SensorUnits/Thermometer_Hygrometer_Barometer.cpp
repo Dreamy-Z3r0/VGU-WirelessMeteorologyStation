@@ -11,10 +11,24 @@
  *** Contructor(s) ***
  *********************/
 
+// Empty constructor
+BME280_Control::BME280_Control(void) {
+  Adafruit_BME280_InstanceAvailable = false;
+}
+
 // Accepts the pointer to global device instance
 BME280_Control::BME280_Control(Adafruit_BME280* bme280_instance) {
-  this->bme280_instance = bme280_instance;
+  update_external_device_instance(bme280_instance);
+  Adafruit_BME280_InstanceAvailable = true;
+}
 
+
+/**********************
+ *** Initialization ***
+ **********************/
+
+// Initial settings for BME280 device
+void BME280_Control::init(void) {
   BME280_userSettings.Sensor_Mode = Adafruit_BME280::MODE_SLEEP;
   BME280_userSettings.Temperature_Oversampling = Adafruit_BME280::SAMPLING_X1;
   BME280_userSettings.Pressure_Oversampling = Adafruit_BME280::SAMPLING_X1;
@@ -22,7 +36,21 @@ BME280_Control::BME280_Control(Adafruit_BME280* bme280_instance) {
   BME280_userSettings.Filter_Coefficient = Adafruit_BME280::FILTER_OFF;
   BME280_userSettings.Standby_Duration = Adafruit_BME280::STANDBY_MS_0_5;
 
+  update_BME280_settings();
+
   clear_readFlag();
+}
+
+// Initialize BME280 device settings with update Adafruit_BME280 instance
+void BME280_Control::init(Adafruit_BME280* bme280_instance) {
+  update_external_device_instance(bme280_instance);
+  init();
+}
+
+// Update Adafruit_BME280 instance
+void BME280_Control::update_external_device_instance(Adafruit_BME280* bme280_instance) {
+  this->bme280_instance = bme280_instance;
+  Adafruit_BME280_InstanceAvailable = true;
 }
 
 
@@ -33,15 +61,17 @@ BME280_Control::BME280_Control(Adafruit_BME280* bme280_instance) {
 // Update device settings
 void BME280_Control::update_BME280_settings(unsigned long custom_readInterval) {
   BME280_userSettings.readInterval = custom_readInterval;
-  
-  bme280_instance->setSampling( 
-                     BME280_userSettings.Sensor_Mode,                // Overwrite BME280 power mode
-                     BME280_userSettings.Temperature_Oversampling,   // Overwrite BME280 temperature oversampling
-                     BME280_userSettings.Pressure_Oversampling,      // Overwrite BME280 pressure oversampling
-                     BME280_userSettings.Humidity_Oversampling,      // Overwrite BME280 humidity oversampling
-                     BME280_userSettings.Filter_Coefficient,         // Overwrite BME280 IIR filter coefficient
-                     BME280_userSettings.Standby_Duration            // Overwrite BME280 standby duration
-                   );
+
+  if (Adafruit_BME280_InstanceAvailable) {  
+    bme280_instance->setSampling( 
+                      BME280_userSettings.Sensor_Mode,                // Overwrite BME280 power mode
+                      BME280_userSettings.Temperature_Oversampling,   // Overwrite BME280 temperature oversampling
+                      BME280_userSettings.Pressure_Oversampling,      // Overwrite BME280 pressure oversampling
+                      BME280_userSettings.Humidity_Oversampling,      // Overwrite BME280 humidity oversampling
+                      BME280_userSettings.Filter_Coefficient,         // Overwrite BME280 IIR filter coefficient
+                      BME280_userSettings.Standby_Duration            // Overwrite BME280 standby duration
+                     );
+  }
 }
 
 // Set (custom) sensor mode
@@ -130,6 +160,12 @@ float BME280_Control::get_Humidity(void) {
 /*********************
  *** Contructor(s) ***
  *********************/
+
+// Accept input pin for One-Wire bus; (optional) thermometer resolution and shared bus indicator
+DS18B20_Control::DS18B20_Control(PRECISION thermometerResolution, bool sharedBus) {
+  update_DS18B20_settings(thermometerResolution);
+  this->sharedBus = sharedBus;
+}
 
 // Accept input pin for One-Wire bus; (optional) thermometer resolution and shared bus indicator
 DS18B20_Control::DS18B20_Control(uint32_t SensorPin, PRECISION thermometerResolution, bool sharedBus) {

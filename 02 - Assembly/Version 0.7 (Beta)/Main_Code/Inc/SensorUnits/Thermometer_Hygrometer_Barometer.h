@@ -82,7 +82,13 @@ enum CONVERT_T_DELAY {ENABLE_DELAY = 1, DISABLE_DELAY = 0};     // Valid values 
 class BME280_Control : public Sensor_Base {    
   public:
     // Class constructor(s)
+    BME280_Control(void);
     BME280_Control(Adafruit_BME280* bme280_instance);
+
+    // Initialization
+    void init(void);
+    void init(Adafruit_BME280* bme280_instance);
+    void update_external_device_instance(Adafruit_BME280* bme280_instance);
 
     // Device settings operations
     void update_BME280_settings(unsigned long custom_readInterval = 1000);    // Update device settings  
@@ -106,6 +112,8 @@ class BME280_Control : public Sensor_Base {
     Adafruit_BME280* bme280_instance;       // Pointer to global device instance
     BME280_settings BME280_userSettings;    // Stores the latest (user-input) settings for sensor
     BME280_Data BME280_dataStorage;         // Stores the latest sensor readings
+
+    bool Adafruit_BME280_InstanceAvailable;
 };
 
 
@@ -113,7 +121,8 @@ class BME280_Control : public Sensor_Base {
 class DS18B20_Control : public Sensor_Base {
   public:
     // Class constructor(s)
-    DS18B20_Control(uint32_t OneWireBus, PRECISION thermometerResolution = R_12BIT, bool sharedBus = false);   // Constructor
+    DS18B20_Control(PRECISION thermometerResolution = R_12BIT, bool sharedBus = false);
+    DS18B20_Control(uint32_t SensorPin, PRECISION thermometerResolution = R_12BIT, bool sharedBus = false);   // Constructor
 
     void update_DS18B20_addr(uint8_t* addr);  // Update DS18B20 ROM code
 

@@ -5,10 +5,24 @@
  *** Contructor(s) ***
  *********************/
 
-// Accept input pin parameter and set (initial) values of variables and class constants
+// Class constructor without input parameter(s)
+Anemometer_Control::Anemometer_Control(void) {
+  // Do nothing inside this constructor
+}
+
+// Accept input pin parameter
 Anemometer_Control::Anemometer_Control(uint32_t SensorPin) {    
   set_SensorPin(SensorPin);
+}
 
+
+/*****************************
+ *** Device initialization ***
+ *****************************/
+
+// Timer initialisation
+void Anemometer_Control::init(TIM_TypeDef* EdgePeriodTimer_Instance, TIM_TypeDef* CalmAirTimer_Instance) {
+  /* Set initial value for class variables */
   idleTimeInMilliseconds = timeBetweenReadingPeriods * 60E3;
 
   set_standbyFlag();
@@ -25,15 +39,8 @@ Anemometer_Control::Anemometer_Control(uint32_t SensorPin) {
 
   arr_index = 0;
   fault_count = 0;
-}
 
-
-/*****************************
- *** Device initialization ***
- *****************************/
-
-// Timer initialisation
-void Anemometer_Control::init(TIM_TypeDef* EdgePeriodTimer_Instance, TIM_TypeDef* CalmAirTimer_Instance) {
+  /* Initiate timers */
   EdgePeriodTimer = new HardwareTimer(EdgePeriodTimer_Instance);
   CalmAirTimer = new HardwareTimer(CalmAirTimer_Instance);
   
