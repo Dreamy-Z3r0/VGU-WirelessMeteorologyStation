@@ -1,3 +1,5 @@
+#pragma once
+
 /*****************
  *** Libraries ***
  *****************/
@@ -81,6 +83,8 @@ enum CONVERT_T_DELAY {ENABLE_DELAY = 1, DISABLE_DELAY = 0};     // Valid values 
 /* BME280 */
 class BME280_Control : public Sensor_Base {    
   public:
+    Adafruit_BME280* bme280_instance;       // Pointer to global device instance
+
     // Class constructor(s)
     BME280_Control(void);
     BME280_Control(Adafruit_BME280* bme280_instance);
@@ -106,10 +110,9 @@ class BME280_Control : public Sensor_Base {
     void read_sensor_data(float *external_storage);
     float get_Temperature(void);  // Only return latest ambient temperature reading   
     float get_Pressure(void);     // Only return latest barometric pressure reading
-    float get_Humidity(void);     // Only return latest relative humidity reading
+    float get_Humidity(void);     // Only return latest relative humidity reading   
 
   private:
-    Adafruit_BME280* bme280_instance;       // Pointer to global device instance
     BME280_settings BME280_userSettings;    // Stores the latest (user-input) settings for sensor
     BME280_Data BME280_dataStorage;         // Stores the latest sensor readings
 

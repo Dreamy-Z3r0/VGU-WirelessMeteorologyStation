@@ -5,8 +5,30 @@
  *** Contructor(s) ***
  *********************/
 
-// Set initial values for variables (and class constants)
-Precipitation::Precipitation(byte hour, byte minute, byte second) {
+// Empty constructor; Should never be called
+Precipitation::Precipitation(void) {
+  // Do nothing
+}
+
+// Accept sensor and alarm inputs; Set default values for class variables/settings
+Precipitation::Precipitation(uint32_t SensorPin, uint32_t Alarm_InputPin) {
+  set_SensorPin(SensorPin);
+  this->Alarm_InputPin = Alarm_InputPin;
+
+  Daily_Counter = 0;
+  Rainfall_Data = 0;
+  RainGauge_DailyAlarm = false;
+
+  DailyAlarm_Time[0] = 9;
+  DailyAlarm_Time[1] = 0;
+  DailyAlarm_Time[2] = 0;
+}
+
+// Accept sensor and alarm inputs; (Optional) accept user-input alarm settings
+Precipitation::Precipitation(uint32_t SensorPin, uint32_t Alarm_InputPin, byte hour, byte minute, byte second) {
+  set_SensorPin(SensorPin);
+  this->Alarm_InputPin = Alarm_InputPin;
+  
   Daily_Counter = 0;
   Rainfall_Data = 0;
   RainGauge_DailyAlarm = false;
@@ -22,11 +44,11 @@ Precipitation::Precipitation(byte hour, byte minute, byte second) {
  *****************************/
 
 // Initial setups for communicating with and managing rain gauge
-void Precipitation::init(uint32_t RainGauge_InputPin, uint32_t Alarm_InputPin) {    
-  pinMode(RainGauge_InputPin, INPUT_PULLUP);  // Initialize rain gauge input
-  pinMode(Alarm_InputPin, INPUT_PULLUP);      // Initialize alarm pin
+void Precipitation::init(void) {    
+  pinMode(get_SensorPin(), INPUT_PULLUP);   // Initialize rain gauge input
+  pinMode(Alarm_InputPin, INPUT_PULLUP);    // Initialize alarm pin
 
-  attachInterrupt(digitalPinToInterrupt(RainGauge_InputPin), std::bind(RainGauge_Tipping_Callback, this), FALLING);   // Routine on a bucket tip
+  attachInterrupt(digitalPinToInterrupt(get_SensorPin()), std::bind(RainGauge_Tipping_Callback, this), FALLING);   // Routine on a bucket tip
 
   DS3231 clock;
   clock.setA1Time(1, DailyAlarm_Time[0], DailyAlarm_Time[1], DailyAlarm_Time[2], 0x8, false, false, false);    // Set up daily alarm

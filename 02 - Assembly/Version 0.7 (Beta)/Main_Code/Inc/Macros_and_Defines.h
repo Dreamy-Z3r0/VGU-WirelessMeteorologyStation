@@ -49,7 +49,7 @@ DS18B20_Control DS18B20_Device(OneWireBus);
  *** Rain gauge ***
  ******************/
 #define RainGauge_InputPin PA1
-Precipitation RainGauge;
+Precipitation RainGauge(RainGauge_InputPin, Alarm_InputPin);
 
 
 /*****************
@@ -64,3 +64,14 @@ Precipitation RainGauge;
  ******************/
 #define Anemometer_InputPin PA3
 Anemometer_Control Anemometer_Device(Anemometer_InputPin);
+
+
+/*********************************
+ *** General sensor controller ***
+ *********************************/
+Sensor_Control Project_Sensor( &Anemometer_Device,
+                               &WindVane, 
+                               &RainGauge,
+                               &BME280_Device,
+                               &DS18B20_Device
+                             );

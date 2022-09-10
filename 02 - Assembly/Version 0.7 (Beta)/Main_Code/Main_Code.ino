@@ -10,7 +10,7 @@ void setup() {
 
   Wire.begin();
   WindVane.init();
-  RainGauge.init(RainGauge_InputPin, Alarm_InputPin);
+  RainGauge.init();
   Anemometer_Device.init();
 //  RainGauge.set_DailyAlarm(12, 14, 45);
 

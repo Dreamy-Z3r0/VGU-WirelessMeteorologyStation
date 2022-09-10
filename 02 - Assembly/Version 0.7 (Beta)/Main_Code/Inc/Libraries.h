@@ -19,7 +19,10 @@
 
 // Custom functions
 #include "../Inc/RTC.h"
+
 #include "../Inc/SensorUnits/Thermometer_Hygrometer_Barometer.h"
 #include "../Inc/SensorUnits/Precipitation.h"
 #include "../Inc/SensorUnits/Wind_Vane.h"
 #include "../Inc/SensorUnits/Anemometer.h"
+
+#include "Sensor_Control.h"
