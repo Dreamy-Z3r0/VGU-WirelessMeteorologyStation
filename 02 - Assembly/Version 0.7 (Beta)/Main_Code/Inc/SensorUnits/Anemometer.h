@@ -36,28 +36,26 @@ class Anemometer_Control : public Sensor_Base {
     Anemometer_Control(uint32_t SensorPin);
 
     // Device initialization
-    void init(TIM_TypeDef* EdgePeriodTimer_Instance = TIM1, TIM_TypeDef* CalmAirTimer_Instance = TIM2);
+    void init(TIM_TypeDef* AnemometerTimer_Instance = TIM1);
 
     // Public operations
     void update_sensor_data(void);    // Continuously called to perform wind speed reading
     void read_sensor_data(float *external_storage);    // Returns the latest wind speed value
 
     // Internal operations for external interrupt service routines
-    void Timer_Callback(HardwareTimer* OverflownTimer);   // Timer counter overflow callback
+    void Timer_Callback(void);   // Timer counter overflow callback
     void Input_Callback(void);    // Edge presence callback
     
   private:
     unsigned long idleTimeInMilliseconds;   // Duration between 2 consecutive readings
     
-    HardwareTimer* EdgePeriodTimer;   // Timer timing 2 consecutive edges
-    HardwareTimer* CalmAirTimer;      // Timer timing calm air period
+    HardwareTimer* AnemometerTimer;   // Timer for anemometer
     
     bool isTakingFirstEdge, isSecondEdgeDetected;  // Edge-controlling flags 
     bool CalmAir;   // Calm air detection
 
-    unsigned long EdgeTiming_Overflow;    // Helps timing edges since duration between 2 edges could exceed timer counter capacity
-    uint8_t CalmAirTiming_Overflow,   // Helps timing calm air period since it exceeds timer counter capacity
-            CalmAirTiming_MaxValue;   // Max value for CalmAirTiming_Overflow by which a calm air period is determined
+    unsigned long Timing_Overflow;    // Helps timing edges since duration between 2 edges could exceed timer counter capacity
+    uint8_t CalmAirTiming_MaxValue;   // Max value for CalmAirTiming_Overflow by which a calm air period is determined
 
     float windSpeed[dataPointsPerMeasurement];    // Stores wind speed data points of a reading
     uint8_t arr_index;    // Index for windSpeed[]
@@ -74,5 +72,5 @@ class Anemometer_Control : public Sensor_Base {
 /*******************************************
  *** External interrupt service routines ***
  *******************************************/
-void TIM_Ovf_callback(Anemometer_Control* Anemometer_Instance, HardwareTimer* OverflownTimer);    // Interrupt service routine when a timer counter overflows
+void TIM_Ovf_Callback(Anemometer_Control* Anemometer_Instance);    // Interrupt service routine when a timer counter overflows
 void anemometerInput_Detected(Anemometer_Control* Anemometer_Instance);   // Interrupt service routine when an edge is present at the input pin
