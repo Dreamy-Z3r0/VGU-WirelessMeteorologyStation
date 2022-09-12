@@ -37,7 +37,7 @@ class WindVane_Control : public Sensor_Base {
     WindVane_Control(uint32_t ADC_input_pin, unsigned int storage_size = numberOfDataPoints);
 
     // Public operation(s)
-    void init(TIM_TypeDef* StandbyTimer_Instance = TIM3);    // Initiate the ADC
+    void init(TIM_TypeDef* StandbyTimer_Instance = TIM2);    // Initiate the ADC
 
     void update_standby(unsigned long standby_period = 50);  
     

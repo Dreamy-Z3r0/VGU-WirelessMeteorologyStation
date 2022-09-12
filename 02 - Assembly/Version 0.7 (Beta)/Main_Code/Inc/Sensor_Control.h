@@ -5,7 +5,7 @@
 typedef struct {
     float Wind_Data[2];     // Wind_Data[0] -> wind speed; Wind_Data[1] -> wind direction
     float Rainfall_Amount;
-    float BME280_Data[3];
+    float BME280_Data[3];   // BME280: Temperature - Pressure - Humidity
     float DS18B20_Temperature;
 } Sensor_Readings;
 
@@ -38,7 +38,7 @@ class Sensor_Control {
         void Read_From_Sensors(void);
 
     private:
-
+        void Read_From_Anemometer(void);
 };
 
 extern Sensor_Control General_Sensor_Control;

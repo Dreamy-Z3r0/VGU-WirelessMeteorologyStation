@@ -66,5 +66,9 @@ void Sensor_Control::update_DS18B20_Device(DS18B20_Control *DS18B20_Device) {
 }
 
 void Sensor_Control::Read_From_Sensors(void) {
+
+}
+
+void Sensor_Control::Read_From_Anemometer(void) {
     
 }
