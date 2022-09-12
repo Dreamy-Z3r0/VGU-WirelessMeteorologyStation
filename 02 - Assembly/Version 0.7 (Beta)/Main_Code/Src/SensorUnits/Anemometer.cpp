@@ -21,7 +21,7 @@ Anemometer_Control::Anemometer_Control(uint32_t SensorPin) {
  *****************************/
 
 // Timer initialisation
-void Anemometer_Control::init(TIM_TypeDef* EdgePeriodTimer_Instance, TIM_TypeDef* CalmAirTimer_Instance) {
+void Anemometer_Control::init(TIM_TypeDef* AnemometerTimer_Instance) {
   /* Set initial value for class variables */
   idleTimeInMilliseconds = timeBetweenReadingPeriods * 60E3;
 
@@ -34,23 +34,17 @@ void Anemometer_Control::init(TIM_TypeDef* EdgePeriodTimer_Instance, TIM_TypeDef
   CalmAir = false;
   CalmAirTiming_MaxValue = (uint8_t)(maxInput_windSpeed / (10E-3));
 
-  EdgeTiming_Overflow = 0;
-  CalmAirTiming_Overflow = 0;
+  Timing_Overflow = 0;
 
   arr_index = 0;
   fault_count = 0;
 
   /* Initiate timers */
-  EdgePeriodTimer = new HardwareTimer(EdgePeriodTimer_Instance);
-  CalmAirTimer = new HardwareTimer(CalmAirTimer_Instance);
+  AnemometerTimer = new HardwareTimer(AnemometerTimer_Instance);
   
-  EdgePeriodTimer->setMode(1, TIMER_DISABLED);    // Use channel 1 of EdgePeriodTimer_Instance in output compare mode, no output
-  EdgePeriodTimer->setOverflow(10000, MICROSEC_FORMAT);   // Timer overflows every 10ms
-  EdgePeriodTimer->attachInterrupt(1, std::bind(TIM_Ovf_callback, this, EdgePeriodTimer));  // ISR run whenever timer overflows for channel 1
-
-  CalmAirTimer->setMode(2, TIMER_DISABLED);    // Use channel 1 of CalmAirTimer_Instance in output compare mode, no output
-  CalmAirTimer->setOverflow(10000, MICROSEC_FORMAT);      // Timer overflows every 10ms
-  CalmAirTimer->attachInterrupt(2, std::bind(TIM_Ovf_callback, this, CalmAirTimer));  // ISR run whenever timer overflows for channel 1
+  AnemometerTimer->setMode(1, TIMER_DISABLED);    // Use channel 1 of AnemometerTimer_Instance in output compare mode, no output
+  AnemometerTimer->setOverflow(10000, MICROSEC_FORMAT);   // Timer overflows every 10ms
+  AnemometerTimer->attachInterrupt(1, std::bind(TIM_Ovf_Callback, this));  // ISR run whenever timer overflows for channel 1
 
   set_readFlag();
 }
@@ -77,14 +71,11 @@ void Anemometer_Control::Initialise_New_Timing_Period(void) {
   isSecondEdgeDetected = false;
   CalmAir = false;
 
-  EdgePeriodTimer->pause();  // Make sure the timer is not running, then reset counter register
-  EdgePeriodTimer->setCount(0);
-
-  CalmAirTimer->pause();    // Make sure the timer is not running, then reset counter register
-  CalmAirTimer->setCount(0);
+  AnemometerTimer->pause();  // Make sure the timer is not running, then reset counter register
+  AnemometerTimer->setCount(0);
 
   attachInterrupt(digitalPinToInterrupt(get_SensorPin()), std::bind(anemometerInput_Detected, this), RISING);
-  CalmAirTimer->resume();
+  AnemometerTimer->resume();
 }
 
 // Update windSpeed[] at the end of a timing period
@@ -94,7 +85,7 @@ void Anemometer_Control::WindSpeed_Array_Update_Routine(void) {
   }
   else {
     float measured_input_frequency;
-    measured_input_frequency = 1 / ((EdgePeriodTimer->getCount(MICROSEC_FORMAT) * 1E-6) + (EdgeTiming_Overflow * 10E-3));
+    measured_input_frequency = 1 / ((AnemometerTimer->getCount(MICROSEC_FORMAT) * 1E-6) + (Timing_Overflow * 10E-3));
           
     windSpeed[arr_index] = measured_input_frequency * 2.4;
     if (maxKnown_windSpeed < windSpeed[arr_index]) {
@@ -149,40 +140,29 @@ void Anemometer_Control::read_sensor_data(float *external_storage) {    // Retur
  *******************************************************************/
 
 // Timer counter overflow callback
-void Anemometer_Control::Timer_Callback(HardwareTimer* OverflownTimer) {
-  if (EdgePeriodTimer == OverflownTimer) {
-    EdgeTiming_Overflow += 1;
-  }
-  else if (CalmAirTimer == OverflownTimer) {
-    CalmAirTiming_Overflow += 1;
+void Anemometer_Control::Timer_Callback(void) {
+  Timing_Overflow += 1;
 
-    if (CalmAirTiming_MaxValue <= CalmAirTiming_Overflow) {
-      EdgePeriodTimer->pause();         // Pause (running) timers
-      CalmAirTimer->pause();
+  if (CalmAirTiming_MaxValue <= Timing_Overflow) {
+    detachInterrupt(digitalPinToInterrupt(get_SensorPin()));   // Stop taking inputs
 
-      detachInterrupt(digitalPinToInterrupt(get_SensorPin()));   // Stop taking inputs
-
-      EdgePeriodTimer->setCount(0);     // Reset timer counters
-      CalmAirTimer->setCount(0);
+    AnemometerTimer->pause();         // Pause (running) timer
+    AnemometerTimer->setCount(0);     // Reset timer counter
       
-      EdgeTiming_Overflow = 0;          // Reset overflow counters
-      CalmAirTiming_Overflow = 0;
+    Timing_Overflow = 0;          // Reset overflow counters
 
-      isTakingFirstEdge = false;
-      isSecondEdgeDetected = true;
-      CalmAir = true;
+    isTakingFirstEdge = false;
+    isSecondEdgeDetected = true;
+    CalmAir = true;
 
-      WindSpeed_Array_Update_Routine();
-    }
+    WindSpeed_Array_Update_Routine();
   }
 }
 
 // Edge presence callback
 void Anemometer_Control::Input_Callback(void) {
-  CalmAirTimer->pause();    // Pause the running CalmAir timer
-  
   if (!isTakingFirstEdge) {
-    EdgePeriodTimer->pause();   // Pause running EdgePeriod timer
+    AnemometerTimer->pause();   // Pause the running Anemometer timer
     
     detachInterrupt(digitalPinToInterrupt(get_SensorPin()));   // Stop taking inputs
     isSecondEdgeDetected = true;      // 2 edges timed
@@ -192,10 +172,8 @@ void Anemometer_Control::Input_Callback(void) {
     WindSpeed_Array_Update_Routine();
   }
   else {   
-    CalmAirTimer->setCount(0);    // Reset CalmAir timer
-    CalmAirTimer->resume();
-    
-    EdgePeriodTimer->resume();    // Resume EdgePeriod timer
+    AnemometerTimer->setCount(0);    // Reset CalmAir timer
+    Timing_Overflow = 0;
 
     isTakingFirstEdge = false;    // Prepare for the next edge detection
   }
@@ -207,8 +185,8 @@ void Anemometer_Control::Input_Callback(void) {
  *******************************************/
 
 // Interrupt service routine when a timer counter overflows
-void TIM_Ovf_callback(Anemometer_Control* Anemometer_Instance, HardwareTimer* OverflownTimer) {
-  Anemometer_Instance->Timer_Callback(OverflownTimer);
+void TIM_Ovf_Callback(Anemometer_Control* Anemometer_Instance) {
+  Anemometer_Instance->Timer_Callback();
 }
 
 // Interrupt service routine when an edge is present at the input pin
