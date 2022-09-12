@@ -9,29 +9,7 @@ void setup() {
   #endif
 
   Wire.begin();
-  WindVane.init();
-  RainGauge.init();
-  Anemometer_Device.init();
-//  RainGauge.set_DailyAlarm(12, 14, 45);
-
-  delay(2);
-  if (!bme280.begin()) {
-    #ifdef DEBUGGING_OVER_SERIAL
-    Serial.println("Problem initializing BME280.");
-    #endif
-    return;
-  }
-  delay(20);
-
-  BME280_Device.new_SensorMode(Adafruit_BME280::MODE_FORCED);
-  BME280_Device.new_TemperatureOversampling(Adafruit_BME280::SAMPLING_X2);
-  BME280_Device.new_PressureOversampling(Adafruit_BME280::SAMPLING_X16);
-  BME280_Device.new_HumidityOversampling(Adafruit_BME280::SAMPLING_X1);
-  BME280_Device.new_FilterCoefficient(Adafruit_BME280::FILTER_X16);
-  
-  BME280_Device.update_BME280_settings();
-
-  DS18B20_Device.update_DS18B20_settings(R_10BIT);
+  Project_Sensor.init();
 
   HardwareTimer *fetch_RTC = new HardwareTimer(TIM4);
   fetch_RTC->setOverflow(1, HERTZ_FORMAT);  // callback runs every 1 second

@@ -1,11 +1,13 @@
 #pragma once
 
-// #include "Sensor_Base.h"
+#include "Libraries.h"
 
-#include "SensorUnits/Anemometer.h"
-#include "SensorUnits/Wind_Vane.h"
-#include "SensorUnits/Precipitation.h"
-#include "SensorUnits/Thermometer_Hygrometer_Barometer.h"
+typedef struct {
+    float Wind_Data[2];     // Wind_Data[0] -> wind speed; Wind_Data[1] -> wind direction
+    float Rainfall_Amount;
+    float BME280_Data[3];
+    float DS18B20_Temperature;
+} Sensor_Readings;
 
 
 class Sensor_Control {
@@ -15,6 +17,8 @@ class Sensor_Control {
         Precipitation      *RainGauge_Device;
         BME280_Control     *BME280_Device;
         DS18B20_Control    *DS18B20_Device;
+
+        Sensor_Readings Latest_Sensor_Readings;
 
         Sensor_Control(void);
         Sensor_Control( Anemometer_Control *Anemometer_Device, 
@@ -29,7 +33,12 @@ class Sensor_Control {
         void update_WindVane_Device(WindVane_Control *WindVane_Device);
         void update_RainGauge_Device(Precipitation *RainGauge_Device);
         void update_BME280_Device(BME280_Control *BME280_Device);
-        void update_DS18B20_Device(DS18B20_Control *DS18B20_Device);    
+        void update_DS18B20_Device(DS18B20_Control *DS18B20_Device);   
+
+        void Read_From_Sensors(void);
+
+    private:
+
 };
 
 extern Sensor_Control General_Sensor_Control;

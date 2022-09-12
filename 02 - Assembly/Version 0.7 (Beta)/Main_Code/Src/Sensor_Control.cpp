@@ -23,9 +23,10 @@ void Sensor_Control::init(void) {
     Anemometer_Device->init();
     WindVane_Device->init();
     RainGauge_Device->init();
+    // RainGauge.set_DailyAlarm(12, 14, 45);
 
     delay(2);
-    if (!BME280_Device->bme280_instance->begin()) {
+    if (!(BME280_Device->bme280_instance->begin())) {
         #ifdef DEBUGGING_OVER_SERIAL
         Serial.println("Problem initializing BME280.");
         #endif
@@ -62,4 +63,8 @@ void Sensor_Control::update_BME280_Device(BME280_Control *BME280_Device) {
 
 void Sensor_Control::update_DS18B20_Device(DS18B20_Control *DS18B20_Device) {
     this->DS18B20_Device = DS18B20_Device;
+}
+
+void Sensor_Control::Read_From_Sensors(void) {
+    
 }
