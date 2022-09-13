@@ -17,7 +17,7 @@ Sensor_Control::Sensor_Control( Anemometer_Control *Anemometer_Device,
     update_DS18B20_Device(DS18B20_Device);
 }
 
-void Sensor_Control::init(void) {
+void Sensor_Control::init(TIM_TypeDef* AnemometerTimer_Instance, TIM_TypeDef* WindVaneTimer_Instance) {
     Wire.begin();
 
     Anemometer_Device->init();

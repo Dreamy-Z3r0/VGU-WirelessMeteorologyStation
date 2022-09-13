@@ -209,19 +209,19 @@ void WindVane_Update() {
     Serial.printf("%d", timestamp_buffer);
 
     timestamp_buffer = Anemometer_Device.readMonth();
-    Serial.printf("-%s%d", timestamp_buffer > 10 ? "\0" : "0", timestamp_buffer);
+    Serial.printf("-%s%d", timestamp_buffer < 10 ? "0" : "\0", timestamp_buffer);
 
     timestamp_buffer = Anemometer_Device.readDay();
-    Serial.printf("-%s%d", timestamp_buffer > 10 ? "\0" : "0", timestamp_buffer);
+    Serial.printf("-%s%d", timestamp_buffer < 10 ? "0" : "\0", timestamp_buffer);
 
     timestamp_buffer = Anemometer_Device.readHour();
-    Serial.printf(" %s%d", timestamp_buffer > 10 ? "\0" : "0", timestamp_buffer);
+    Serial.printf(" %s%d", timestamp_buffer < 10 ? "0" : "\0", timestamp_buffer);
 
     timestamp_buffer = Anemometer_Device.readMinute();
-    Serial.printf(":%s%d", timestamp_buffer > 10 ? "\0" : "0", timestamp_buffer);
+    Serial.printf(":%s%d", timestamp_buffer < 10 ? "0" : "\0", timestamp_buffer);
 
     timestamp_buffer = Anemometer_Device.readSecond();
-    Serial.printf(":%s%d)\n", timestamp_buffer > 10 ? "\0" : "0", timestamp_buffer);
+    Serial.printf(":%s%d)\n", timestamp_buffer < 10 ? "0" : "\0", timestamp_buffer);
 
       // Add an empty line for visual purpose
       newLine = true;
@@ -251,19 +251,19 @@ void Anemometer_Update() {
     Serial.printf("%d", timestamp_buffer);
 
     timestamp_buffer = Anemometer_Device.readMonth();
-    Serial.printf("-%s%d", timestamp_buffer > 10 ? "\0" : "0", timestamp_buffer);
+    Serial.printf("-%s%d", timestamp_buffer < 10 ? "0" : "\0", timestamp_buffer);
 
     timestamp_buffer = Anemometer_Device.readDay();
-    Serial.printf("-%s%d", timestamp_buffer > 10 ? "\0" : "0", timestamp_buffer);
+    Serial.printf("-%s%d", timestamp_buffer < 10 ? "0" : "\0", timestamp_buffer);
 
     timestamp_buffer = Anemometer_Device.readHour();
-    Serial.printf(" %s%d", timestamp_buffer > 10 ? "\0" : "0", timestamp_buffer);
+    Serial.printf(" %s%d", timestamp_buffer < 10 ? "0" : "\0", timestamp_buffer);
 
     timestamp_buffer = Anemometer_Device.readMinute();
-    Serial.printf(":%s%d", timestamp_buffer > 10 ? "\0" : "0", timestamp_buffer);
+    Serial.printf(":%s%d", timestamp_buffer < 10 ? "0" : "\0", timestamp_buffer);
 
     timestamp_buffer = Anemometer_Device.readSecond();
-    Serial.printf(":%s%d)\n", timestamp_buffer > 10 ? "\0" : "0", timestamp_buffer);
+    Serial.printf(":%s%d)\n", timestamp_buffer < 10 ? "0" : "\0", timestamp_buffer);
     
   
     // Add an empty line for visual purpose

@@ -54,7 +54,7 @@ void WindVane_Control::init(TIM_TypeDef* StandbyTimer_Instance) {
   update_standby();
   
   MX_DMA_Init();
-  MX_ADC1_Init(INTERNAL_REFERENCE_VOLTAGE);
+  MX_ADC1_Init(EXTERNAL_INPUT_SIGNAL);
   HAL_ADCEx_Calibration_Start(&hadc1);
 
   set_readFlag();
@@ -128,7 +128,7 @@ void WindVane_Control::Data_Processing_Routine(uint16_t* raw_data) {
 // Read the reference voltage for ADC
 void WindVane_Control::read_reference(void) {
   MX_ADC1_Init(INTERNAL_REFERENCE_VOLTAGE);
-  HAL_ADCEx_Calibration_Start(&hadc1);
+  // HAL_ADCEx_Calibration_Start(&hadc1);
 
   HAL_ADC_Start(&hadc1);  
   HAL_ADC_PollForConversion(&hadc1, 100);
@@ -136,7 +136,6 @@ void WindVane_Control::read_reference(void) {
   uint16_t raw_VREFINT = HAL_ADC_GetValue(&hadc1);
   
   AVref = (VREFINT * (ADC_MAX_VALUE+1) / raw_VREFINT) / 1000.0;   // Take the AVref
-  Vcc = AVref;
 }
 
 // Sample input signal from the wind vane

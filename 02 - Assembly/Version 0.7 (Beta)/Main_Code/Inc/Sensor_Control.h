@@ -2,6 +2,9 @@
 
 #include "Libraries.h"
 
+#define Anemometer_TIM_Instance TIM2
+#define WindVane_TIM_Insstance  TIM1
+
 typedef struct {
     float Wind_Data[2];     // Wind_Data[0] -> wind speed; Wind_Data[1] -> wind direction
     float Rainfall_Amount;
@@ -27,7 +30,8 @@ class Sensor_Control {
                         BME280_Control     *BME280_Device,
                         DS18B20_Control    *DS18B20_Device );
 
-        void init(void);
+        void init(TIM_TypeDef* AnemometerTimer_Instance = Anemometer_TIM_Instance,
+                  TIM_TypeDef* WindVaneTimer_Instance = WindVane_TIM_Insstance);
 
         void update_Anemometer_Device(Anemometer_Control *Anemometer_Device);
         void update_WindVane_Device(WindVane_Control *WindVane_Device);
