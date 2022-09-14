@@ -99,27 +99,25 @@ void WindVane_Control::End_Of_Sampling_Routine(bool half_complete) {
 
 // Manages all the data-processing sub-routines at the end of a sampling routine
 void WindVane_Control::Data_Processing_Routine(uint16_t* raw_data) {
-  float *x = new float[3],    // Stores voltage from raw ADC data / inputs for IIR filter
-        *y = new float[3];    // Stores outputs of IIR filter
+  float x[3],   // Stores voltage from raw ADC data / inputs for IIR filter
+        y[3];   // Stores outputs of IIR filter
 
   float voltage_mean_value = 0;
   
   unsigned int n = 0,
                half_storage_size = (unsigned int)(storage_size / 2);
   do {    
-    *x = rawData_to_voltage(raw_data+n);   // Convert the ADC value at index n of raw_data[] array to voltage value
+    x[0] = rawData_to_voltage(raw_data+n);   // Convert the ADC value at index n of raw_data[] array to voltage value
     IIR_Filter(x, y);   // Apply IIR filter for the newly converted voltage value
                                                                                                 
-    voltage_mean_value += (*y / storage_size);
+    voltage_mean_value += (y[0] / storage_size);
 
     n += 1;
     if (n == half_storage_size) 
       while (half_complete);
   } while (n < storage_size);
 
-  delete[] x;   // Free up the heap
-  delete[] y;
-  delete[] raw_data;
+  delete[] raw_data;   // Free up the heap
 
   WindDirectionInstance(voltage_mean_value);
   sample_ready = false;
@@ -136,6 +134,7 @@ void WindVane_Control::read_reference(void) {
   uint16_t raw_VREFINT = HAL_ADC_GetValue(&hadc1);
   
   AVref = (VREFINT * (ADC_MAX_VALUE+1) / raw_VREFINT) / 1000.0;   // Take the AVref
+  Vcc = AVref;
 }
 
 // Sample input signal from the wind vane
@@ -155,17 +154,17 @@ float WindVane_Control::rawData_to_voltage(uint16_t* raw_data) {
 }
 
 // Apply IIR filter
-void WindVane_Control::IIR_Filter(float* x, float* y) {
-  // IIR Filter direct form I output function:
+void WindVane_Control::IIR_Filter(float *x, float *y) {
+  // IIR Filter direct form II Transposed output function:
   //    y[n] = (b0 * x[n] + b1 * x[n-1] + b2 * x[n-2]) - (a1 * y[n-1] + a2 * y[n-2])
 
-  *y = (float)(b0*(*x) + b1*(*(x+1)) + b2*(*(x+2)) - (a1*(*(y+1)) + a2*(*(y+2))));
+  y[0] = (float)(b0*x[0] + b1*x[1] + b2*x[2] + a1*y[1] + a2*y[2]);
 
-  *(x+2) = *(x+1);
-  *(x+1) = *x;
+  x[2] = x[1];
+  x[1] = x[0];
 
-  *(y+2) = *(y+1);
-  *(y+1) = *y;
+  y[2] = y[1];
+  y[1] = y[0];
 }
 
 // Take the final estimation of the wind direction

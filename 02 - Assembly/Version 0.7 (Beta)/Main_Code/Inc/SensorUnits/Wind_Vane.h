@@ -59,10 +59,16 @@ class WindVane_Control : public Sensor_Base {
          sample_ready;  // Indicates the end of a sampling routine
 
     // IIR filter coefficients
+    // double b0 = 1,
+    //        b1 = 2, 
+    //        b2 = 1,        
+    //        a1 = -1.98519065789626150000,
+    //        a2 = 0.98529951312821473000; 
+
     double b0 = 1,
            b1 = 1, 
            b2 = 0,        
-           a1 = 0.99919607551456557000,
+           a1 = -0.98958247531875398000,
            a2 = 0; 
 
     HardwareTimer* StandbyTimer;
