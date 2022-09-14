@@ -58,13 +58,16 @@ class WindVane_Control : public Sensor_Base {
     bool half_complete, // Indicates that ADC is on-going and the buffer is half-filled
          sample_ready;  // Indicates the end of a sampling routine
 
-    // IIR filter coefficients
+    // IIR filter coefficients:
+
+    // 2nd order IIR filter
     // double b0 = 1,
     //        b1 = 2, 
     //        b2 = 1,        
     //        a1 = -1.98519065789626150000,
     //        a2 = 0.98529951312821473000; 
 
+    // 1st order IIR filter
     double b0 = 1,
            b1 = 1, 
            b2 = 0,        
