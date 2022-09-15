@@ -17,10 +17,10 @@ Sensor_Control::Sensor_Control( Anemometer_Control *Anemometer_Device,
     update_DS18B20_Device(DS18B20_Device);
 }
 
-void Sensor_Control::init(TIM_TypeDef* AnemometerTimer_Instance, TIM_TypeDef* WindVaneTimer_Instance) {
+void Sensor_Control::init(TIM_TypeDef* AnemometerTimer_Instance) {
     Wire.begin();
 
-    Anemometer_Device->init();
+    Anemometer_Device->init(AnemometerTimer_Instance);
     WindVane_Device->init();
     RainGauge_Device->init();
     // RainGauge.set_DailyAlarm(12, 14, 45);
