@@ -23,7 +23,7 @@ Anemometer_Control::Anemometer_Control(uint32_t SensorPin) {
 // Timer initialisation
 void Anemometer_Control::init(TIM_TypeDef* AnemometerTimer_Instance) {
   /* Set initial value for class variables */
-  idleTimeInMilliseconds = timeBetweenReadingPeriods * 60E3;
+  idleTimeInMilliseconds = timeBetweenTwoReadingRoutines;
 
   set_standbyFlag();
   clear_readFlag();
@@ -44,7 +44,7 @@ void Anemometer_Control::init(TIM_TypeDef* AnemometerTimer_Instance) {
   
   AnemometerTimer->setMode(1, TIMER_DISABLED);    // Use channel 1 of AnemometerTimer_Instance in output compare mode, no output
   AnemometerTimer->setOverflow(10000, MICROSEC_FORMAT);   // Timer overflows every 10ms
-  AnemometerTimer->attachInterrupt(1, std::bind(TIM_Ovf_Callback, this));  // ISR run whenever timer overflows for channel 1
+  AnemometerTimer->attachInterrupt(1, std::bind(Anemometer_Control_TIM_Ovf_Callback, this));  // ISR run whenever timer overflows for channel 1
 
   set_readFlag();
 }
@@ -185,7 +185,7 @@ void Anemometer_Control::Input_Callback(void) {
  *******************************************/
 
 // Interrupt service routine when a timer counter overflows
-void TIM_Ovf_Callback(Anemometer_Control* Anemometer_Instance) {
+void Anemometer_Control_TIM_Ovf_Callback(Anemometer_Control* Anemometer_Instance) {
   Anemometer_Instance->Timer_Callback();
 }
 

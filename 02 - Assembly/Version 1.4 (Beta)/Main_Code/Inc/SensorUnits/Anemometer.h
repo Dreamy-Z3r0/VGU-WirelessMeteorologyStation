@@ -23,7 +23,7 @@
 #define maxKnown_windSpeed 407.16 // km/h -> highest wind speed ever recorded on Earth by June 2022
 #define dataPointsPerMeasurement 10   // Number of data points per measurement to take the final mean value
 
-#define timeBetweenReadingPeriods 0.5   // minutes -> standby period between 2 consecutive readings
+#define timeBetweenTwoReadingRoutines 30000   // ms -> standby period between 2 consecutive readings
 
 
 /***********************************
@@ -72,5 +72,5 @@ class Anemometer_Control : public Sensor_Base {
 /*******************************************
  *** External interrupt service routines ***
  *******************************************/
-void TIM_Ovf_Callback(Anemometer_Control* Anemometer_Instance);    // Interrupt service routine when a timer counter overflows
+void Anemometer_Control_TIM_Ovf_Callback(Anemometer_Control* Anemometer_Instance);    // Interrupt service routine when a timer counter overflows
 void anemometerInput_Detected(Anemometer_Control* Anemometer_Instance);   // Interrupt service routine when an edge is present at the input pin

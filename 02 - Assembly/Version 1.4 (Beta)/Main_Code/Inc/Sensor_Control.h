@@ -2,7 +2,13 @@
 
 #include "Libraries.h"
 
-#define Anemometer_TIM_Instance TIM1
+#ifndef Sensor_Control_TIM_Instance
+#define Sensor_Control_TIM_Instance TIM1
+#endif
+
+#ifndef Anemometer_TIM_Instance
+#define Anemometer_TIM_Instance TIM2
+#endif
 
 typedef struct {
     float Wind_Data[2];     // Wind_Data[0] -> wind speed; Wind_Data[1] -> wind direction
@@ -12,6 +18,9 @@ typedef struct {
 } Sensor_Readings;
 
 
+/***************************************
+ *** Sensor_Control class definition ***
+ ***************************************/
 class Sensor_Control {
     public:
         Anemometer_Control *Anemometer_Device;
@@ -27,7 +36,7 @@ class Sensor_Control {
                         WindVane_Control   *WindVane_Device,
                         Precipitation      *RainGauge_Device,
                         BME280_Control     *BME280_Device,
-                        DS18B20_Control    *DS18B20_Device );
+                        DS18B20_Control    *DS18B20_Device     );
 
         void init(TIM_TypeDef* AnemometerTimer_Instance = Anemometer_TIM_Instance);
 
@@ -37,10 +46,25 @@ class Sensor_Control {
         void update_BME280_Device(BME280_Control *BME280_Device);
         void update_DS18B20_Device(DS18B20_Control *DS18B20_Device);   
 
-        void Read_From_Sensors(void);
+        void Sensor_Control_Main_Routine(void);
+
+        // Internal operation(s) for external interrupt service routine(s)
+        void Timer_Callback(void);   // Timer counter overflow callback
 
     private:
+        void init_Timer(TIM_TypeDef* Timer_Instance = Sensor_Control_TIM_Instance);
+
         void Read_From_Anemometer(void);
 };
 
-extern Sensor_Control General_Sensor_Control;
+
+/*********************************************
+ *** External interrupt service routine(s) ***
+ *********************************************/
+void Sensor_Control_TIM_Ovf_Callback(Sensor_Control* Sensor_Control_Instance);    // Interrupt service routine when a timer counter overflows
+
+
+/*********************************************************
+ *** Declaration of externally accessed class instance ***
+ *********************************************************/
+// extern Sensor_Control General_Sensor_Control;
