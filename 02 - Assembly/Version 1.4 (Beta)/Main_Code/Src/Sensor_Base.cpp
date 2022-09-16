@@ -76,6 +76,7 @@ void Sensor_Base::clear_readFlag(void) {
 // Set standbyFlag
 void Sensor_Base::set_standbyFlag(void) {
   standbyFlag = true;
+  standby_period_count = 0;
 }
 
 // Return standbyFlag value
@@ -86,4 +87,16 @@ bool Sensor_Base::is_standbyFlag_set(void) {
 // Clear standbyFlag
 void Sensor_Base::clear_standbyFlag(void) {
   standbyFlag = false;
+}
+
+
+
+/*********************************
+ *** Device-on-standby routine ***
+ *********************************/
+
+void Sensor_Base::standby_routine(void) {
+  standby_period_count += 1;
+
+  
 }

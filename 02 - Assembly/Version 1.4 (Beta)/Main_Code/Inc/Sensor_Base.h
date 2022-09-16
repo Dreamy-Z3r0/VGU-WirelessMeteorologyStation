@@ -30,6 +30,9 @@ class Sensor_Base : public DS3231_Control {
     bool is_standbyFlag_set(void);   // Return samplingFlag value
     void clear_standbyFlag(void);    // Clear samplingFlag
 
+    // Device-on-standby routine
+    void standby_routine(void);
+
   protected:
     void update_timestamp(void);
 
@@ -39,4 +42,7 @@ class Sensor_Base : public DS3231_Control {
     bool readFlag,      // Enable to issue an update of sensor data
          samplingFlag,  // Indicates an on-going sampling routine
          standbyFlag;   // Indicates a standby period
+
+    unsigned int standby_period_count,        // Elapsed time in milliseconds from the beginning of a standby period
+                 standby_period_max_count;    // Duration of a standby period in milliseconds
 };
