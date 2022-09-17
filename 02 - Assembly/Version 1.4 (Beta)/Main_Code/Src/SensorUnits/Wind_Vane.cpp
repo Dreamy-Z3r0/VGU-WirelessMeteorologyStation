@@ -57,23 +57,6 @@ void WindVane_Control::init(void) {
 
 
 /**************************
- *** Standby operations ***
- **************************/
-
-void WindVane_Control::update_standby(unsigned long standby_period) {
-  this->standby_period = standby_period;
-}
-
-void WindVane_Control::increment_standby_counter(void) {
-  standby_counter += 1;
-}
-
-unsigned int WindVane_Control::get_standby_counter(void) {
-  return standby_counter;
-}
-
-
-/**************************
  *** Reading operations ***
  **************************/
 

@@ -29,6 +29,10 @@ void Sensor_Base::read_sensor_data(float *external_storage) {
   
 }
 
+void Sensor_Base::update_standby(unsigned long standby_period_max_count = 50) {
+  this->standby_period_max_count = standby_period_max_count;
+}
+
 
 
 /*************************
@@ -96,7 +100,11 @@ void Sensor_Base::clear_standbyFlag(void) {
  *********************************/
 
 void Sensor_Base::standby_routine(void) {
-  standby_period_count += 1;
+  if (standbyFlag) {
+    standby_period_count += 1;
 
-  
+    if (standby_period_max_count == standby_period_count) {
+      readFlag = true;
+    }
+  }
 }

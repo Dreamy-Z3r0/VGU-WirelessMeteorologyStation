@@ -47,8 +47,6 @@ class Anemometer_Control : public Sensor_Base {
     void Input_Callback(void);    // Edge presence callback
     
   private:
-    unsigned long idleTimeInMilliseconds;   // Duration between 2 consecutive readings
-    
     HardwareTimer* AnemometerTimer;   // Timer for anemometer
     
     bool isTakingFirstEdge, isSecondEdgeDetected;  // Edge-controlling flags 

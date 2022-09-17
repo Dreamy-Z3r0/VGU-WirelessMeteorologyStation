@@ -11,6 +11,8 @@ class Sensor_Base : public DS3231_Control {
     void set_SensorPin(uint32_t SensorPin);
     uint32_t get_SensorPin(void);
 
+    void update_standby(unsigned long standby_period_max_count = 50);
+
     void update_sensor_data(void);
 
     void read_sensor_data(float *external_storage);
@@ -44,5 +46,5 @@ class Sensor_Base : public DS3231_Control {
          standbyFlag;   // Indicates a standby period
 
     unsigned int standby_period_count,        // Elapsed time in milliseconds from the beginning of a standby period
-                 standby_period_max_count;    // Duration of a standby period in milliseconds
+                 standby_period_max_count;    // Duration of a standby period in milliseconds  
 };

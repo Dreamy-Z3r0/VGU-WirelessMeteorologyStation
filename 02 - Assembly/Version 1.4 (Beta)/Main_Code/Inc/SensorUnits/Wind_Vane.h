@@ -40,10 +40,6 @@ class WindVane_Control : public Sensor_Base {
 
     // Public operation(s)
     void init(void);    // Initiate the ADC
-
-    void update_standby(unsigned long standby_period = 50);  
-    void increment_standby_counter(void);
-    unsigned int get_standby_counter(void);
     
     void update_sensor_data(void);    // Initiate a read operation of wind direction
     void End_Of_Sampling_Routine(bool halfComplete = false);
@@ -75,10 +71,6 @@ class WindVane_Control : public Sensor_Base {
            b2 = 0,        
            a1 = 0.98958247531875398000,
            a2 = 0; 
-
-    HardwareTimer* StandbyTimer;
-    unsigned int standby_period,    // Standby period in ms
-                 standby_counter;   // Counter for standby
 
     void read_reference(void);              // Read the reference voltage for ADC
     void read_raw_ADC(uint16_t* storage);   // Sample input signal from the wind vane

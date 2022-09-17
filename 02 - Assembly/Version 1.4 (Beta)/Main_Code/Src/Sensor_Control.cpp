@@ -33,6 +33,8 @@ void Sensor_Control::init(TIM_TypeDef* AnemometerTimer_Instance) {
     }
     delay(20);
 
+    BME280_Device->init();
+
     BME280_Device->new_SensorMode(Adafruit_BME280::MODE_FORCED);
     BME280_Device->new_TemperatureOversampling(Adafruit_BME280::SAMPLING_X2);
     BME280_Device->new_PressureOversampling(Adafruit_BME280::SAMPLING_X16);
@@ -41,7 +43,7 @@ void Sensor_Control::init(TIM_TypeDef* AnemometerTimer_Instance) {
 
     BME280_Device->update_BME280_settings();
 
-    DS18B20_Device->update_DS18B20_settings(R_10BIT);
+    DS18B20_Device->init();
 
     init_Timer();
 }
@@ -89,7 +91,10 @@ void Sensor_Control::Read_From_Anemometer(void) {
 
 // Timer counter overflow callback
 void Sensor_Control::Timer_Callback(void) {
-
+    Anemometer_Device->standby_routine();
+    WindVane_Device->standby_routine();
+    BME280_Device->standby_routine();
+    DS18B20_Device->standby_routine();
 }
 
 

@@ -53,8 +53,6 @@ typedef struct {    // Structure for sensor settings storage
                                                           //   + Adafruit_BME280::STANDBY_MS_250    -> 250 ms
                                                           //   + Adafruit_BME280::STANDBY_MS_500    -> 500 ms
                                                           //   + Adafruit_BME280::STANDBY_MS_1000   -> 1000 ms
-
-  unsigned long readInterval;     // User-defined read-out interval for software; does not affect the sensor
 } BME280_settings;
 
 typedef struct {      // Structure for sensor read-out storage
@@ -65,6 +63,7 @@ typedef struct {      // Structure for sensor read-out storage
 
 
 /* DS18B20 */
+#define Data_Update_Interval 1000
 enum PRECISION {R_9BIT = 0x1F, R_10BIT = 0x3F, R_11BIT = 0x5F, R_12BIT = 0x7F};   // Valid DS18B20 thermometer resolution values (9-bit, 10-bit, 11-bit, and 12-bit, respectively)
 enum ROM_COMMAND {SEARCH_ROM = 0xF0, READ_ROM = 0x33, MATCH_ROM = 0x55,   // Valid ROM commands provided in the datasheet
                   SKIP_ROM = 0xCC, ALARM_SEARCH = 0xEC};
@@ -127,6 +126,8 @@ class DS18B20_Control : public Sensor_Base {
     DS18B20_Control(PRECISION thermometerResolution = R_12BIT, bool sharedBus = false);
     DS18B20_Control(uint32_t SensorPin, PRECISION thermometerResolution = R_12BIT, bool sharedBus = false);   // Constructor
 
+    void init(void);
+
     void update_DS18B20_addr(uint8_t* addr);  // Update DS18B20 ROM code
 
     void update_DS18B20_settings(PRECISION thermometerResolution);    // Update DS18B20 thermometer resolution and delay settings
@@ -142,7 +143,16 @@ class DS18B20_Control : public Sensor_Base {
     PRECISION thermometerResolution;    // Thermometer resolution setting for DS18B20
     unsigned int Conversion_delayTime;  // Delay time for a temperature conversion to complete, used mostly in parasitic power mode
     
+    OneWire* ds;
+    uint8_t* powerMode;
+    uint8_t data[9];
+
+    ROM_COMMAND ROMCommand;
+
+    bool ongoing_request;
     float temperature;      // Temperature output of the last conversion
+
+    
   
     /* Perform a full functional communication cycle with a DS18B20 
      * 

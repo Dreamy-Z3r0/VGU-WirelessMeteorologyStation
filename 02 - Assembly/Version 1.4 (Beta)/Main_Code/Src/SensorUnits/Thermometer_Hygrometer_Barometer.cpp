@@ -39,6 +39,7 @@ void BME280_Control::init(void) {
   update_BME280_settings();
 
   clear_readFlag();
+  set_standbyFlag();
 }
 
 // Initialize BME280 device settings with update Adafruit_BME280 instance
@@ -60,7 +61,7 @@ void BME280_Control::update_external_device_instance(Adafruit_BME280* bme280_ins
 
 // Update device settings
 void BME280_Control::update_BME280_settings(unsigned long custom_readInterval) {
-  BME280_userSettings.readInterval = custom_readInterval;
+  update_standby(custom_readInterval);
 
   if (Adafruit_BME280_InstanceAvailable) {  
     bme280_instance->setSampling( 
@@ -111,16 +112,29 @@ void BME280_Control::new_StandbyDuration(Adafruit_BME280::standby_duration newVa
 
 // Fetch latest readings from sensor
 void BME280_Control::update_sensor_data(void) {
-  if (BME280_userSettings.Sensor_Mode == Adafruit_BME280::MODE_FORCED) {
-    bme280_instance->takeForcedMeasurement();
-  }
-  
-  BME280_dataStorage.temperature = bme280_instance->readTemperature();         // Read temperature data in degree Celsius
-  BME280_dataStorage.pressure    = bme280_instance->readPressure() / 100.0F;   // Read barometric data in hPa
-  BME280_dataStorage.humidity    = bme280_instance->readHumidity();            // Read relative humidity data in %RH
+  if (is_readFlag_set() && is_standbyFlag_set()) {
+    // Clear standbyFlag to avoid unwanted behaviour with standby_routine()
+    clear_standbyFlag();
 
-  // Update timestamp
-  readRTC();
+    // Issue a data conversion to sensor in forced mode
+    if (BME280_userSettings.Sensor_Mode == Adafruit_BME280::MODE_FORCED) {
+      bme280_instance->takeForcedMeasurement();
+    }
+  
+    // Fetch the latest sensor readings
+    BME280_dataStorage.temperature = bme280_instance->readTemperature();         // Read temperature data in degree Celsius
+    BME280_dataStorage.pressure    = bme280_instance->readPressure() / 100.0F;   // Read barometric data in hPa
+    BME280_dataStorage.humidity    = bme280_instance->readHumidity();            // Read relative humidity data in %RH
+
+    // Update timestamp
+    // readRTC();
+
+    // Clear sensor update request
+    clear_readFlag();
+
+    // Reset sketch level standby period
+    set_standbyFlag();
+  }
 }
 
 
@@ -165,6 +179,8 @@ float BME280_Control::get_Humidity(void) {
 DS18B20_Control::DS18B20_Control(PRECISION thermometerResolution, bool sharedBus) {
   update_DS18B20_settings(thermometerResolution);
   this->sharedBus = sharedBus;
+
+  ongoing_request = false;
 }
 
 // Accept input pin for One-Wire bus; (optional) thermometer resolution and shared bus indicator
@@ -173,6 +189,22 @@ DS18B20_Control::DS18B20_Control(uint32_t SensorPin, PRECISION thermometerResolu
   update_DS18B20_settings(thermometerResolution);
 
   this->sharedBus = sharedBus;
+
+  ongoing_request = false;
+}
+
+
+/**********************
+ *** Initialization ***
+ **********************/
+
+// Initial settings for BME280 device
+void DS18B20_Control::init(void) {
+  update_DS18B20_settings(R_10BIT);
+  update_standby(Data_Update_Interval);
+
+  clear_readFlag();
+  set_standbyFlag();
 }
 
 
@@ -226,72 +258,98 @@ PRECISION DS18B20_Control::get_thermometerResolution(void) {
 
 // Enable a temperature conversion
 void DS18B20_Control::update_sensor_data(uint8_t* present) {
-  OneWire ds(get_SensorPin());
-  uint8_t powerMode;
-  uint8_t data[9];
+  bool conversion_complete = false;
 
-  // In case of multiple one-wire devices available, ROM command is set to MATCH_ROM to address a specific address (addr) to avoid conflicts during data communication.
-  ROM_COMMAND ROMCommand = SKIP_ROM;
-  if (sharedBus) ROMCommand = MATCH_ROM;
+  if (is_readFlag_set()) {
+    if (is_standbyFlag_set()) {
+      clear_standbyFlag();
 
-  // Fetch the existing settings of the DS18B20
-  pushCommands_Full(&ds, present, ROMCommand, addr, READ_SCRATCHPAD, data, 0);
-  if (0 == *present) {
-    return;
+      ds = new OneWire(get_SensorPin());
+      powerMode = new uint8_t;
+
+      // In case of multiple one-wire devices available, ROM command is set to MATCH_ROM to address a specific address (addr) to avoid conflicts during data communication.
+      ROMCommand = SKIP_ROM;
+      if (sharedBus) ROMCommand = MATCH_ROM;
+
+      // Fetch the existing settings of the DS18B20
+      pushCommands_Full(ds, present, ROMCommand, addr, READ_SCRATCHPAD, data, 0);
+      if (0 == *present) {
+        return;
+      }
+
+      // Update thermometer resolution to configuration register
+      if (thermometerResolution != data[4]) {
+        data[4] = thermometerResolution;
+        pushCommands_Full(ds, present, ROMCommand, addr, WRITE_SCRATCHPAD, data+2, 0);
+        if (0 == *present) {
+          return;
+        }
+      }
+
+      // Read power mode to determine the necessity of a delay command following the conversion request
+      pushCommands_Full(ds, present, ROMCommand, addr, READ_POWERSUPPLY, powerMode, 0);
+      if (0 == *present) {
+        return;
+      }
+
+      // Issue a temperature conversion
+      pushCommands_Full(ds, present, ROMCommand, addr, CONVERT_T, data, (*powerMode == EXTERNAL_POWER ? DISABLE_DELAY : ENABLE_DELAY));
+      if (0 == *present) {
+        return;
+      }
+    } else {
+      if (ongoing_request) {
+        clear_standbyFlag();
+        ongoing_request = false;
+
+        update_standby(Data_Update_Interval);
+
+        conversion_complete = true;
+      } else {
+        if (0 != ds->read_bit()) {
+          conversion_complete = true;
+        }
+      }
+    }
   }
 
-  // Update thermometer resolution to configuration register
-  if (thermometerResolution != data[4]) {
-    data[4] = thermometerResolution;
-    pushCommands_Full(&ds, present, ROMCommand, addr, WRITE_SCRATCHPAD, data+2, 0);
+  if (conversion_complete) {
+    // Verify the updated thermometer resolution and read the temperature conversion result
+    pushCommands_Full(ds, present, ROMCommand, addr, READ_SCRATCHPAD, data, 5);
+    if (data[4] != thermometerResolution) *present = 0;   // Errors may have occurred
     if (0 == *present) {
       return;
     }
-  }
 
-  // Read power mode to determine the necessity of a delay command following the conversion request
-  pushCommands_Full(&ds, present, ROMCommand, addr, READ_POWERSUPPLY, &powerMode, 0);
-  if (0 == *present) {
-    return;
-  }
-
-  // Issue a temperature conversion
-  pushCommands_Full(&ds, present, ROMCommand, addr, CONVERT_T, data, (powerMode == EXTERNAL_POWER ? DISABLE_DELAY : ENABLE_DELAY));
-  if (0 == *present) {
-    return;
-  }
-
-  // Verify the updated thermometer resolution and read the temperature conversion result
-  pushCommands_Full(&ds, present, ROMCommand, addr, READ_SCRATCHPAD, data, 5);
-  if (data[4] != thermometerResolution) *present = 0;   // Errors may have occurred
-  if (0 == *present) {
-    return;
-  }
-
-  // Extract raw data
-  int16_t raw = (data[1] << 8) | data[0];
-  switch (thermometerResolution) {
-    case R_9BIT: {    // 3 least significant bits are invalid in 9-bit resolution mode
-      raw &= ~7;
-      break;
+    // Extract raw data
+    int16_t raw = (data[1] << 8) | data[0];
+    switch (thermometerResolution) {
+      case R_9BIT: {    // 3 least significant bits are invalid in 9-bit resolution mode
+        raw &= ~7;
+        break;
+      }
+      case R_10BIT: {   // 2 least significant bits are invalid in 10-bit resolution mode
+        raw &= ~3;
+        break;
+      }
+      case R_11BIT: {   // the least significant bit is invalid in 11-bit resolution mode
+        raw &= ~1;
+        break;
+      }
+      default:  // All bits are valid in 12-bit resolution mode
+        break;
     }
-    case R_10BIT: {   // 2 least significant bits are invalid in 10-bit resolution mode
-      raw &= ~3;
-      break;
-    }
-    case R_11BIT: {   // the least significant bit is invalid in 11-bit resolution mode
-      raw &= ~1;
-      break;
-    }
-    default:  // All bits are valid in 12-bit resolution mode
-      break;
+
+    // Calculate temperature in degree Celsius
+    temperature = (float)raw / 16.0;
+
+    // Update timestamp
+    // readRTC();
+
+    // Free up the heap memory
+    delete ds;
+    delete powerMode;
   }
-
-  // Calculate temperature in degree Celsius
-  temperature = (float)raw / 16.0;
-
-  // Update timestamp
-  readRTC();
 }
 
 /* Perform a full functional communication cycle with a DS18B20 
@@ -345,9 +403,13 @@ void DS18B20_Control::pushCommands_Full(OneWire* device, uint8_t* present,
     case CONVERT_T: {
       if (1 == option) {  
         if (0 == data[0]) { // Wait by a pre-determined time for temperature conversion if parasitic power mode is in use
-          delay(Conversion_delayTime);
+          ongoing_request = true;
+          update_standby(Conversion_delayTime);
+          clear_readFlag();
+          set_standbyFlag();
         } else {  // Wait until temperature conversion is complete if the device is externally powered
-          while (0 == device->read_bit());  
+          // while (0 == device->read_bit()); 
+          ongoing_request = false;
         }
       }
       break;

@@ -23,7 +23,7 @@ Anemometer_Control::Anemometer_Control(uint32_t SensorPin) {
 // Timer initialisation
 void Anemometer_Control::init(TIM_TypeDef* AnemometerTimer_Instance) {
   /* Set initial value for class variables */
-  idleTimeInMilliseconds = timeBetweenTwoReadingRoutines;
+  update_standby(timeBetweenTwoReadingRoutines);
 
   set_standbyFlag();
   clear_readFlag();
