@@ -46,6 +46,8 @@ void Anemometer_Control::init(TIM_TypeDef* AnemometerTimer_Instance) {
   AnemometerTimer->setOverflow(10000, MICROSEC_FORMAT);   // Timer overflows every 10ms
   AnemometerTimer->attachInterrupt(1, std::bind(Anemometer_Control_TIM_Ovf_Callback, this));  // ISR run whenever timer overflows for channel 1
 
+  clear_dataReady();
+
   set_readFlag();
 }
 
@@ -113,6 +115,8 @@ void Anemometer_Control::WindSpeed_MeanValue_Update_Routine(void) {
       meanWindSpeed_temp += (windSpeed[arr_index] / denominator);
     }
     meanWindSpeed = meanWindSpeed_temp;
+
+    set_dataReady();
 
     // Update new wind speed timestamp
     update_timestamp();

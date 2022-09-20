@@ -45,14 +45,18 @@ WindVane_Control::WindVane_Control(uint32_t ADC_input_pin, unsigned int storage_
 
 // Initiate the ADC
 void WindVane_Control::init(void) {
+  set_standbyFlag();
+  clear_readFlag();
+
   update_standby();
   
   MX_DMA_Init();
   MX_ADC1_Init(EXTERNAL_INPUT_SIGNAL);
   HAL_ADCEx_Calibration_Start(&hadc1);
 
-  set_standbyFlag();
-  clear_readFlag();
+  clear_dataReady();
+
+  set_readFlag();
 }
 
 
@@ -174,6 +178,8 @@ void WindVane_Control::Wind_Direction_Instance(float V_in) {
   }
 
   windDir = 22.5 * output_index; 
+
+  set_dataReady();
 
   // Update timestamp
   update_timestamp();

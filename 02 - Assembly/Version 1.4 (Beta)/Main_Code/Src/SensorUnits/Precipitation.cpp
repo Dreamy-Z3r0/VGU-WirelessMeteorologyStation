@@ -56,6 +56,8 @@ void Precipitation::init(void) {
   clock.checkIfAlarm(1);    // Make sure there is no alarm present initially
 
   attachInterrupt(digitalPinToInterrupt(Alarm_InputPin), std::bind(Alarm_Callback, this), LOW);    // Enable interrupt from alarm
+
+  clear_dataReady();
 }
 
 // Set daily alarm (Default: 9 A.M)
@@ -93,6 +95,8 @@ void Precipitation::Update_Rainfall_Data(void) {    // Update the rainfall amoun
                                                       // when the alarm goes off).
 
   Rainfall_Data = RainfallPerTip * temp_Daily_Counter;    // Calculate the rainfall amount of the previous day
+
+  set_dataReady();
 }
 
 // Increment internal count whenever a bucket tip appears

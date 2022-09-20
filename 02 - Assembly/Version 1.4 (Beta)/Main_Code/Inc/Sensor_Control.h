@@ -17,6 +17,16 @@ typedef struct {
     float DS18B20_Temperature;
 } Sensor_Readings;
 
+enum Sensor_Data_Status {DATA_AVAILABLE = 1, ONGOING_SAMPLING = 2, INITIAL_STATE = 4};
+
+typedef struct {
+    Sensor_Data_Status Anemometer_status;
+    Sensor_Data_Status WindVane_status;
+    Sensor_Data_Status RainGauge_status;
+    Sensor_Data_Status BME280_status;
+    Sensor_Data_Status DS18B20_status;
+} Sensor_Status;
+
 
 /***************************************
  *** Sensor_Control class definition ***
@@ -30,6 +40,7 @@ class Sensor_Control {
         DS18B20_Control    *DS18B20_Device;
 
         Sensor_Readings Latest_Sensor_Readings;
+        Sensor_Status Latest_Sensor_Status;
 
         Sensor_Control(void);
         Sensor_Control( Anemometer_Control *Anemometer_Device, 
@@ -48,13 +59,18 @@ class Sensor_Control {
 
         void Sensor_Control_Main_Routine(void);
 
+        void Sensor_Data_Printout(void);
+
         // Internal operation(s) for external interrupt service routine(s)
         void Timer_Callback(void);   // Timer counter overflow callback
 
     private:
+        uint8_t DS18B20_present;
+
         void init_Timer(TIM_TypeDef* Timer_Instance = Sensor_Control_TIM_Instance);
 
-        void Read_From_Anemometer(void);
+        void Sensor_Update_Request(void);
+        void Sensor_Data_Request(void);
 };
 
 
