@@ -106,8 +106,6 @@ void WindVane_Control::Data_Processing_Routine(uint16_t* raw_data) {
       while (halfComplete);
   } while (n < storage_size);
 
-  Serial.println();
-
   delete[] raw_data;   // Free up the heap
 
   Wind_Direction_Instance(voltage_mean_value);

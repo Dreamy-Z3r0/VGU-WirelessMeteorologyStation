@@ -136,26 +136,30 @@ void Sensor_Control::Sensor_Data_Request(void) {
 }
 
 void Sensor_Control::Sensor_Data_Printout(void) {
-    #ifdef DEBUGGING_OVER_SERIAL
+    // #ifdef DEBUGGING_OVER_SERIAL
 
     bool newLine = false;
 
     if (Latest_Sensor_Status.RainGauge_status == DATA_AVAILABLE) {
+        // Latest_Sensor_Status.RainGauge_status = INITIAL_STATE;
         Serial.printf("  Precipitation (rainfall): %.4f mm\n", Latest_Sensor_Readings.Rainfall_Amount);
         newLine = true;
     }
 
     if (Latest_Sensor_Status.Anemometer_status == DATA_AVAILABLE) {
+        // Latest_Sensor_Status.Anemometer_status = INITIAL_STATE;
         Serial.printf("  Wind speed = %.2f km/h\n", Latest_Sensor_Readings.Wind_Data[0]);      // Print wind speed
         newLine = true;
     }
 
     if (Latest_Sensor_Status.WindVane_status == DATA_AVAILABLE) {
+        // Latest_Sensor_Status.WindVane_status = INITIAL_STATE;
         Serial.printf("  Wind direction = %.1f°\n", Latest_Sensor_Readings.Wind_Data[1]);     // Print wind direction
         newLine = true;
     }
 
     if (Latest_Sensor_Status.DS18B20_status == DATA_AVAILABLE) {
+        // Latest_Sensor_Status.DS18B20_status = INITIAL_STATE;
         PRECISION thermometerResolution = DS18B20_Device->get_thermometerResolution();
         uint8_t floating_point = (uint8_t)(((thermometerResolution >> 4) + 1) / 2);
 
@@ -183,6 +187,7 @@ void Sensor_Control::Sensor_Data_Printout(void) {
     }
 
     if (Latest_Sensor_Status.BME280_status == DATA_AVAILABLE) {
+        // Latest_Sensor_Status.BME280_status = INITIAL_STATE;
         // Print temperature
         Serial.printf("  Ambient temperature = %.2f ºC (BME280)\n", Latest_Sensor_Readings.BME280_Data[0]);    
 
@@ -197,7 +202,7 @@ void Sensor_Control::Sensor_Data_Printout(void) {
 
     if (newLine) Serial.println();
 
-    #endif
+    // #endif
 }
 
 
@@ -207,10 +212,10 @@ void Sensor_Control::Sensor_Data_Printout(void) {
 
 // Timer counter overflow callback
 void Sensor_Control::Timer_Callback(void) {
-    Anemometer_Device->standby_routine(Anemometer_Device->standby_period_max_count);
-    WindVane_Device->standby_routine(WindVane_Device->standby_period_max_count);
-    BME280_Device->standby_routine(BME280_Device->standby_period_max_count);
-    DS18B20_Device->standby_routine(DS18B20_Device->standby_period_max_count);
+    Anemometer_Device->standby_routine(Anemometer_Device);
+    WindVane_Device->standby_routine(WindVane_Device);
+    BME280_Device->standby_routine(BME280_Device);
+    DS18B20_Device->standby_routine(DS18B20_Device);
 }
 
 

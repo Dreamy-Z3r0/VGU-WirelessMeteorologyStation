@@ -11,7 +11,10 @@ class Sensor_Base : public DS3231_Control {
     void set_SensorPin(uint32_t SensorPin);
     uint32_t get_SensorPin(void);
 
-    void update_standby(unsigned long standby_period_max_count = 50);
+    void update_standby(unsigned int standby_period_max_count = 50);
+    void increment_standby_count(void);
+    unsigned int get_standby_count(void);
+    unsigned int get_standby_period(void);
 
     void update_sensor_data(void);
 
@@ -38,16 +41,17 @@ class Sensor_Base : public DS3231_Control {
     void clear_dataReady(void);    // Clear dataReady
 
     // Device-on-standby routine
-    void standby_routine(unsigned int device_standby_period_max_count);
+    void standby_routine(Sensor_Base* Sensor_Instance);
 
   protected:
     void update_timestamp(void);
 
   private:
     uint32_t SensorPin;
+
     unsigned int standby_period_count,        // Elapsed time in milliseconds from the beginning of a standby period
                  standby_period_max_count;    // Duration of a standby period in milliseconds  
-
+    
     bool readFlag,      // Enable to issue an update of sensor data
         //  samplingFlag,  // Indicates an on-going sampling routine
          standbyFlag,   // Indicates a standby period

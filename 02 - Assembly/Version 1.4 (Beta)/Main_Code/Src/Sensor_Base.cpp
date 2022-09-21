@@ -29,8 +29,20 @@ void Sensor_Base::read_sensor_data(float *external_storage) {
   
 }
 
-void Sensor_Base::update_standby(unsigned long standby_period_max_count) {
+void Sensor_Base::update_standby(unsigned int standby_period_max_count) {
   this->standby_period_max_count = standby_period_max_count;
+}
+
+void Sensor_Base::increment_standby_count(void) {
+  this->standby_period_count += 1;
+}
+
+unsigned int Sensor_Base::get_standby_count(void) {
+  return this->standby_period_count;
+}
+
+unsigned int Sensor_Base::get_standby_period(void) {
+  return this->standby_period_max_count;
 }
 
 
@@ -117,12 +129,12 @@ void Sensor_Base::clear_dataReady(void) {
  *** Device-on-standby routine ***
  *********************************/
 
-void Sensor_Base::standby_routine(unsigned int device_standby_period_max_count) {
-  if (standbyFlag) {
-    standby_period_count += 1;
+void Sensor_Base::standby_routine(Sensor_Base* Sensor_Instance) {
+  if (Sensor_Instance->is_standbyFlag_set()) {
+    Sensor_Instance->increment_standby_count();
 
-    if (device_standby_period_max_count == standby_period_count) {
-      readFlag = true;
+    if (Sensor_Instance->get_standby_period() == Sensor_Instance->get_standby_count()) {
+      Sensor_Instance->set_readFlag();
     }
   }
 }
