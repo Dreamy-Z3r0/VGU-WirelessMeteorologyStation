@@ -1,5 +1,5 @@
 # Assembly
-### Beta release - Version 1.4
+### Alpha release - Version 2.0
 
 Change log:
 - Add main routine for Sensor_Control class
