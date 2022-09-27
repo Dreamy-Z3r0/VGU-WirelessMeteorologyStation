@@ -1,5 +1,8 @@
 #include "../Inc/RTC.h"
 
+
+DS3231_Control RTC_DS3231;
+
 uint8_t counter = 0;
 
 

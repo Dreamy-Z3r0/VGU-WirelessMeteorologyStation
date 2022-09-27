@@ -1,8 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
-
-// #include "RTC.h"
+#include "RTC.h"
 
 class Sensor_Base {
   public:
@@ -21,6 +20,16 @@ class Sensor_Base {
     void update_sensor_data(void);
 
     void read_sensor_data(float *external_storage);
+
+    // Return timestamp: date data
+    int readDay(void);    // Day of month
+    int readMonth(void);  // Month
+    int readYear(void);   // Year
+
+    // Return timestamp: time data
+    int readHour(void);     // Hour
+    int readMinute(void);   // Minute
+    int readSecond(void);   // Second
 
     // readFlag operations
     void set_readFlag(void);      // Set readFlag
@@ -41,6 +50,7 @@ class Sensor_Base {
     void standby_routine(Sensor_Base* Sensor_Instance);
 
   protected:
+    int RTC_data[6];    // Date and time data holder: day - month - year - hour - minute - second
     void update_timestamp(void);
 
   private:

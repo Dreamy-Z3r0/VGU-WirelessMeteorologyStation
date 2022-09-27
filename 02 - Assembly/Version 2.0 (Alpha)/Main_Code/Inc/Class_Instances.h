@@ -1,12 +1,13 @@
 #pragma once
 
+#include "Libraries.h"
 #include "Macros_and_Defines.h"
 
 
 /*******************************
  *** DS32331 Real-time Clock ***
  *******************************/
-DS3231_Control RTC_DS3231;
+// DS3231_Control RTC_DS3231;   <--- Defined within RTC.cpp for global access
 
 
 /*******************************************************************
@@ -31,7 +32,7 @@ Precipitation RainGauge(RainGauge_InputPin, Alarm_InputPin);
 /*****************
  *** Wind vane ***
  *****************/
-//WindVane_Control WindVane;
+//WindVane_Control WindVane;   <--- Defined within Wind_Vane.cpp for the use of HAL library
 
 
 /******************
