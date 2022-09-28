@@ -5,7 +5,7 @@
 #include <SPI.h>
 
 // Logger with an SD card
-#include "SD.h"
+#include <SD.h>
 
 // Real-time clock DS3231
 #include <DS3231.h>
