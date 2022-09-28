@@ -1,5 +1,5 @@
 # Assembly
-### Alpha release - Version 2.0
+### Beta release - Version 2.1
 
 Change log:
 - Relocate Sensor_Base.h and Sensor_Base.cpp
