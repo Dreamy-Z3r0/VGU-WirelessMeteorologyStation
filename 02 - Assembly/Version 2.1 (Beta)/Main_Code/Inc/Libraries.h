@@ -39,3 +39,6 @@
 #include "SensorUnits/Thermometer_Hygrometer_Barometer.h"
 
 #include "Sensor_Control.h"
+
+// Data exchange
+#include "SX1278_LoRa.h"

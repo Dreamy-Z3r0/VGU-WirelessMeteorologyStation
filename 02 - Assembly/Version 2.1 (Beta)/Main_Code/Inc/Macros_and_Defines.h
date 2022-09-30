@@ -13,6 +13,12 @@
 #define BAUD_RATE 9600          // Define baud rate for Serial monitor
 #endif
 
+/***********************************************
+ *** SX1278: Long-Range (LoRa) Communication ***
+ ***********************************************/
+#define LoRa_NCSS_Pin PA12  // ***
+#define 
+
 
 /********************************
  *** SD card's requirement(s) ***
