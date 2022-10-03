@@ -5,6 +5,7 @@
 #include <LoRa.h>
 
 #include "Macros_and_Defines.h"
+#include "Class_Instances.h"
 
 
 typedef struct {
@@ -39,15 +40,23 @@ class LoRa_Control {
     public:
         LoRa_Control(void);
 
-        void set_SPI(SPIClass& spi, uint32_t SPI_Frequency = LORA_DEFAULT_SPI_FREQUENCY);
+        void init(void);
+
+        void set_SPI(SPIClass& spi = SPI_2, uint32_t SPI_Frequency = LORA_DEFAULT_SPI_FREQUENCY);
         void set_SPI( uint32_t MOSI_Pin, uint32_t MISO_Pin, 
                       uint32_t SCLK_Pin, uint32_t NCSS_Pin,
                       uint32_t SPI_Frequency = LORA_DEFAULT_SPI_FREQUENCY);
         void set_SPI( uint32_t MOSI_Pin, uint32_t MISO_Pin, uint32_t SCLK_Pin,
                       uint32_t SPI_Frequency = LORA_DEFAULT_SPI_FREQUENCY);
 
-        void set_LoRa_Frequency(long LoRa_Frequency = );
+        void set_LoRa_Frequency(long LoRa_Frequency, bool update_LoRa_module = false);
+        void set_LoRa_NCSS_Pin(uint32_t Pin);
+        void set_LoRa_Reset_Pin(uint32_t Pin);
+        void set_LoRa_IRQ_Pin(uint32_t Pin);
+
+        void initiate_device(bool forced_initialisation = false);
 
     private:
         LoRa_Config LoRa_Configurations;
+        int LoRa_Device_Initiated;
 };

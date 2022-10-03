@@ -4,6 +4,12 @@
 #include "Macros_and_Defines.h"
 
 
+/****************************
+ *** SPI2 for SX1278 LoRa ***
+ ****************************/
+SPIClass SPI_2(LoRa_SPI_MOSI_Pin, LoRa_SPI_MISO_Pin, LoRa_SPI_SCLK_Pin);
+
+
 /*******************************
  *** DS32331 Real-time Clock ***
  *******************************/
