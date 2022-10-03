@@ -30,8 +30,8 @@ typedef struct {
     int  LoRa_SpreadingFactor;
     long LoRa_SignalBandwidth;
     int  LoRa_CodingRate4;
-    long LoRa_PreambleLength;
     int  LoRa_SyncWord;
+    int  LoRa_TransmissionPower;
 } LoRa_Config;
 
 
@@ -53,9 +53,19 @@ class LoRa_Control {
         void set_LoRa_Reset_Pin(uint32_t Pin);
         void set_LoRa_IRQ_Pin(uint32_t Pin);
 
+        void set_LoRa_SpreadingFactor(int sf);
+        void set_LoRa_SignalBandwidth(long bw);
+        void set_LoRa_CodingRate4(int cr4);
+        void set_LoRa_SyncWord(int sw);
+        void set_LoRa_TransmissionPower(int tp);
+
         void initiate_device(bool forced_initialisation = false);
+        void push_lora_parameters(void);
 
     private:
         LoRa_Config LoRa_Configurations;
         int LoRa_Device_Initiated;
+
+        bool new_lora_parameters;
+        bool new_sf, new_bw, new_cr, new_sw, new_tp;
 };

@@ -4,24 +4,19 @@
 LoRa_Control::LoRa_Control(void) {
     LoRa_Device_Initiated = 0;
 
+    new_lora_parameters = false;
+    new_sf = false;
+    new_bw = false;
+    new_cr = false;
+    new_sw = false;
+    new_tp = false;
+
     // SPI default parameter(s)
     LoRa_Configurations.LoRa_SPI_Configurations.MOSI_Pin = LoRa_SPI_MOSI_Pin;
     LoRa_Configurations.LoRa_SPI_Configurations.MISO_Pin = LoRa_SPI_MISO_Pin;
     LoRa_Configurations.LoRa_SPI_Configurations.SCLK_Pin = LoRa_SPI_SCLK_Pin;
 
-    LoRa_Configurations.LoRa_SPI_Configurations.SPI_Frequency = LoRa_Module_SPI_Clock;
-
-    // LoRa interface default parameters
-    set_LoRa_Frequency(LoRa_Project_Frequency);
-
-    set_LoRa_NCSS_Pin(LoRa_NCSS_Pin);
-    set_LoRa_Reset_Pin(LoRa_RST_Pin);
-    set_LoRa_IRQ_Pin(LoRa_IRQ_Pin);
-
-    LoRa_Configurations.LoRa_SpreadingFactor = LoRa_Project_Spreading_Factor;
-    LoRa_Configurations.LoRa_SignalBandwidth = LoRa_Project_Signal_Bandwidth;
-    LoRa_Configurations.LoRa_CodingRate4 = LoRa_Project_Coding_Rate_4_Denominator;
-    LoRa_Configurations.LoRa_SyncWord = LoRa_Project_Sync_Word;
+    LoRa_Configurations.LoRa_SPI_Configurations.SPI_Frequency = LoRa_Module_SPI_Clock;    
 }
 
 void LoRa_Control::init(void) {
@@ -33,7 +28,14 @@ void LoRa_Control::init(void) {
     set_LoRa_Reset_Pin(LoRa_RST_Pin);
     set_LoRa_IRQ_Pin(LoRa_IRQ_Pin);
 
+    set_LoRa_SpreadingFactor(LoRa_Project_Spreading_Factor);
+    set_LoRa_SignalBandwidth(LoRa_Project_Signal_Bandwidth);
+    set_LoRa_CodingRate4(LoRa_Project_Coding_Rate_4_Denominator);
+    set_LoRa_SyncWord(LoRa_Project_Sync_Word);
+    set_LoRa_TransmissionPower(LoRa_Project_Transmission_Power);
+
     initiate_device(true);
+    push_lora_parameters();
 }
 
 void LoRa_Control::set_SPI(SPIClass& spi, uint32_t SPI_Frequency) {
@@ -116,6 +118,61 @@ void LoRa_Control::set_LoRa_IRQ_Pin(uint32_t Pin) {
     LoRa.setPins(LoRa_Configurations.NCSS_Pin, LoRa_Configurations.Reset_Pin, LoRa_Configurations.IRQ_Pin);
 }
 
+void LoRa_Control::set_LoRa_SpreadingFactor(int sf) {
+    if ((6 > sf) | (12 < sf)) {
+        return;
+    }
+
+    LoRa_Configurations.LoRa_SpreadingFactor = sf;
+
+    new_lora_parameters = true;
+    new_sf = true;
+}
+
+void LoRa_Control::set_LoRa_SignalBandwidth(long bw) {
+    if (((long)7.8E3 > bw) | ((long)500E3 < bw)) {
+        return;
+    }
+
+    LoRa_Configurations.LoRa_SignalBandwidth = bw;
+
+    new_lora_parameters = true;
+    new_bw = true;
+}
+
+void LoRa_Control::set_LoRa_CodingRate4(int cr4) {
+    if ((5 > cr4) | (8 < cr4)) {
+        return;
+    }
+
+    LoRa_Configurations.LoRa_CodingRate4 = cr4;
+
+    new_lora_parameters = true;
+    new_cr = true;
+}
+
+void LoRa_Control::set_LoRa_SyncWord(int sw) {
+    if ((0x00 > sw) | (0xFF < sw)) {
+        return;
+    }
+
+    LoRa_Configurations.LoRa_SyncWord = sw;
+
+    new_lora_parameters = true;
+    new_sw = true;
+}
+
+void LoRa_Control::set_LoRa_TransmissionPower(int tp) {
+    if ((-4 > tp) | (20 < tp)) {
+        return;
+    }
+
+    LoRa_Configurations.LoRa_TransmissionPower = tp;
+
+    new_lora_parameters = true;
+    new_tp = true;
+}
+
 void LoRa_Control::initiate_device(bool forced_initialisation) {
     if (forced_initialisation) {
         LoRa_Device_Initiated = 0;
@@ -144,3 +201,33 @@ void LoRa_Control::initiate_device(bool forced_initialisation) {
     }
 }
 
+void LoRa_Control::push_lora_parameters(void) {
+    if (new_lora_parameters) {
+        new_lora_parameters = false;
+
+        if (new_sf) {
+            new_sf = false;
+            LoRa.setSpreadingFactor(LoRa_Configurations.LoRa_SpreadingFactor);
+        }
+
+        if (new_bw) {
+            new_bw = false;
+            LoRa.setSignalBandwidth(LoRa_Configurations.LoRa_SignalBandwidth);
+        }
+
+        if (new_cr) {
+            new_cr = false;
+            LoRa.setCodingRate4(LoRa_Configurations.LoRa_CodingRate4);
+        }
+
+        if (new_sw) {
+            new_sw = false;
+            LoRa.setSyncWord(LoRa_Configurations.LoRa_SyncWord);
+        }
+
+        if (new_tp) {
+            new_tp = false;
+            LoRa.setTxPower(LoRa_Configurations.LoRa_TransmissionPower);
+        }
+    }
+}

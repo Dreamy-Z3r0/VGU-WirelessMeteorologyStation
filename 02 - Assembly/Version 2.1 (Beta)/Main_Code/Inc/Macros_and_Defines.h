@@ -32,6 +32,7 @@
 #define LoRa_Project_Signal_Bandwidth 500E3
 #define LoRa_Project_Coding_Rate_4_Denominator 8
 #define LoRa_Project_Sync_Word 0x12
+#define LoRa_Project_Transmission_Power 17
 
 
 /********************************
