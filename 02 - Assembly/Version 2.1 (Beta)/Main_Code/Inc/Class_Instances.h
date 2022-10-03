@@ -7,7 +7,7 @@
 /****************************
  *** SPI2 for SX1278 LoRa ***
  ****************************/
-SPIClass SPI_2(LoRa_SPI_MOSI_Pin, LoRa_SPI_MISO_Pin, LoRa_SPI_SCLK_Pin);
+// SPIClass SPI_2(LoRa_SPI_MOSI_Pin, LoRa_SPI_MISO_Pin, LoRa_SPI_SCLK_Pin);
 
 
 /*******************************
