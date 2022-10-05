@@ -1,6 +1,10 @@
 #include "../Inc/SX1278_LoRa.h"
 
 
+/*********************
+ *** Contructor(s) ***
+ *********************/
+
 LoRa_Control::LoRa_Control(void) {
     LoRa_Device_Initiated = 0;
 
@@ -18,6 +22,11 @@ LoRa_Control::LoRa_Control(void) {
 
     LoRa_Configurations.LoRa_SPI_Configurations.SPI_Frequency = LoRa_Module_SPI_Clock;    
 }
+
+
+/*************************************
+ *** Class instance initialization ***
+ *************************************/
 
 void LoRa_Control::init(void) {
     set_SPI(LoRa_SPI_MOSI_Pin, LoRa_SPI_MISO_Pin, LoRa_SPI_SCLK_Pin);
@@ -38,6 +47,12 @@ void LoRa_Control::init(void) {
     push_lora_parameters();
 }
 
+
+/***************************
+ *** Update SPI settings ***
+ ***************************/
+
+// Change SPIClass instance and (optional) SPI frequency
 void LoRa_Control::set_SPI(SPIClass& spi, uint32_t SPI_Frequency) {
     LoRa.setSPI(spi);
 
@@ -45,6 +60,7 @@ void LoRa_Control::set_SPI(SPIClass& spi, uint32_t SPI_Frequency) {
     LoRa.setSPIFrequency(LoRa_Configurations.LoRa_SPI_Configurations.SPI_Frequency);
 }
 
+// Set SPI for LoRa module by hardware SPI pins and (optional) SPI frequency
 void LoRa_Control::set_SPI( uint32_t MOSI_Pin, uint32_t MISO_Pin, 
                             uint32_t SCLK_Pin, uint32_t NCSS_Pin,
                             uint32_t SPI_Frequency ) 
@@ -64,6 +80,7 @@ void LoRa_Control::set_SPI( uint32_t MOSI_Pin, uint32_t MISO_Pin,
     LoRa.setSPIFrequency(LoRa_Configurations.LoRa_SPI_Configurations.SPI_Frequency);
 }
 
+// Set SPI for LoRa module by hardware SPI pins (without NCSS pin) and (optional) SPI frequency
 void LoRa_Control::set_SPI( uint32_t MOSI_Pin, uint32_t MISO_Pin, 
                             uint32_t SCLK_Pin, uint32_t SPI_Frequency ) 
 {
@@ -80,6 +97,12 @@ void LoRa_Control::set_SPI( uint32_t MOSI_Pin, uint32_t MISO_Pin,
     LoRa.setSPIFrequency(LoRa_Configurations.LoRa_SPI_Configurations.SPI_Frequency);
 }
 
+
+/**********************************
+ *** Update LoRa configurations ***
+ **********************************/
+
+// LoRa frequency; default: 433 MHz
 void LoRa_Control::set_LoRa_Frequency(long LoRa_Frequency, bool update_LoRa_module) {
     long temp = LoRa_Configurations.LoRa_Frequency;
     LoRa_Configurations.LoRa_Frequency = LoRa_Frequency;
@@ -103,21 +126,30 @@ void LoRa_Control::set_LoRa_Frequency(long LoRa_Frequency, bool update_LoRa_modu
     }
 }
 
+// NCSS pin for LoRa module SX1278
 void LoRa_Control::set_LoRa_NCSS_Pin(uint32_t Pin) {
     LoRa_Configurations.NCSS_Pin = Pin;
     LoRa.setPins(LoRa_Configurations.NCSS_Pin, LoRa_Configurations.Reset_Pin, LoRa_Configurations.IRQ_Pin);
 }
 
+// Reset pin for LoRa module SX1278
 void LoRa_Control::set_LoRa_Reset_Pin(uint32_t Pin) {
     LoRa_Configurations.Reset_Pin = Pin;
     LoRa.setPins(LoRa_Configurations.NCSS_Pin, LoRa_Configurations.Reset_Pin, LoRa_Configurations.IRQ_Pin);
 }
 
+// IRQ pin for LoRa module SX1278's DIO0
 void LoRa_Control::set_LoRa_IRQ_Pin(uint32_t Pin) {
     LoRa_Configurations.IRQ_Pin = Pin;
     LoRa.setPins(LoRa_Configurations.NCSS_Pin, LoRa_Configurations.Reset_Pin, LoRa_Configurations.IRQ_Pin);
 }
 
+
+/******************************
+ *** Update LoRa parameters ***
+ ******************************/
+
+// Spreading factor (6 .. 12)
 void LoRa_Control::set_LoRa_SpreadingFactor(int sf) {
     if ((6 > sf) | (12 < sf)) {
         return;
@@ -129,6 +161,7 @@ void LoRa_Control::set_LoRa_SpreadingFactor(int sf) {
     new_sf = true;
 }
 
+// Signal bandwidth (7.8 / 10.4 / 15.6 / 20.8 / 31.25 / 41.7 / 62.5 / 125 / 250 / 500 kHz)
 void LoRa_Control::set_LoRa_SignalBandwidth(long bw) {
     if (((long)7.8E3 > bw) | ((long)500E3 < bw)) {
         return;
@@ -140,6 +173,7 @@ void LoRa_Control::set_LoRa_SignalBandwidth(long bw) {
     new_bw = true;
 }
 
+// Denominator for LoRa coding rate (5 .. 8)
 void LoRa_Control::set_LoRa_CodingRate4(int cr4) {
     if ((5 > cr4) | (8 < cr4)) {
         return;
@@ -151,6 +185,7 @@ void LoRa_Control::set_LoRa_CodingRate4(int cr4) {
     new_cr = true;
 }
 
+// Sync word (8-bit integer)
 void LoRa_Control::set_LoRa_SyncWord(int sw) {
     if ((0x00 > sw) | (0xFF < sw)) {
         return;
@@ -162,6 +197,7 @@ void LoRa_Control::set_LoRa_SyncWord(int sw) {
     new_sw = true;
 }
 
+// Transmission power (-4 to +20 dBm)
 void LoRa_Control::set_LoRa_TransmissionPower(int tp) {
     if ((-4 > tp) | (20 < tp)) {
         return;
@@ -173,6 +209,12 @@ void LoRa_Control::set_LoRa_TransmissionPower(int tp) {
     new_tp = true;
 }
 
+
+/**************************************************
+ *** Hardware initialization / parameter update ***
+ **************************************************/
+
+// Initiate LoRa module SX1278 with an option of forced update
 void LoRa_Control::initiate_device(bool forced_initialisation) {
     if (forced_initialisation) {
         LoRa_Device_Initiated = 0;
@@ -201,6 +243,7 @@ void LoRa_Control::initiate_device(bool forced_initialisation) {
     }
 }
 
+// Update LoRa parameters to the LoRa module
 void LoRa_Control::push_lora_parameters(void) {
     if (new_lora_parameters) {
         new_lora_parameters = false;

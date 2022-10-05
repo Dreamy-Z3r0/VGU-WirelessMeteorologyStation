@@ -37,30 +37,36 @@ typedef struct {
 
 class LoRa_Control {
     public:
+        /* Constructor(s) */
         LoRa_Control(void);
 
+        /* Class instance initialization */
         void init(void);
 
-        void set_SPI(SPIClass& spi, uint32_t SPI_Frequency = LORA_DEFAULT_SPI_FREQUENCY);
-        void set_SPI( uint32_t MOSI_Pin, uint32_t MISO_Pin, 
+        /* Update SPI settings */
+        void set_SPI(SPIClass& spi, uint32_t SPI_Frequency = LORA_DEFAULT_SPI_FREQUENCY);   // Change SPIClass instance and (optional) SPI frequency
+        void set_SPI( uint32_t MOSI_Pin, uint32_t MISO_Pin,     // Set SPI for LoRa module by hardware SPI pins and (optional) SPI frequency
                       uint32_t SCLK_Pin, uint32_t NCSS_Pin,
                       uint32_t SPI_Frequency = LORA_DEFAULT_SPI_FREQUENCY);
-        void set_SPI( uint32_t MOSI_Pin, uint32_t MISO_Pin, uint32_t SCLK_Pin,
+        void set_SPI( uint32_t MOSI_Pin, uint32_t MISO_Pin, uint32_t SCLK_Pin,  // Set SPI for LoRa module by hardware SPI pins (without NCSS pin) and (optional) SPI frequency
                       uint32_t SPI_Frequency = LORA_DEFAULT_SPI_FREQUENCY);
 
-        void set_LoRa_Frequency(long LoRa_Frequency, bool update_LoRa_module = false);
-        void set_LoRa_NCSS_Pin(uint32_t Pin);
-        void set_LoRa_Reset_Pin(uint32_t Pin);
-        void set_LoRa_IRQ_Pin(uint32_t Pin);
+        /* Update LoRa configurations */
+        void set_LoRa_Frequency(long LoRa_Frequency, bool update_LoRa_module = false);  // LoRa frequency; default: 433 MHz
+        void set_LoRa_NCSS_Pin(uint32_t Pin);       // NCSS pin for LoRa module SX1278
+        void set_LoRa_Reset_Pin(uint32_t Pin);      // Reset pin for LoRa module SX1278
+        void set_LoRa_IRQ_Pin(uint32_t Pin);        // IRQ pin for LoRa module SX1278's DIO0
 
-        void set_LoRa_SpreadingFactor(int sf);
-        void set_LoRa_SignalBandwidth(long bw);
-        void set_LoRa_CodingRate4(int cr4);
-        void set_LoRa_SyncWord(int sw);
-        void set_LoRa_TransmissionPower(int tp);
+        /* Update LoRa parameters */
+        void set_LoRa_SpreadingFactor(int sf);      // Spreading factor (6 .. 12)
+        void set_LoRa_SignalBandwidth(long bw);     // Signal bandwidth (7.8 / 10.4 / 15.6 / 20.8 / 31.25 / 41.7 / 62.5 / 125 / 250 / 500 kHz)
+        void set_LoRa_CodingRate4(int cr4);         // Denominator for LoRa coding rate (5 .. 8)
+        void set_LoRa_SyncWord(int sw);             // Sync word (8-bit integer)
+        void set_LoRa_TransmissionPower(int tp);    // Transmission power (-4 to +20 dBm)
 
-        void initiate_device(bool forced_initialisation = false);
-        void push_lora_parameters(void);
+        /* Hardware initialization / parameter update */
+        void initiate_device(bool forced_initialisation = false);   // Initiate LoRa module SX1278 with an option of forced update
+        void push_lora_parameters(void);    // Update LoRa parameters to the LoRa module
 
     private:
         LoRa_Config LoRa_Configurations;
