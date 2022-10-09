@@ -10,6 +10,12 @@
 // SPIClass SPI_2(LoRa_SPI_MOSI_Pin, LoRa_SPI_MISO_Pin, LoRa_SPI_SCLK_Pin);
 
 
+/*****************************************
+ *** SX1278: LoRa communication (node) ***
+ *****************************************/
+// LoRa_Settings_Control LoRa_Device;
+
+
 /*******************************
  *** DS32331 Real-time Clock ***
  *******************************/

@@ -35,11 +35,24 @@ typedef struct {
     int  LoRa_TransmissionPower;
 } LoRa_Config;
 
+typedef struct {
+    String message;
 
-class LoRa_Settings_Control {
+    int packetRssi,
+        packetSnr,
+        packetFrequencyError;
+
+    bool messageStatus;
+} LoRa_Message_Handler;
+
+
+class LoRa_Control {
     public:
+        LoRa_Message_Handler Received_Message;
+        LoRa_Message_Handler Outgoing_Message;
+
         /* Constructor(s) */
-        LoRa_Settings_Control(void);
+        LoRa_Control(void);
 
         /* Class instance initialization */
         void init(void);
@@ -90,4 +103,6 @@ void onTxDone(void);                // LoRa post-transmission event
 
 void LoRa_sendMessage(String message);      // Out-going message handler
 
+
+extern LoRa_Control LoRa_Device;
 #endif
