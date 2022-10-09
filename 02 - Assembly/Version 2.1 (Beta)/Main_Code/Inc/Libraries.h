@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _LIBRARIES_H_
+#define _LIBRARIES_H_
 
 
 /****************************************************
@@ -42,3 +43,5 @@
 
 // Data exchange
 #include "SX1278_LoRa.h"
+
+#endif

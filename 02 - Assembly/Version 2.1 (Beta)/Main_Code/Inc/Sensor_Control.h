@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _SENSOR_CONTROL_H_
+#define _SENSOR_CONTROL_H_
 
 #include "Libraries.h"
 #include "Macros_and_Defines.h"
@@ -85,3 +86,5 @@ void Sensor_Control_TIM_Ovf_Callback(Sensor_Control* Sensor_Control_Instance);  
  *** Declaration of externally accessed class instance ***
  *********************************************************/
 // extern Sensor_Control General_Sensor_Control;
+
+#endif

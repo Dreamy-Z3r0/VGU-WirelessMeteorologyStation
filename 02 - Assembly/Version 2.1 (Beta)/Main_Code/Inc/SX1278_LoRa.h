@@ -104,5 +104,9 @@ void onTxDone(void);                // LoRa post-transmission event
 void LoRa_sendMessage(String message);      // Out-going message handler
 
 
+/***********************************************
+ *** LoRa_Control class instance declaration ***
+ ***********************************************/
 extern LoRa_Control LoRa_Device;
+
 #endif

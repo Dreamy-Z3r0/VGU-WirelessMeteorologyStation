@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _THERMOMETER_HYGROMETER_BAROMETER_H_
+#define _THERMOMETER_HYGROMETER_BAROMETER_H_
 
 /*****************
  *** Libraries ***
@@ -172,3 +173,5 @@ class DS18B20_Control : public Sensor_Base {
                            FUNCTION_COMMAND functionCommand, uint8_t* data, 
                            uint8_t option);
 };
+
+#endif

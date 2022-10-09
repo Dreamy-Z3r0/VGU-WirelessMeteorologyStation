@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _MACROS_AND_DEFINES_H_
+#define _MACROS_AND_DEFINES_H_
 
 #include "Libraries.h"
 
@@ -75,3 +76,5 @@
  *** Anemometer ***
  ******************/
 #define Anemometer_InputPin PA3
+
+#endif

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _CLASS_INSTANCES_H_
+#define _CLASS_INSTANCES_H_
 
 #include "Libraries.h"
 #include "Macros_and_Defines.h"
@@ -62,3 +63,5 @@ Sensor_Control Project_Sensor( &Anemometer_Device,
                                &BME280_Device,
                                &DS18B20_Device
                              );
+                            
+#endif

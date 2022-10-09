@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _WIND_VANE_H_
+#define _WIND_VANE_H_
 
 /* STM32F1xx specific HAL configuration options. */
 #if __has_include("hal_conf_custom.h")
@@ -94,3 +95,5 @@ static void MX_DMA_Init(void);
 static void MX_ADC1_Init(ADC_INPUT_TYPE input_type);
 
 extern WindVane_Control WindVane;
+
+#endif

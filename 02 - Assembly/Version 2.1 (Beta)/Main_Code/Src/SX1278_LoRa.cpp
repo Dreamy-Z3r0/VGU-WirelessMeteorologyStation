@@ -363,6 +363,12 @@ void LoRa_sendMessage(String message) {
     LoRa.beginPacket();      // start packet
     LoRa.print(message);     // add payload
     LoRa.endPacket(true);    // finish packet and send it
+
+    LoRa_Device.Outgoing_Message.messageStatus = true;
 }
 
+
+/***********************************************
+ *** LoRa_Control class instance declaration ***
+ ***********************************************/
 LoRa_Control LoRa_Device;

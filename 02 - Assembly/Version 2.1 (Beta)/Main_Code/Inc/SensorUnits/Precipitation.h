@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _PRECIPITATION_H_
+#define _PRECIPITATION_H_
 
 #include <DS3231.h>
 #include "Sensor_Base.h"
@@ -50,3 +51,5 @@ class Precipitation : public Sensor_Base {
  *******************************************/
 void RainGauge_Tipping_Callback(Precipitation* PrecipitationInstance);  // Interrupt service routine when the bucket tips
 void Alarm_Callback(Precipitation* PrecipitationInstance);              // Interrupt service routine when alarm for a new day appears
+
+#endif

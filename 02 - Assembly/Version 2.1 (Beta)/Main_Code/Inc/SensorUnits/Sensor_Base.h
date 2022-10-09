@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _SENSOR_BASE_H_
+#define _SENSOR_BASE_H_
 
 #include <Arduino.h>
 #include "../RTC.h"
@@ -63,3 +64,5 @@ class Sensor_Base {
          standbyFlag,   // Indicates a standby period
          newDataReady;     // Indicates sensor data is available to be accessed externally
 };
+
+#endif

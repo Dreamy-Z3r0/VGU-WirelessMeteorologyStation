@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _ANEMOMETER_H_
+#define _ANEMETER_H_
 
 #include "Sensor_Base.h"
 
@@ -72,3 +73,5 @@ class Anemometer_Control : public Sensor_Base {
  *******************************************/
 void Anemometer_Control_TIM_Ovf_Callback(Anemometer_Control* Anemometer_Instance);    // Interrupt service routine when a timer counter overflows
 void anemometerInput_Detected(Anemometer_Control* Anemometer_Instance);   // Interrupt service routine when an edge is present at the input pin
+
+#endif

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _RTC_H_
+#define _RTC_H_
 
 #include <DS3231.h>
 
@@ -65,3 +66,5 @@ class DS3231_Control {
 extern DS3231_Control RTC_DS3231;
 
 void request_from_RTC(DS3231_Control* RTC_DS3231);
+
+#endif
