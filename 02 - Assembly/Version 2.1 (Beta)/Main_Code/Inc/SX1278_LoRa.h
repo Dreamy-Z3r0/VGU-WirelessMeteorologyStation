@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _SX1278_LORA_H_
+#define _SX1278_LORA_H_
 
 #include <Arduino.h>
 #include <SPI.h>
@@ -35,10 +36,10 @@ typedef struct {
 } LoRa_Config;
 
 
-class LoRa_Control {
+class LoRa_Settings_Control {
     public:
         /* Constructor(s) */
-        LoRa_Control(void);
+        LoRa_Settings_Control(void);
 
         /* Class instance initialization */
         void init(void);
@@ -64,7 +65,7 @@ class LoRa_Control {
         void set_LoRa_SyncWord(int sw);             // Sync word (8-bit integer)
         void set_LoRa_TransmissionPower(int tp);    // Transmission power (-4 to +20 dBm)
 
-        /* Hardware initialization / parameter update */
+        /* Physical layer update */
         void initiate_device(bool forced_initialisation = false);   // Initiate LoRa module SX1278 with an option of forced update
         void push_lora_parameters(void);    // Update LoRa parameters to the LoRa module
 
@@ -73,5 +74,20 @@ class LoRa_Control {
         int LoRa_Device_Initiated;
 
         bool new_lora_parameters;
-        bool new_sf, new_bw, new_cr, new_sw, new_tp;
+        bool new_sf, new_bw, new_cr, new_sw, new_tp;        
 };
+
+
+/****************************
+ *** LoRa event functions ***
+ ****************************/
+
+void LoRa_rxMode(void);     // Switch to RX mode
+void LoRa_txMode(void);     // Switch to TX mode
+
+void onReceive(int packetSize);     // LoRa on-receive event
+void onTxDone(void);                // LoRa post-transmission event
+
+void LoRa_sendMessage(String message);      // Out-going message handler
+
+#endif

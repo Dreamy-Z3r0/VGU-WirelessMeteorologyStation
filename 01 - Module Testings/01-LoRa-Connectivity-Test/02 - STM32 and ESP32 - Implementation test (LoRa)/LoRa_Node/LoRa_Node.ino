@@ -91,8 +91,8 @@ void setup() {
   // Set up LoRa parameters
   LoRaSettings();
 
-  LoRa.onReceive(onReceive);
-  LoRa.onTxDone(onTxDone);
+  LoRa.onReceive(&onReceive);
+  LoRa.onTxDone(&onTxDone);
   LoRa_rxMode();
   
   timestamp = millis();

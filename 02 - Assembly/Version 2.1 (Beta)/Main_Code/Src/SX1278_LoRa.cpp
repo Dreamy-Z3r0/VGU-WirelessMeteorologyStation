@@ -5,7 +5,7 @@
  *** Contructor(s) ***
  *********************/
 
-LoRa_Control::LoRa_Control(void) {
+LoRa_Settings_Control::LoRa_Settings_Control(void) {
     LoRa_Device_Initiated = 0;
 
     new_lora_parameters = false;
@@ -28,23 +28,37 @@ LoRa_Control::LoRa_Control(void) {
  *** Class instance initialization ***
  *************************************/
 
-void LoRa_Control::init(void) {
+void LoRa_Settings_Control::init(void) {
+    // Create an SPIClass instance for LoRa module by hardware SPI pins and configure SPI frequency
     set_SPI(LoRa_SPI_MOSI_Pin, LoRa_SPI_MISO_Pin, LoRa_SPI_SCLK_Pin);
     
+    // Set LoRa frequency
     set_LoRa_Frequency(LoRa_Project_Frequency);
 
+    // Set microcontroller's NCSS, Reset, and interrupt pins corresponding to the NSS, RST, and DIO0 pins on LoRa module
     set_LoRa_NCSS_Pin(LoRa_NCSS_Pin);
     set_LoRa_Reset_Pin(LoRa_RST_Pin);
     set_LoRa_IRQ_Pin(LoRa_IRQ_Pin);
 
+    // Set LoRa parameters
     set_LoRa_SpreadingFactor(LoRa_Project_Spreading_Factor);
     set_LoRa_SignalBandwidth(LoRa_Project_Signal_Bandwidth);
     set_LoRa_CodingRate4(LoRa_Project_Coding_Rate_4_Denominator);
     set_LoRa_SyncWord(LoRa_Project_Sync_Word);
     set_LoRa_TransmissionPower(LoRa_Project_Transmission_Power);
 
+    // Force initialisation of LoRa module
     initiate_device(true);
+    if (0 == LoRa_Device_Initiated) {   // Break the initialisation in case of failure
+        return;
+    }
+
+    // Push LoRa parameters from microcontroller to LoRa module
     push_lora_parameters();
+
+    // Set LoRa event functions
+    LoRa.onReceive(onReceive);
+    LoRa.onTxDone(onTxDone);
 }
 
 
@@ -53,7 +67,7 @@ void LoRa_Control::init(void) {
  ***************************/
 
 // Change SPIClass instance and (optional) SPI frequency
-void LoRa_Control::set_SPI(SPIClass& spi, uint32_t SPI_Frequency) {
+void LoRa_Settings_Control::set_SPI(SPIClass& spi, uint32_t SPI_Frequency) {
     LoRa.setSPI(spi);
 
     LoRa_Configurations.LoRa_SPI_Configurations.SPI_Frequency = SPI_Frequency;
@@ -61,7 +75,7 @@ void LoRa_Control::set_SPI(SPIClass& spi, uint32_t SPI_Frequency) {
 }
 
 // Set SPI for LoRa module by hardware SPI pins and (optional) SPI frequency
-void LoRa_Control::set_SPI( uint32_t MOSI_Pin, uint32_t MISO_Pin, 
+void LoRa_Settings_Control::set_SPI( uint32_t MOSI_Pin, uint32_t MISO_Pin, 
                             uint32_t SCLK_Pin, uint32_t NCSS_Pin,
                             uint32_t SPI_Frequency ) 
 {
@@ -81,7 +95,7 @@ void LoRa_Control::set_SPI( uint32_t MOSI_Pin, uint32_t MISO_Pin,
 }
 
 // Set SPI for LoRa module by hardware SPI pins (without NCSS pin) and (optional) SPI frequency
-void LoRa_Control::set_SPI( uint32_t MOSI_Pin, uint32_t MISO_Pin, 
+void LoRa_Settings_Control::set_SPI( uint32_t MOSI_Pin, uint32_t MISO_Pin, 
                             uint32_t SCLK_Pin, uint32_t SPI_Frequency ) 
 {
     LoRa_Configurations.LoRa_SPI_Configurations.MOSI_Pin = MISO_Pin;
@@ -103,7 +117,7 @@ void LoRa_Control::set_SPI( uint32_t MOSI_Pin, uint32_t MISO_Pin,
  **********************************/
 
 // LoRa frequency; default: 433 MHz
-void LoRa_Control::set_LoRa_Frequency(long LoRa_Frequency, bool update_LoRa_module) {
+void LoRa_Settings_Control::set_LoRa_Frequency(long LoRa_Frequency, bool update_LoRa_module) {
     long temp = LoRa_Configurations.LoRa_Frequency;
     LoRa_Configurations.LoRa_Frequency = LoRa_Frequency;
 
@@ -127,19 +141,19 @@ void LoRa_Control::set_LoRa_Frequency(long LoRa_Frequency, bool update_LoRa_modu
 }
 
 // NCSS pin for LoRa module SX1278
-void LoRa_Control::set_LoRa_NCSS_Pin(uint32_t Pin) {
+void LoRa_Settings_Control::set_LoRa_NCSS_Pin(uint32_t Pin) {
     LoRa_Configurations.NCSS_Pin = Pin;
     LoRa.setPins(LoRa_Configurations.NCSS_Pin, LoRa_Configurations.Reset_Pin, LoRa_Configurations.IRQ_Pin);
 }
 
 // Reset pin for LoRa module SX1278
-void LoRa_Control::set_LoRa_Reset_Pin(uint32_t Pin) {
+void LoRa_Settings_Control::set_LoRa_Reset_Pin(uint32_t Pin) {
     LoRa_Configurations.Reset_Pin = Pin;
     LoRa.setPins(LoRa_Configurations.NCSS_Pin, LoRa_Configurations.Reset_Pin, LoRa_Configurations.IRQ_Pin);
 }
 
 // IRQ pin for LoRa module SX1278's DIO0
-void LoRa_Control::set_LoRa_IRQ_Pin(uint32_t Pin) {
+void LoRa_Settings_Control::set_LoRa_IRQ_Pin(uint32_t Pin) {
     LoRa_Configurations.IRQ_Pin = Pin;
     LoRa.setPins(LoRa_Configurations.NCSS_Pin, LoRa_Configurations.Reset_Pin, LoRa_Configurations.IRQ_Pin);
 }
@@ -150,7 +164,7 @@ void LoRa_Control::set_LoRa_IRQ_Pin(uint32_t Pin) {
  ******************************/
 
 // Spreading factor (6 .. 12)
-void LoRa_Control::set_LoRa_SpreadingFactor(int sf) {
+void LoRa_Settings_Control::set_LoRa_SpreadingFactor(int sf) {
     if ((6 > sf) | (12 < sf)) {
         return;
     }
@@ -162,7 +176,7 @@ void LoRa_Control::set_LoRa_SpreadingFactor(int sf) {
 }
 
 // Signal bandwidth (7.8 / 10.4 / 15.6 / 20.8 / 31.25 / 41.7 / 62.5 / 125 / 250 / 500 kHz)
-void LoRa_Control::set_LoRa_SignalBandwidth(long bw) {
+void LoRa_Settings_Control::set_LoRa_SignalBandwidth(long bw) {
     if (((long)7.8E3 > bw) | ((long)500E3 < bw)) {
         return;
     }
@@ -174,7 +188,7 @@ void LoRa_Control::set_LoRa_SignalBandwidth(long bw) {
 }
 
 // Denominator for LoRa coding rate (5 .. 8)
-void LoRa_Control::set_LoRa_CodingRate4(int cr4) {
+void LoRa_Settings_Control::set_LoRa_CodingRate4(int cr4) {
     if ((5 > cr4) | (8 < cr4)) {
         return;
     }
@@ -186,7 +200,7 @@ void LoRa_Control::set_LoRa_CodingRate4(int cr4) {
 }
 
 // Sync word (8-bit integer)
-void LoRa_Control::set_LoRa_SyncWord(int sw) {
+void LoRa_Settings_Control::set_LoRa_SyncWord(int sw) {
     if ((0x00 > sw) | (0xFF < sw)) {
         return;
     }
@@ -198,7 +212,7 @@ void LoRa_Control::set_LoRa_SyncWord(int sw) {
 }
 
 // Transmission power (-4 to +20 dBm)
-void LoRa_Control::set_LoRa_TransmissionPower(int tp) {
+void LoRa_Settings_Control::set_LoRa_TransmissionPower(int tp) {
     if ((-4 > tp) | (20 < tp)) {
         return;
     }
@@ -210,12 +224,12 @@ void LoRa_Control::set_LoRa_TransmissionPower(int tp) {
 }
 
 
-/**************************************************
- *** Hardware initialization / parameter update ***
- **************************************************/
+/*****************************
+ *** Physical layer update ***
+ *****************************/
 
 // Initiate LoRa module SX1278 with an option of forced update
-void LoRa_Control::initiate_device(bool forced_initialisation) {
+void LoRa_Settings_Control::initiate_device(bool forced_initialisation) {
     if (forced_initialisation) {
         LoRa_Device_Initiated = 0;
     }
@@ -244,8 +258,12 @@ void LoRa_Control::initiate_device(bool forced_initialisation) {
 }
 
 // Update LoRa parameters to the LoRa module
-void LoRa_Control::push_lora_parameters(void) {
+void LoRa_Settings_Control::push_lora_parameters(void) {
     if (new_lora_parameters) {
+        if (0 == LoRa_Device_Initiated) {
+            return;
+        }
+
         new_lora_parameters = false;
 
         if (new_sf) {
@@ -273,4 +291,49 @@ void LoRa_Control::push_lora_parameters(void) {
             LoRa.setTxPower(LoRa_Configurations.LoRa_TransmissionPower);
         }
     }
+}
+
+
+/****************************
+ *** LoRa event functions ***
+ ****************************/
+
+// Switch to RX mode
+void LoRa_rxMode(void) {
+  LoRa.enableInvertIQ();    // active invert I and Q signals
+  LoRa.receive();           // set receive mode
+}
+
+// Switch to TX mode
+void LoRa_txMode(void) {
+  LoRa.idle();              // set standby mode
+  LoRa.disableInvertIQ();   // normal mode
+}
+
+// LoRa on-receive event
+void onReceive(int packetSize) {
+    String gateway_msg = "";
+
+    while (LoRa.available()) {
+        gateway_msg += (char)LoRa.read();
+    }
+
+    int rx_packetRssi = LoRa.packetRssi();
+    int rx_packetSnr = LoRa.packetSnr();
+    int rx_packetFrequencyError = LoRa.packetFrequencyError();
+
+    bool gatewayMessaged = true;
+}
+
+// LoRa post-transmission event
+void onTxDone(void) {
+    LoRa_rxMode();
+}
+
+// Out-going message handler
+void LoRa_sendMessage(String message) {
+    LoRa_txMode();                        // set tx mode
+    LoRa.beginPacket();                   // start packet
+    LoRa.print(message);                  // add payload
+    LoRa.endPacket(true);                 // finish packet and send it
 }
