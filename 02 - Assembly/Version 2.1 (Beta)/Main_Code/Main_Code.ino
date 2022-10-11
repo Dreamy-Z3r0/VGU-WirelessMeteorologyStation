@@ -8,8 +8,9 @@ void setup() {
   #endif
 
   Wire.begin();
-  Project_Sensor.init();
+  
   LoRa_Device.init();
+  Project_Sensor.init();
 
   HardwareTimer *fetch_RTC = new HardwareTimer(TIM4);
   fetch_RTC->setOverflow(1, HERTZ_FORMAT);  // callback runs every 1 second

@@ -54,7 +54,7 @@ class LoRa_Control {
                       uint32_t SPI_Frequency = LORA_DEFAULT_SPI_FREQUENCY);
 
         /* Update LoRa configurations */
-        void set_LoRa_Frequency(long LoRa_Frequency, bool update_LoRa_module = false);  // LoRa frequency; default: 433 MHz
+        void set_LoRa_Frequency(long LoRa_Frequency, bool forced_update = false);  // LoRa frequency; default: 433 MHz
         void set_LoRa_NCSS_Pin(uint32_t Pin);       // NCSS pin for LoRa module SX1278
         void set_LoRa_Reset_Pin(uint32_t Pin);      // Reset pin for LoRa module SX1278
         void set_LoRa_IRQ_Pin(uint32_t Pin);        // IRQ pin for LoRa module SX1278's DIO0

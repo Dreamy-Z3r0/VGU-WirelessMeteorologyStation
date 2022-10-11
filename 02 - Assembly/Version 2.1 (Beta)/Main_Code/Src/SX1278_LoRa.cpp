@@ -35,6 +35,8 @@ LoRa_Control::LoRa_Control(void) {
  *************************************/
 
 void LoRa_Control::init(void) {   
+    delay(5000);
+
     // Create an SPIClass instance for LoRa module by hardware SPI pins and configure SPI frequency
     set_SPI(LoRa_SPI_MOSI_Pin, LoRa_SPI_MISO_Pin, LoRa_SPI_SCLK_Pin);
     
@@ -65,6 +67,9 @@ void LoRa_Control::init(void) {
     // Set LoRa event functions
     LoRa.onReceive(onReceive);
     LoRa.onTxDone(onTxDone);
+
+    // Set initial LoRa mode (receiver)
+    LoRa_rxMode();
 }
 
 
@@ -103,11 +108,11 @@ void LoRa_Control::set_SPI( uint32_t MOSI_Pin, uint32_t MISO_Pin,
  **********************************/
 
 // LoRa frequency; default: 433 MHz
-void LoRa_Control::set_LoRa_Frequency(long LoRa_Frequency, bool update_LoRa_module) {
+void LoRa_Control::set_LoRa_Frequency(long LoRa_Frequency, bool forced_update) {
     long temp = LoRa_Configurations.LoRa_Frequency;
     LoRa_Configurations.LoRa_Frequency = LoRa_Frequency;
 
-    if (update_LoRa_module) {
+    if (forced_update) {
         if (LoRa_Device_Initiated) {
             initiate_device(true);
         }
@@ -156,6 +161,7 @@ void LoRa_Control::set_LoRa_SpreadingFactor(int sf) {
     }
 
     LoRa_Configurations.LoRa_SpreadingFactor = sf;
+    Serial.printf("Spreading factor: %d\n", LoRa_Configurations.LoRa_SpreadingFactor);
 
     new_lora_parameters = true;
     new_sf = true;
@@ -168,6 +174,14 @@ void LoRa_Control::set_LoRa_SignalBandwidth(long bw) {
     }
 
     LoRa_Configurations.LoRa_SignalBandwidth = bw;
+    Serial.print("Signal bandwidth: ");
+    if (LoRa_Configurations.LoRa_SignalBandwidth > 62.5E3) {
+        Serial.printf("(1) %d kHz\n", (long)(LoRa_Configurations.LoRa_SignalBandwidth/1E3));
+    } else if (LoRa_Configurations.LoRa_SignalBandwidth == 31.25) {
+        Serial.printf("(2) %.2f kHz\n", LoRa_Configurations.LoRa_SignalBandwidth/1E3);
+    } else {
+        Serial.printf("(3) %.1f kHz\n", LoRa_Configurations.LoRa_SignalBandwidth/1E3);
+    }
 
     new_lora_parameters = true;
     new_bw = true;
@@ -180,6 +194,7 @@ void LoRa_Control::set_LoRa_CodingRate4(int cr4) {
     }
 
     LoRa_Configurations.LoRa_CodingRate4 = cr4;
+    Serial.printf("Coding rate: 4/%d\n", LoRa_Configurations.LoRa_CodingRate4);
 
     new_lora_parameters = true;
     new_cr = true;
@@ -192,6 +207,7 @@ void LoRa_Control::set_LoRa_SyncWord(int sw) {
     }
 
     LoRa_Configurations.LoRa_SyncWord = sw;
+    Serial.printf("Sync word: 0x%X\n", LoRa_Configurations.LoRa_SyncWord);
 
     new_lora_parameters = true;
     new_sw = true;
@@ -204,6 +220,7 @@ void LoRa_Control::set_LoRa_TransmissionPower(int tp) {
     }
 
     LoRa_Configurations.LoRa_TransmissionPower = tp;
+    Serial.printf("Transmission power: %d dBm\n", LoRa_Configurations.LoRa_TransmissionPower);
 
     new_lora_parameters = true;
     new_tp = true;
@@ -224,11 +241,12 @@ void LoRa_Control::initiate_device(bool forced_initialisation) {
         uint8_t attempt_no = 0;
         do {
             attempt_no += 1;
+            Serial.printf("Attempting to initiate LoRa device (attempt no.%d)\n", attempt_no);
             LoRa_Device_Initiated = LoRa.begin(LoRa_Configurations.LoRa_Frequency);
 
             if (0 == LoRa_Device_Initiated) {
                 #ifdef DEBUGGING_OVER_SERIAL
-                Serial.printf("LoRa init failed (attempts: %d). Check your connections.\n", attempt_no);
+                Serial.printf("LoRa init failed. Check your connections.\n", attempt_no);
                 #endif
                 
                 if ((10 > attempt_no) & forced_initialisation) {
@@ -236,7 +254,7 @@ void LoRa_Control::initiate_device(bool forced_initialisation) {
                 }
             } else {
                 #ifdef DEBUGGING_OVER_SERIAL
-                Serial.printf("LoRa init failed. Check your connections.\n");
+                Serial.printf("LoRa initiated.\n");
                 #endif
             }
         } while ((0 == LoRa_Device_Initiated) & forced_initialisation & (10 >= attempt_no));
@@ -311,12 +329,12 @@ void onReceive(int packetSize) {
 
     // Print out received message and its properties on debugging console
     #ifdef DEBUGGING_OVER_SERIAL
-    Serial.print("~~~\nReceived message: ");
+    Serial.print("\n\n~~~\nReceived message: ");
     Serial.println(LoRa_Device.Received_Message.message);
 
     Serial.printf("RSSI = %d dBm\n", LoRa_Device.Received_Message.packetRssi);
     Serial.printf("SNR = %d dB\n", LoRa_Device.Received_Message.packetSnr);
-    Serial.printf("Frequency error = %d Hz\n~~~\n", LoRa_Device.Received_Message.packetFrequencyError);
+    Serial.printf("Frequency error = %d Hz\n~~~\n\n", LoRa_Device.Received_Message.packetFrequencyError);
     #endif
 
     // Set status: new message has been received via LoRa
@@ -325,17 +343,11 @@ void onReceive(int packetSize) {
 
 // LoRa post-transmission event
 void onTxDone(void) {
-    LoRa_sendMessage("Package confirmed.");
     LoRa_rxMode();
 }
 
 // Out-going message handler
 void LoRa_sendMessage(String message) {
-    #ifdef DEBUGGING_OVER_SERIAL
-    Serial.print("Outgoing message: ");
-    Serial.println(message);
-    #endif
-
     LoRa_txMode();           // set tx mode
     LoRa.beginPacket();      // start packet
     LoRa.print(message);     // add payload
