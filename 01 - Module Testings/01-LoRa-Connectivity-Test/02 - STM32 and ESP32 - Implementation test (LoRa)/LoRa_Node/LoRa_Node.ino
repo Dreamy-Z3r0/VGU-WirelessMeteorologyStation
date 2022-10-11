@@ -45,7 +45,7 @@ SPIClass SPI_2(SPI2_MOSI_Pin, SPI2_MISO_Pin, SPI2_SCLK_Pin);
 
 long frequency = 433E6;   // LoRa frequency
 
-const int csPin = PB12;    // SPI NCSS for LoRa
+const int csPin = PA12;    // SPI NCSS for LoRa
 const int resetPin = PA8;  // LoRa reset
 const int irqPin = PA11;   // Interrupt by LoRa
 

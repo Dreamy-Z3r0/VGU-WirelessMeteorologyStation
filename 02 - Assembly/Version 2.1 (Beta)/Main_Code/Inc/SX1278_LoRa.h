@@ -5,23 +5,11 @@
 #include <SPI.h>
 #include <LoRa.h>
 
+#include "Libraries.h"
 #include "Macros_and_Defines.h"
 
 
-typedef struct {
-    uint32_t MOSI_Pin,      // MOSI pin of the hardware SPI 
-             MISO_Pin,      // MISO pin of the hardware SPI
-             SCLK_Pin,      // SCLK pin of the hardware SPI
-             NCSS_Pin;      // SCLK pin of the hardware SPI (optional)
-
-    // Note: MOSI, MISO, and SCLK pins must be of the same hardware SPI
-
-    uint32_t SPI_Frequency; // Clock frequency for communication via SPI
-} SPI_Config;
-
-typedef struct {
-    SPI_Config LoRa_SPI_Configurations;
-    
+typedef struct {    
     uint32_t NCSS_Pin,
              Reset_Pin,
              IRQ_Pin;
@@ -59,9 +47,9 @@ class LoRa_Control {
 
         /* Update SPI settings */
         void set_SPI(SPIClass& spi, uint32_t SPI_Frequency = LORA_DEFAULT_SPI_FREQUENCY);   // Change SPIClass instance and (optional) SPI frequency
-        void set_SPI( uint32_t MOSI_Pin, uint32_t MISO_Pin,     // Set SPI for LoRa module by hardware SPI pins and (optional) SPI frequency
-                      uint32_t SCLK_Pin, uint32_t NCSS_Pin,
-                      uint32_t SPI_Frequency = LORA_DEFAULT_SPI_FREQUENCY);
+        // void set_SPI( uint32_t MOSI_Pin, uint32_t MISO_Pin,     // Set SPI for LoRa module by hardware SPI pins and (optional) SPI frequency
+        //               uint32_t SCLK_Pin, uint32_t NCSS_Pin,
+        //               uint32_t SPI_Frequency = LORA_DEFAULT_SPI_FREQUENCY);
         void set_SPI( uint32_t MOSI_Pin, uint32_t MISO_Pin, uint32_t SCLK_Pin,  // Set SPI for LoRa module by hardware SPI pins (without NCSS pin) and (optional) SPI frequency
                       uint32_t SPI_Frequency = LORA_DEFAULT_SPI_FREQUENCY);
 
@@ -81,6 +69,8 @@ class LoRa_Control {
         /* Physical layer update */
         void initiate_device(bool forced_initialisation = false);   // Initiate LoRa module SX1278 with an option of forced update
         void push_lora_parameters(void);    // Update LoRa parameters to the LoRa module
+
+        /* LoRa nessage analysis */
 
     private:
         LoRa_Config LoRa_Configurations;

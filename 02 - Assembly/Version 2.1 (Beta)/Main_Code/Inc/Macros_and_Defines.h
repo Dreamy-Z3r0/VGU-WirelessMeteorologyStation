@@ -27,10 +27,10 @@
 #define LoRa_RST_Pin  PA8
 #define LoRa_IRQ_Pin  PA11
 
-#define LoRa_Project_Frequency 433E6
+#define LoRa_Project_Frequency (long)433E6
 
 #define LoRa_Project_Spreading_Factor 12
-#define LoRa_Project_Signal_Bandwidth 500E3
+#define LoRa_Project_Signal_Bandwidth (long)500E3
 #define LoRa_Project_Coding_Rate_4_Denominator 8
 #define LoRa_Project_Sync_Word 0x12
 #define LoRa_Project_Transmission_Power 17

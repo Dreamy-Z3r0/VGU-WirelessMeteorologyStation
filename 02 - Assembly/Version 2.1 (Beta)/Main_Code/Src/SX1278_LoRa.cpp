@@ -15,13 +15,6 @@ LoRa_Control::LoRa_Control(void) {
     new_sw = false;
     new_tp = false;
 
-    // SPI default parameter(s)
-    LoRa_Configurations.LoRa_SPI_Configurations.MOSI_Pin = LoRa_SPI_MOSI_Pin;
-    LoRa_Configurations.LoRa_SPI_Configurations.MISO_Pin = LoRa_SPI_MISO_Pin;
-    LoRa_Configurations.LoRa_SPI_Configurations.SCLK_Pin = LoRa_SPI_SCLK_Pin;
-
-    LoRa_Configurations.LoRa_SPI_Configurations.SPI_Frequency = LoRa_Module_SPI_Clock;    
-
     // Initialize message handlers
     Received_Message.message = "";
     Received_Message.packetRssi = 0;
@@ -41,7 +34,7 @@ LoRa_Control::LoRa_Control(void) {
  *** Class instance initialization ***
  *************************************/
 
-void LoRa_Control::init(void) {
+void LoRa_Control::init(void) {   
     // Create an SPIClass instance for LoRa module by hardware SPI pins and configure SPI frequency
     set_SPI(LoRa_SPI_MOSI_Pin, LoRa_SPI_MISO_Pin, LoRa_SPI_SCLK_Pin);
     
@@ -82,46 +75,26 @@ void LoRa_Control::init(void) {
 // Change SPIClass instance and (optional) SPI frequency
 void LoRa_Control::set_SPI(SPIClass& spi, uint32_t SPI_Frequency) {
     LoRa.setSPI(spi);
-
-    LoRa_Configurations.LoRa_SPI_Configurations.SPI_Frequency = SPI_Frequency;
-    LoRa.setSPIFrequency(LoRa_Configurations.LoRa_SPI_Configurations.SPI_Frequency);
+    LoRa.setSPIFrequency(SPI_Frequency);
 }
 
 // Set SPI for LoRa module by hardware SPI pins and (optional) SPI frequency
-void LoRa_Control::set_SPI( uint32_t MOSI_Pin, uint32_t MISO_Pin, 
-                            uint32_t SCLK_Pin, uint32_t NCSS_Pin,
-                            uint32_t SPI_Frequency ) 
-{
-    LoRa_Configurations.LoRa_SPI_Configurations.MOSI_Pin = MOSI_Pin;
-    LoRa_Configurations.LoRa_SPI_Configurations.MISO_Pin = MISO_Pin;
-    LoRa_Configurations.LoRa_SPI_Configurations.SCLK_Pin = SCLK_Pin;
-    LoRa_Configurations.LoRa_SPI_Configurations.NCSS_Pin = NCSS_Pin;
-
-    LoRa_Configurations.LoRa_SPI_Configurations.SPI_Frequency = SPI_Frequency;
-
-    SPIClass* NewSPI = new SPIClass(LoRa_Configurations.LoRa_SPI_Configurations.MOSI_Pin,
-                                    LoRa_Configurations.LoRa_SPI_Configurations.MISO_Pin,
-                                    LoRa_Configurations.LoRa_SPI_Configurations.SCLK_Pin,
-                                    LoRa_Configurations.LoRa_SPI_Configurations.NCSS_Pin);
-    LoRa.setSPI(*NewSPI);
-    LoRa.setSPIFrequency(LoRa_Configurations.LoRa_SPI_Configurations.SPI_Frequency);
-}
+// void LoRa_Control::set_SPI( uint32_t MOSI_Pin, uint32_t MISO_Pin, 
+//                             uint32_t SCLK_Pin, uint32_t NCSS_Pin,
+//                             uint32_t SPI_Frequency ) 
+// {
+//     SPIClass* NewSPI = new SPIClass(MOSI_Pin, MISO_Pin, SCLK_Pin, NCSS_Pin);
+//     LoRa.setSPI(*NewSPI);
+//     LoRa.setSPIFrequency(SPI_Frequency);
+// }
 
 // Set SPI for LoRa module by hardware SPI pins (without NCSS pin) and (optional) SPI frequency
 void LoRa_Control::set_SPI( uint32_t MOSI_Pin, uint32_t MISO_Pin, 
                             uint32_t SCLK_Pin, uint32_t SPI_Frequency ) 
 {
-    LoRa_Configurations.LoRa_SPI_Configurations.MOSI_Pin = MISO_Pin;
-    LoRa_Configurations.LoRa_SPI_Configurations.MISO_Pin = MISO_Pin;
-    LoRa_Configurations.LoRa_SPI_Configurations.SCLK_Pin = SCLK_Pin;
-
-    LoRa_Configurations.LoRa_SPI_Configurations.SPI_Frequency = SPI_Frequency;
-
-    SPIClass* NewSPI = new SPIClass(LoRa_Configurations.LoRa_SPI_Configurations.MOSI_Pin,
-                                    LoRa_Configurations.LoRa_SPI_Configurations.MISO_Pin,
-                                    LoRa_Configurations.LoRa_SPI_Configurations.SCLK_Pin);
+    SPIClass* NewSPI = new SPIClass(MOSI_Pin, MISO_Pin, SCLK_Pin);
     LoRa.setSPI(*NewSPI);
-    LoRa.setSPIFrequency(LoRa_Configurations.LoRa_SPI_Configurations.SPI_Frequency);
+    LoRa.setSPIFrequency(SPI_Frequency);
 }
 
 
@@ -325,30 +298,34 @@ void LoRa_txMode(void) {
 
 // LoRa on-receive event
 void onReceive(int packetSize) {
+    // Read LoRa message
     LoRa_Device.Received_Message.message = "";
-
     while (LoRa.available()) {
         LoRa_Device.Received_Message.message += (char)LoRa.read();
     }
 
-    LoRa_Device.Received_Message.packetRssi = LoRa.packetRssi();
-    LoRa_Device.Received_Message.packetSnr  = LoRa.packetSnr();
-    LoRa_Device.Received_Message.packetFrequencyError = LoRa.packetFrequencyError();
+    // Read received packet's properties
+    LoRa_Device.Received_Message.packetRssi = LoRa.packetRssi();    // RSSI
+    LoRa_Device.Received_Message.packetSnr  = LoRa.packetSnr();     // SNR
+    LoRa_Device.Received_Message.packetFrequencyError = LoRa.packetFrequencyError();    // Frequency error
 
+    // Print out received message and its properties on debugging console
     #ifdef DEBUGGING_OVER_SERIAL
-    Serial.print("Received message: ");
+    Serial.print("~~~\nReceived message: ");
     Serial.println(LoRa_Device.Received_Message.message);
 
     Serial.printf("RSSI = %d dBm\n", LoRa_Device.Received_Message.packetRssi);
     Serial.printf("SNR = %d dB\n", LoRa_Device.Received_Message.packetSnr);
-    Serial.printf("Frequency error = %d Hz\n", LoRa_Device.Received_Message.packetFrequencyError);
+    Serial.printf("Frequency error = %d Hz\n~~~\n", LoRa_Device.Received_Message.packetFrequencyError);
     #endif
 
+    // Set status: new message has been received via LoRa
     LoRa_Device.Received_Message.messageStatus = true;
 }
 
 // LoRa post-transmission event
 void onTxDone(void) {
+    LoRa_sendMessage("Package confirmed.");
     LoRa_rxMode();
 }
 

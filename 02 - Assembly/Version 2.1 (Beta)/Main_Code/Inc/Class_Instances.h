@@ -14,7 +14,7 @@
 /*****************************************
  *** SX1278: LoRa communication (node) ***
  *****************************************/
-// LoRa_Settings_Control LoRa_Device;
+// LoRa_Settings_Control LoRa_Device;   <--- Defined within SX1278_LoRa.cpp for global access
 
 
 /*******************************

@@ -6,9 +6,14 @@
  *** Built-in and community-contributed libraries ***
  ****************************************************/
 
+#include <Arduino.h>
+
 // Basic communication protocols
 #include <Wire.h>
 #include <SPI.h>
+
+// LoRa
+#include <LoRa.h>
 
 // Logger with an SD card
 #include <SD.h>

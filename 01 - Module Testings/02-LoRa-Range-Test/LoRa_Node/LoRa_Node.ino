@@ -41,7 +41,7 @@
 #define SPI2_SCLK_Pin PB13   // SPI2 SCLK pin
 //#define SPI2_SSEL_Pin PB12   // SPI2 SSEL pin -> not used
 
-SPIClass SPI_2(SPI2_MOSI_Pin, SPI2_MISO_Pin, SPI2_SCLK_Pin);
+//SPIClass SPI_2(SPI2_MOSI_Pin, SPI2_MISO_Pin, SPI2_SCLK_Pin);
 
 #define command_start_char '?'
 #define command_stop_char  '_'
@@ -49,14 +49,14 @@ SPIClass SPI_2(SPI2_MOSI_Pin, SPI2_MISO_Pin, SPI2_SCLK_Pin);
 
 const long frequency = 433E6;   // LoRa frequency
 
-const int csPin = PB12;    // SPI NCSS for LoRa
+const int csPin = PA12;    // SPI NCSS for LoRa
 const int resetPin = PA8;  // LoRa reset
 const int irqPin = PA11;   // Interrupt by LoRa
 
-int spreadingFactor = 0;
-long signalBandwidth = 0;
-int codingRate4 = 0;
-int syncWord = 0;
+int spreadingFactor = 12;
+long signalBandwidth = 500E3;
+int codingRate4 = 8;
+int syncWord = 0x12;
 
 bool new_sf = false,
      new_sb = false,
@@ -81,7 +81,8 @@ void setup() {
   while (!Serial);
 
   // Initialize LoRa
-  LoRa.setSPI(SPI_2);
+  SPIClass* NewSPI = new SPIClass(SPI2_MOSI_Pin, SPI2_MISO_Pin, SPI2_SCLK_Pin);
+  LoRa.setSPI(*NewSPI);
   LoRa.setPins(csPin, resetPin, irqPin);
   if (!LoRa.begin(frequency)) {
     Serial.println("LoRa init failed. Check your connections.");
@@ -112,27 +113,17 @@ void loop() {
       Input_Message_Handler(gateway_msg);
     }
     
-    Serial.print("\nLast message: ");
-    Serial.print((millis()-timestamp_lastmsg)/1000.0, 3);
-    Serial.println(" seconds ago.");
+    Serial.printf("\nLast message: %.3f seconds ago.\n", (millis()-timestamp_lastmsg)/1000.0, 3);
     timestamp_lastmsg = millis();
     timestamp = millis();
 
     Serial.print("Node received: \"");
     Serial.print(gateway_msg);
-    if (!LoRa_newSettingsAvailable) Serial.print("\n");
+    Serial.println("\"");
 
-    Serial.print("\" packet RSSI = ");
-    Serial.print(rx_packetRssi);
-    Serial.println(" dBm");
-
-    Serial.print(" packet SNR = ");
-    Serial.print(rx_packetSnr);
-    Serial.println(" dB");
-
-    Serial.print(" Frequency error = ");
-    Serial.print(rx_packetFrequencyError);
-    Serial.println(" Hz");
+    Serial.printf(" packet RSSI = %d dBm\n", rx_packetRssi);
+    Serial.printf(" packet SNR = %d dB\n", rx_packetSnr);
+    Serial.printf(" Frequency error = %d Hz\n", rx_packetFrequencyError);
 
     if (LoRa_newSettingsAvailable) {
       reply = "New LoRa settings = OK";
@@ -142,10 +133,8 @@ void loop() {
     }
     LoRa_sendMessage(reply);
   } else if (millis() - timestamp >= 15000) {
-    Serial.println("\nIdle...");
-    Serial.print("Last message: ");
-    Serial.print((millis()-timestamp_lastmsg)/1000.0, 3);
-    Serial.println(" seconds ago.");
+    Serial.printf("\nIdle...\n");
+    Serial.printf("\nLast message: %.3f seconds ago.\n", (millis()-timestamp_lastmsg)/1000.0, 3);
     timestamp = millis();
   }
 
