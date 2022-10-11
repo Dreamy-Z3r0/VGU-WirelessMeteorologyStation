@@ -254,7 +254,7 @@ void LoRa_Control::initiate_device(bool forced_initialisation) {
                 }
             } else {
                 #ifdef DEBUGGING_OVER_SERIAL
-                Serial.printf("LoRa initiated.\n");
+                Serial.printf("LoRa initiated.\n\n");
                 #endif
             }
         } while ((0 == LoRa_Device_Initiated) & forced_initialisation & (10 >= attempt_no));
@@ -327,15 +327,15 @@ void onReceive(int packetSize) {
     LoRa_Device.Received_Message.packetSnr  = LoRa.packetSnr();     // SNR
     LoRa_Device.Received_Message.packetFrequencyError = LoRa.packetFrequencyError();    // Frequency error
 
-    // Print out received message and its properties on debugging console
-    #ifdef DEBUGGING_OVER_SERIAL
-    Serial.print("\n\n~~~\nReceived message: ");
-    Serial.println(LoRa_Device.Received_Message.message);
+    // // Print out received message and its properties on debugging console
+    // #ifdef DEBUGGING_OVER_SERIAL
+    // Serial.print("\n\n~~~\nReceived message: ");
+    // Serial.println(LoRa_Device.Received_Message.message);
 
-    Serial.printf("RSSI = %d dBm\n", LoRa_Device.Received_Message.packetRssi);
-    Serial.printf("SNR = %d dB\n", LoRa_Device.Received_Message.packetSnr);
-    Serial.printf("Frequency error = %d Hz\n~~~\n\n", LoRa_Device.Received_Message.packetFrequencyError);
-    #endif
+    // Serial.printf("  package RSSI = %d dBm\n", LoRa_Device.Received_Message.packetRssi);
+    // Serial.printf("  package SNR = %d dB\n", LoRa_Device.Received_Message.packetSnr);
+    // Serial.printf("  Frequency error = %d Hz\n~~~\n\n", LoRa_Device.Received_Message.packetFrequencyError);
+    // #endif
 
     // Set status: new message has been received via LoRa
     LoRa_Device.Received_Message.messageStatus = true;

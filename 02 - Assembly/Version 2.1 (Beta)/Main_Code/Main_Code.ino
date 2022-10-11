@@ -26,6 +26,20 @@ void loop() {
     DateTime_Display();
     Project_Sensor.Sensor_Data_Printout();
   }
+
+  if (LoRa_Device.Received_Message.messageStatus) {
+    LoRa_Device.Received_Message.messageStatus = false;
+    
+    // Print out received message and its properties on debugging console
+    #ifdef DEBUGGING_OVER_SERIAL
+    Serial.print("~~~\nReceived message: ");
+    Serial.println(LoRa_Device.Received_Message.message);
+
+    Serial.printf("  package RSSI = %d dBm\n", LoRa_Device.Received_Message.packetRssi);
+    Serial.printf("  package SNR = %d dB\n", LoRa_Device.Received_Message.packetSnr);
+    Serial.printf("  Frequency error = %d Hz\n~~~\n\n", LoRa_Device.Received_Message.packetFrequencyError);
+    #endif
+  }
 }
 
 void DateTime_InputHandler() {
