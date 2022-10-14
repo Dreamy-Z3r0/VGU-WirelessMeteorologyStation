@@ -23,7 +23,7 @@
 
 #define LoRa_Module_SPI_Clock LORA_DEFAULT_SPI_FREQUENCY
 
-#define LoRa_NCSS_Pin PA12
+#define LoRa_NCSS_Pin PB12
 #define LoRa_RST_Pin  PA8
 #define LoRa_IRQ_Pin  PA11
 
@@ -45,7 +45,7 @@
 /*******************************
  *** DS32331 Real-time Clock ***
  *******************************/
-#define Alarm_InputPin PB12
+#define Alarm_InputPin PA15 
 
 
 /*******************************************************************

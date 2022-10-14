@@ -16,6 +16,8 @@ void setup() {
   fetch_RTC->setOverflow(1, HERTZ_FORMAT);  // callback runs every 1 second
   fetch_RTC->attachInterrupt(std::bind(request_from_RTC, &RTC_DS3231));
   fetch_RTC->resume();
+  
+  delay(100);   // Delay a short period for the system to fully initialise
 }
 
 void loop() {

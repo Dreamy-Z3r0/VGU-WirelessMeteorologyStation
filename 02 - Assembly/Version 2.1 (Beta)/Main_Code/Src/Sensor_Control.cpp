@@ -28,7 +28,7 @@ void Sensor_Control::init(TIM_TypeDef* AnemometerTimer_Instance) {
     Anemometer_Device->init(AnemometerTimer_Instance);
     WindVane_Device->init();
     RainGauge_Device->init();
-    RainGauge_Device->set_DailyAlarm(10, 56, 50);
+    // RainGauge_Device->set_DailyAlarm(17, 20, 30);
 
     delay(2);
     if (!(BME280_Device->bme280_instance->begin())) {

@@ -35,7 +35,7 @@ LoRa_Control::LoRa_Control(void) {
  *************************************/
 
 void LoRa_Control::init(void) {   
-    delay(5000);
+    // delay(5000);
 
     // Create an SPIClass instance for LoRa module by hardware SPI pins and configure SPI frequency
     set_SPI(LoRa_SPI_MOSI_Pin, LoRa_SPI_MISO_Pin, LoRa_SPI_SCLK_Pin);
