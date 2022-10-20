@@ -161,7 +161,10 @@ void LoRa_Control::set_LoRa_SpreadingFactor(int sf) {
     }
 
     LoRa_Configurations.LoRa_SpreadingFactor = sf;
+
+    #ifdef SERIAL_MONITOR_OUTPUT
     Serial.printf("Spreading factor: %d\n", LoRa_Configurations.LoRa_SpreadingFactor);
+    #endif
 
     new_lora_parameters = true;
     new_sf = true;
@@ -174,6 +177,8 @@ void LoRa_Control::set_LoRa_SignalBandwidth(long bw) {
     }
 
     LoRa_Configurations.LoRa_SignalBandwidth = bw;
+
+    #ifdef SERIAL_MONITOR_OUTPUT
     Serial.print("Signal bandwidth: ");
     if (LoRa_Configurations.LoRa_SignalBandwidth > 62.5E3) {
         Serial.printf("(1) %d kHz\n", (long)(LoRa_Configurations.LoRa_SignalBandwidth/1E3));
@@ -182,6 +187,7 @@ void LoRa_Control::set_LoRa_SignalBandwidth(long bw) {
     } else {
         Serial.printf("(3) %.1f kHz\n", LoRa_Configurations.LoRa_SignalBandwidth/1E3);
     }
+    #endif
 
     new_lora_parameters = true;
     new_bw = true;
@@ -194,7 +200,10 @@ void LoRa_Control::set_LoRa_CodingRate4(int cr4) {
     }
 
     LoRa_Configurations.LoRa_CodingRate4 = cr4;
+
+    #ifdef SERIAL_MONITOR_OUTPUT
     Serial.printf("Coding rate: 4/%d\n", LoRa_Configurations.LoRa_CodingRate4);
+    #endif
 
     new_lora_parameters = true;
     new_cr = true;
@@ -207,7 +216,10 @@ void LoRa_Control::set_LoRa_SyncWord(int sw) {
     }
 
     LoRa_Configurations.LoRa_SyncWord = sw;
+
+    #ifdef SERIAL_MONITOR_OUTPUT
     Serial.printf("Sync word: 0x%X\n", LoRa_Configurations.LoRa_SyncWord);
+    #endif
 
     new_lora_parameters = true;
     new_sw = true;
@@ -220,7 +232,10 @@ void LoRa_Control::set_LoRa_TransmissionPower(int tp) {
     }
 
     LoRa_Configurations.LoRa_TransmissionPower = tp;
+
+    #ifdef SERIAL_MONITOR_OUTPUT
     Serial.printf("Transmission power: %d dBm\n", LoRa_Configurations.LoRa_TransmissionPower);
+    #endif
 
     new_lora_parameters = true;
     new_tp = true;
@@ -241,7 +256,9 @@ void LoRa_Control::initiate_device(bool forced_initialisation) {
         uint8_t attempt_no = 0;
         do {
             attempt_no += 1;
+            #ifdef SERIAL_MONITOR_OUTPUT
             Serial.printf("Attempting to initiate LoRa device (attempt no.%d)\n", attempt_no);
+            #endif
             LoRa_Device_Initiated = LoRa.begin(LoRa_Configurations.LoRa_Frequency);
 
             if (0 == LoRa_Device_Initiated) {

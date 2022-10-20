@@ -37,10 +37,10 @@ const int csPin = 5;      // SPI NCSS for LoRa
 const int resetPin = 16;  // LoRa reset
 const int irqPin = 17;    // Interrupt by LoRa
 
-int spreadingFactor = 0;
-long signalBandwidth = 0;
-int codingRate4 = 0;
-int syncWord = 0;
+int spreadingFactor = 12;
+long signalBandwidth = 500E3;
+int codingRate4 = 8;
+int syncWord = 0x12;
 
 bool new_sf = false,
      new_sb = false,

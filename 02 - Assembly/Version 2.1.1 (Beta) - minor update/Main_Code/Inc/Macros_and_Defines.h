@@ -9,12 +9,15 @@
  ****************************/
 // UART
 // #define DEBUGGING_OVER_SERIAL   // Un-comment/Comment to enable/disable printing over Serial for debugging
-#define SERIAL_MONITOR_OUTPUT   // Un-comment/Comment to enable/disable printing messages on Serial Monitor
+// #define SERIAL_MONITOR_OUTPUT   // Un-comment/Comment to enable/disable printing messages on Serial Monitor
+#define RASPBERRY_PI_LOGGING
 
 #if defined(DEBUGGING_OVER_SERIAL)
     #define BAUD_RATE 9600          // Define baud rate for Serial monitor
 #elif defined(SERIAL_MONITOR_OUTPUT)
     #define BAUD_RATE 9600          // Define baud rate for Serial monitor
+#elif defined(RASPBERRY_PI_LOGGING)
+    #define BAUD_RATE 9600          // Define baud rate for communication with Raspberry Pi
 #endif
 
 /***********************************************
