@@ -20,7 +20,11 @@
  ***                              |-> Oscilloscope                          ***
  ***                                                                        ***
  *** Note: Logic analyzer is used to validate the resolution of the rain    ***
- ***       gauge (1 pulse for 0.2794mm of precipitation).                   ***
+ ***       gauge (1 pulse for 0.2794mm of precipitation). Since the orifice ***
+ ***       of the tipping bucket in use is approx. 5.2989E-3 m^2, 1mm of    ***
+ ***       rainfall collected is equivalent to 5.2989 ml of water. The most ***
+ ***       achievable measurement with the assisstance of a 0.1-g scale is  ***
+ ***       10 pulses from 14.8g water.                                      ***
  ***                                                                        ***
  ******************************************************************************
  ******************************************************************************/
