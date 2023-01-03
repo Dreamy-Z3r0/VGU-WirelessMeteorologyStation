@@ -15,7 +15,7 @@ class Card_Access {
 
         void init();
 
-        void create_file(String new_FileName);
+        bool create_file(String new_FileName);
 
     protected:
         int RTC_data[3];    // Year - Month - Day

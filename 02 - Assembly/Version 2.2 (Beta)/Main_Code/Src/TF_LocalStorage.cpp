@@ -15,8 +15,31 @@ void Card_Access::init() {
     }
 }
 
-void create_file(String new_FileName) {
+bool create_file(String new_FileName) {
+    bool isFilenameValid = filename_check(new_FileName);
 
+    if (!isFilenameValid) {
+        return false;
+    } else {
+        int DirectoryStartIndex = new_FileName.indexOf('/'),
+            DirectoryEndIndex = new_FileName.lastIndexOf('/');
+
+        if (DirectoryStartIndex == DirectoryEndIndex) {
+            if (0 == DirectoryStartIndex) {
+                newFileName = new_FileName.substring(1);
+            } else if (0 < DirectoryStartIndex) {
+                SD.mkdir(new_FileName.substring(0, DirectoryStartIndex));
+                new_FileName = new_FileName.substring(DirectoryStartIndex+1);
+            }
+        } else {
+            if (0 == DirectoryStartIndex) {
+                SD.mkdir(new_FileName.substring(DirectoryStartIndex+1, DirectoryEndIndex));
+                new_FileName = new_FileName.substring(DirectoryEndIndex+1);
+            } else {
+                SD.mkdir(new_FileName.substring(0, DirectoryEndIndex));
+            }
+        }
+    }
 }
 
 void Card_Access::update_calendar(void) {
