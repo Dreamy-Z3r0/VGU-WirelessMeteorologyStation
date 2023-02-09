@@ -9,28 +9,28 @@
 #define FILENAME_SEPARATOR "-"
 #define FILENAME_EXTENSION ".csv"
 
+#define SYSTEM_FILE "LOCAL-STORAGE.csv"
+
+
 class Card_Access {
     public:
         Card_Access(uint32_t CSPin);
 
         void init();
 
-        void create_file(String new_FileName);
+        bool create_daily_log(void);
 
-    protected:
-        int RTC_data[3];    // Year - Month - Day
-        void update_calendar(void);
-
-        String FileName = "";
-        void generate_filename(void);
+        bool log_entry(String data);
 
     private:
         uint32_t CSPin;
-        bool cardAvailable;
+        bool cardAvailable, calendarAvailable;
 
-        bool filename_check(String filename, String filename_extension = FILENAME_EXTENSION);
-
-        
+        int RTC_data[3];    // Year - Month - Day
+        String DailyLog_Name = "";
+  
+        bool update_calendar(void);
+        void generate_dailylog_filename(void);
 };
 
 
