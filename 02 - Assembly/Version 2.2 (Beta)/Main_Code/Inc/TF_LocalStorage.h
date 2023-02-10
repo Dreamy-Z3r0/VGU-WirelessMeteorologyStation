@@ -7,9 +7,20 @@
 #include "RTC.h"
 
 #define FILENAME_SEPARATOR "-"
-#define FILENAME_EXTENSION ".csv"
+#define DIRECTORY_SEPARATOR "/"
 
 #define SYSTEM_FILE "LOCAL-STORAGE.csv"
+
+#define DAILY_LOG_EXTENSION ".csv"
+#define DAILY_LOG_DIRECTORY "DAILY_LOG"
+
+#define COMMUNICATION_LOG_EXTENSION ".txt"
+#define COMMUNICATION_LOG_DIRECTORY "COMMUNICATION"
+
+#define CHANGE_LOG_FILE "CHANGE-LOG.txt"
+
+
+enum AccessDestination {SystemConfig, DailyLog, CommunicationLog, ChangeLog};
 
 
 class Card_Access {
@@ -18,19 +29,21 @@ class Card_Access {
 
         void init();
 
-        bool create_daily_log(void);
+        bool add_entry(AccessDestination writeTarget, String cardEntry);
 
-        bool log_entry(String data);
-
+        
     private:
         uint32_t CSPin;
         bool cardAvailable, calendarAvailable;
 
         int RTC_data[3];    // Year - Month - Day
-        String DailyLog_Name = "";
+        String Name_FromDate = "";
+
+        bool Card_InUse = false;
+        String Card_WriteBuffer = "";
   
-        bool update_calendar(void);
-        void generate_dailylog_filename(void);
+        bool update_calendar(void); // Fetch calendar data to generate daily log file name
+        void generate_filename(void);  // Generate a file name for daily log
 };
 
 
