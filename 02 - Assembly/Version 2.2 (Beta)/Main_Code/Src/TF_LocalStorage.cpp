@@ -103,7 +103,7 @@ bool Card_Access::add_entry(AccessDestination writeTarget, String cardEntry) {
                     return false;
                 }
             } else {
-                // Do something
+                system_file_update(cardEntry);
             }
 
             Card_InUse = false;
@@ -141,4 +141,30 @@ void Card_Access::generate_filename(void) {
     if (!Name_FromDate.equals(FileName_temp)) {     // Double check file name for repeat
         Name_FromDate = FileName_temp;
     }
+}
+
+bool Card_Access::system_file_update(String cardEntry) {
+    bool EntryValidity = true;
+
+    int startIndex = 0;
+    int SeparatorIndex = cardEntry.indexOf(':');
+
+    if (-1 == SeparatorIndex) {
+        return false;
+    }
+
+    do {
+        String headerTag = cardEntry.substring(startIndex, SeparatorIndex);
+        EntryValidity = analyse_header_tag(headerTag);
+
+        if (!EntryValidity) {
+            return false;
+        }
+
+        
+    }
+}
+
+bool Card_Access::analyse_header_tag(String headerTag) {
+    
 }

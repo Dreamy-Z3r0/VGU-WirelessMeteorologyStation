@@ -30,7 +30,7 @@ class Card_Access {
         void init();
 
         bool add_entry(AccessDestination writeTarget, String cardEntry);
-
+        
         
     private:
         uint32_t CSPin;
@@ -44,6 +44,9 @@ class Card_Access {
   
         bool update_calendar(void); // Fetch calendar data to generate daily log file name
         void generate_filename(void);  // Generate a file name for daily log
+
+        bool system_file_update(String cardEntry);
+        bool analyse_header_tag(String headerTag);
 };
 
 
