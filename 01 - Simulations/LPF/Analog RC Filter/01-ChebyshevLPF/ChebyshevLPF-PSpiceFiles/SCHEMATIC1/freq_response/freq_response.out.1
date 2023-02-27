@@ -1,0 +1,47 @@
+
+**** 11/11/22 11:45:05 ***** PSpice 16.6.0 (October 2012) ***** ID# 0 ********
+
+ ** Profile: "SCHEMATIC1-freq_response"  [ G:\Personal Work\Designs\Simulations\LPF\Analog RC Filter\01-ChebyshevLPF\ChebyshevLPF-PSp
+
+
+ ****     CIRCUIT DESCRIPTION
+
+
+******************************************************************************
+
+
+
+
+** Creating circuit file "freq_response.cir" 
+** WARNING: THIS AUTOMATICALLY GENERATED FILE MAY BE OVERWRITTEN BY SUBSEQUENT SIMULATIONS
+
+*Libraries: 
+* Profile Libraries :
+* Local Libraries :
+* From [PSPICE NETLIST] section of C:\Users\Z3r0\AppData\Roaming\SPB_Data\cdssetup\OrCAD_PSpice/16.6.0/PSpice.ini file:
+.lib "nom.lib" 
+
+*Analysis directives: 
+.AC LIN 100K 10 120Meg
+.OPTIONS ADVCONV
+.PROBE64 V(alias(*)) I(alias(*)) W(alias(*)) D(alias(*)) NOISE(alias(*)) 
+.INC "..\SCHEMATIC1.net" 
+
+
+
+**** INCLUDING SCHEMATIC1.net ****
+* source CHEBYSHEVLPF
+L_L1         N00305 N00099  1uH  
+C_C1         N00188 N00305  470p  TC=0,0 
+C_C2         N00188 N00099  470p  TC=0,0 
+V_V1         N00305 N00188 DC 0Vdc AC 1Vac 
+
+**** RESUMING freq_response.cir ****
+.END
+
+ERROR(ORPSIM-15142): Node N00305 is floating
+
+ERROR(ORPSIM-15142): Node N00099 is floating
+
+ERROR(ORPSIM-15142): Node N00188 is floating
+

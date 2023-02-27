@@ -1,0 +1,19 @@
+** Profile: "SCHEMATIC1-freq_response"  [ G:\Personal Work\Designs\Simulations\LPF\Analog RC Filter\01-ChebyshevLPF\ChebyshevLPF-PSpiceFiles\SCHEMATIC1\freq_response.sim ] 
+
+** Creating circuit file "freq_response.cir" 
+** WARNING: THIS AUTOMATICALLY GENERATED FILE MAY BE OVERWRITTEN BY SUBSEQUENT SIMULATIONS
+
+*Libraries: 
+* Profile Libraries :
+* Local Libraries :
+* From [PSPICE NETLIST] section of C:\Users\Z3r0\AppData\Roaming\SPB_Data\cdssetup\OrCAD_PSpice/16.6.0/PSpice.ini file:
+.lib "nom.lib" 
+
+*Analysis directives: 
+.AC LIN 100 10 120Meg
+.OPTIONS ADVCONV
+.PROBE64 V(alias(*)) I(alias(*)) W(alias(*)) D(alias(*)) NOISE(alias(*)) 
+.INC "..\SCHEMATIC1.net" 
+
+
+.END
