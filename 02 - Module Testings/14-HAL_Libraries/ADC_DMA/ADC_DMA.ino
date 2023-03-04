@@ -1,52 +1,92 @@
-/* STM32F1xx specific HAL configuration options. */
-#if __has_include("hal_conf_custom.h")
-#include "hal_conf_custom.h"
-#else
-#if __has_include("hal_conf_extra.h")
 #include "hal_conf_extra.h"
-#endif
-#include "stm32f1xx_hal_conf_default.h"
-#endif
+
+#define CALX_TEMP 25      // Reference temperature (25ºC)
+#define V25       1430    // Vnternal voltage signal (V_sense) at reference temperature in mV
+#define AVG_SLOPE 4300    // Average slope for curve between temperature and V_sense
+#define VREFINT   1.20    // Internal reference voltage in V
+
+uint16_t ADC_MAX_VALUE = 4095;
 
 ADC_HandleTypeDef hadc1;
 DMA_HandleTypeDef hdma_adc1;
 
-uint16_t raw[50];
+#define quantity 50
+
+#define R 3.3
+
+uint16_t raw[quantity];
 bool output_ready = false;
 
-unsigned long t1, t2;
+bool first_run = true;
+float V_ref, Vcc;
 
 void setup() {
   Serial.begin(9600);
-
+  delay(1000);
+  
   MX_DMA_Init();
-  MX_ADC1_Init();
+  
+  MX_ADC1_Init(false);
+  HAL_ADCEx_Calibration_Start(&hadc1);
+
+  HAL_ADC_Start(&hadc1); 
+  HAL_ADC_PollForConversion(&hadc1, 100);
+
+  uint16_t raw_VREFINT = HAL_ADC_GetValue(&hadc1);
+  V_ref = (VREFINT * (ADC_MAX_VALUE+1)) / raw_VREFINT;
+  Serial.printf("V_ref = %.2f V\n", V_ref);
+
+  while (!Serial.available());
+  String input_Vcc = Serial.readStringUntil('\n');
+  Vcc = input_Vcc.toFloat();
+  Serial.printf("Vcc = %.2f V\n", Vcc);
 }
 
 void loop() {
-  t1 = micros();
-  HAL_ADC_Start_DMA(&hadc1, (uint32_t*)raw, 50);
+  if (Serial.available()) {
+    String input_command = Serial.readStringUntil('\n');
+    if (input_command.equals("go")) {
+      Serial.println("\nStart sampling...");
+      output_ready = false;
+      MX_ADC1_Init(true);
 
-  while(!output_ready);
-  output_ready = false;
+      HAL_ADC_Start_DMA(&hadc1, (uint32_t*)raw, 50);
+      while(!output_ready);
+      output_ready = false;
 
-  Serial.print("ADC readout: ");
+      Serial.printf("Raw data:\n");
+      for (unsigned int index = 0; index < quantity; index += 1) {
+        Serial.printf("%d", raw[index]);
+        if ((index+1) % 10 == 0) {
+          Serial.print("\n");
+        } else {
+          Serial.print(" ");
+        }
+      }
 
-  for (uint8_t i = 0; i < 50; i += 1) {
-    if (0 == i%10) Serial.printf("\n");
-    Serial.printf(" %d", raw[i]);
+      Serial.printf("Voltage value (by Vcc):\n");
+      for (unsigned int index = 0; index < quantity; index += 1) {
+        float V_in = Vcc * ((1.0 * raw[index]) / ADC_MAX_VALUE);
+        Serial.printf("%.2fV", V_in);
+        if ((index+1) % 10 == 0) {
+          Serial.print("\n");
+        } else {
+          Serial.print(" ");
+        }
+      }
+
+      Serial.printf("Voltage value (by V_ref):\n");
+      for (unsigned int index = 0; index < quantity; index += 1) {
+        float V_in = V_ref * ((1.0 * raw[index]) / ADC_MAX_VALUE);
+        Serial.printf("%.2fV", V_in);
+        if ((index+1) % 10 == 0) {
+          Serial.print("\n");
+        } else {
+          Serial.print(" ");
+        }
+      }
+    }
   }
-
-  Serial.printf("\nRead time: %d us\n\n", t2 - t1);
-
-//  Serial.printf("\n\n");
-  
-//  Serial.println(raw);
-//  Serial.print("V = ");
-//  Serial.print(3.3*raw/4095);
-//  Serial.println(" V\n");
-  
-  HAL_Delay(1000);
 }
 
 /**
@@ -60,9 +100,6 @@ extern "C" void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
   GPIO_InitTypeDef GPIO_InitStruct = {0};
   if(hadc->Instance==ADC1)
   {
-  /* USER CODE BEGIN ADC1_MspInit 0 */
-
-  /* USER CODE END ADC1_MspInit 0 */
     /* Peripheral clock enable */
     __HAL_RCC_ADC1_CLK_ENABLE();
 
@@ -86,14 +123,10 @@ extern "C" void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
     hdma_adc1.Init.Priority = DMA_PRIORITY_HIGH;
     if (HAL_DMA_Init(&hdma_adc1) != HAL_OK)
     {
-      Error_Handler();
+      while (1);
     }
 
     __HAL_LINKDMA(hadc,DMA_Handle,hdma_adc1);
-
-  /* USER CODE BEGIN ADC1_MspInit 1 */
-
-  /* USER CODE END ADC1_MspInit 1 */
   }
 
 }
@@ -147,46 +180,69 @@ extern "C" void DMA1_Channel1_IRQHandler(void)
   * @param None
   * @retval None
   */
-static void MX_ADC1_Init(void)
+static void MX_ADC1_Init(bool input_type)
 {
-
-  /* USER CODE BEGIN ADC1_Init 0 */
-
-  /* USER CODE END ADC1_Init 0 */
-
   ADC_ChannelConfTypeDef sConfig = {0};
 
   /* USER CODE BEGIN ADC1_Init 1 */
-
+  if (!first_run) {
+    if (HAL_ADC_DeInit(&hadc1) != HAL_OK)
+    {
+      while (1);
+    }
+  }
+  else {
+    first_run = false;
+  }
   /* USER CODE END ADC1_Init 1 */
 
-  /** Common config
-  */
-  hadc1.Instance = ADC1;
-  hadc1.Init.ScanConvMode = ADC_SCAN_DISABLE;
-  hadc1.Init.ContinuousConvMode = ENABLE;
-  hadc1.Init.DiscontinuousConvMode = DISABLE;
-  hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
-  hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
-  hadc1.Init.NbrOfConversion = 1;
-  if (HAL_ADC_Init(&hadc1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  /** Configure Regular Channel
-  */
-  sConfig.Channel = ADC_CHANNEL_9;
-  sConfig.Rank = ADC_REGULAR_RANK_1;
-  sConfig.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
-  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
   /* USER CODE BEGIN ADC1_Init 2 */
+  if (!input_type) {
+    /** Common config
+    */
+    hadc1.Instance = ADC1;
+    hadc1.Init.ScanConvMode = ADC_SCAN_DISABLE;
+    hadc1.Init.ContinuousConvMode = DISABLE;
+    hadc1.Init.DiscontinuousConvMode = DISABLE;
+    hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+    hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+    hadc1.Init.NbrOfConversion = 1;
+    if (HAL_ADC_Init(&hadc1) != HAL_OK) {
+      while (1);
+    }
 
-  /* USER CODE END ADC1_Init 2 */
+    /** Configure Regular Channel
+    */
+    sConfig.Channel = ADC_CHANNEL_VREFINT;
+    sConfig.Rank = ADC_REGULAR_RANK_1;
+    sConfig.SamplingTime = ADC_SAMPLETIME_239CYCLES_5;
+    if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK) {
+      while (1);
+    }
+  } else {
+    /** Common config
+    */
+    hadc1.Instance = ADC1;
+    hadc1.Init.ScanConvMode = ADC_SCAN_DISABLE;
+    hadc1.Init.ContinuousConvMode = ENABLE;
+    hadc1.Init.DiscontinuousConvMode = DISABLE;
+    hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+    hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+    hadc1.Init.NbrOfConversion = 1;
+    if (HAL_ADC_Init(&hadc1) != HAL_OK) {
+      while (1);
+    }
 
+    /** Configure Regular Channel
+    */
+    sConfig.Channel = ADC_CHANNEL_9;
+    sConfig.Rank = ADC_REGULAR_RANK_1;
+    sConfig.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
+    if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK) {
+      while (1);
+    }
+  }
+/* USER CODE END ADC1_Init 2 */
 }
 
 /**
@@ -206,6 +262,5 @@ static void MX_DMA_Init(void)
 }
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
-    t2 = micros();
     output_ready = true;
 }
