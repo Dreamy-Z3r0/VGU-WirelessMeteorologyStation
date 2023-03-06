@@ -8,11 +8,7 @@
  ***                                                                        ***
  *** This scope aims at testing the given resolution of the rain gauge. Any ***
  *** microcontroller could be used for this test, not just the targeted     ***
- *** STM32F103CBT6 of the project. An Arduino Due board is used with a      ***
- *** Raspberry Pi 4B for portability and protection of larger devices like  ***
- *** a laptop against the water in this test. Moreover, Raspberry Pi does   ***
- *** not support STM32 microcontroller families, and an Arduino Due is then ***
- *** a good replacement in terms of logic voltage level (3.3V).             ***
+ *** STM32F103CBT6 of the project.                                          ***
  ***                                                                        ***
  ******************************************************************************
  ******************************************************************************/
