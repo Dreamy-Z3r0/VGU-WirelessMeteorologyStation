@@ -26,14 +26,14 @@
 #include <InfluxDbCloud.h>
 
 // WiFi AP SSID
-#define WIFI_SSID "MoodCafe"
+#define WIFI_SSID "#ThanosDidNothingWrong_2.4GHz"
 // WiFi password
-#define WIFI_PASSWORD "moodcafe"
+#define WIFI_PASSWORD "perfectlybalanced"
 
 #define INFLUXDB_URL "https://europe-west1-1.gcp.cloud2.influxdata.com"
-#define INFLUXDB_TOKEN "RPV_duPbU-ApEGhzQxYh1Te0YT2dyWbrKzWqBsZVHpaL6Mvu062hkvBPl12algNLj4vTR8un-fAn_odT8EUzSA=="
+#define INFLUXDB_TOKEN "jCJvDd2bMDxxABb3hjycWp23ZQKNN1BFzqu-gjm_I11rmSkZoR2-0H0qyTUpunsYJYZV3vnXvTw2de77MHyY1w=="
 #define INFLUXDB_ORG "39be5680e12a0d07"
-#define INFLUXDB_BUCKET "WeMos_BME280"
+#define INFLUXDB_BUCKET "Senior_Project"
 
 // Time zone info
 #define TZ_INFO "UTC7"
