@@ -42,15 +42,15 @@ bool Card_Access::add_entry(AccessDestination writeTarget, String cardEntry) {
                 generate_filename();
             }
 
-            // Generate targetted file directory
+            // Generate targeted file directory
             String FileToWrite = "";
             switch (writeTarget) {
                 case SystemConfig: { // "LOCAL-STORAGE.csv"
-                    FileToWrite += SYSTEM_FILE;
+                    FileToWrite = SYSTEM_FILE;
                     break;
                 }
                 case DailyLog: { // "DAILY_LOG/YYYY-MM-DD.csv"
-                    FileToWrite += DAILY_LOG_DIRECTORY;
+                    FileToWrite  = DAILY_LOG_DIRECTORY;
                     FileToWrite += DIRECTORY_SEPARATOR;
                     FileToWrite += Name_FromDate;
                     FileToWrite += DAILY_LOG_EXTENSION;
@@ -103,7 +103,7 @@ bool Card_Access::add_entry(AccessDestination writeTarget, String cardEntry) {
                     return false;
                 }
             } else {
-                system_file_update(cardEntry);
+                // Update system configuration file
             }
 
             Card_InUse = false;
@@ -132,7 +132,7 @@ void Card_Access::generate_filename(void) {
     FileName_temp += FILENAME_SEPARATOR;        // since years counted by DS3231 go from 1970
 
     if (10 > RTC_data[1]) FileName_temp += "0";     // "MM-"; adding a '0' for months
-    FileName_temp += String(RTC_data[1]);           // from January to September
+    FileName_temp += String(RTC_data[1]);           // from January ("01") to September ("09")
     FileName_temp += FILENAME_SEPARATOR;
 
     if (10 > RTC_data[2]) FileName_temp += "0";     // "DD"; adding a '0' for days
@@ -141,30 +141,4 @@ void Card_Access::generate_filename(void) {
     if (!Name_FromDate.equals(FileName_temp)) {     // Double check file name for repeat
         Name_FromDate = FileName_temp;
     }
-}
-
-bool Card_Access::system_file_update(String cardEntry) {
-    bool EntryValidity = true;
-
-    int startIndex = 0;
-    int SeparatorIndex = cardEntry.indexOf(':');
-
-    if (-1 == SeparatorIndex) {
-        return false;
-    }
-
-    do {
-        String headerTag = cardEntry.substring(startIndex, SeparatorIndex);
-        EntryValidity = analyse_header_tag(headerTag);
-
-        if (!EntryValidity) {
-            return false;
-        }
-
-        
-    }
-}
-
-bool Card_Access::analyse_header_tag(String headerTag) {
-    
 }
