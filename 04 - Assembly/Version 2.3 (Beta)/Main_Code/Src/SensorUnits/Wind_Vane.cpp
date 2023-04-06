@@ -45,18 +45,9 @@ WindVane_Control::WindVane_Control(uint32_t ADC_input_pin, unsigned int storage_
 
 // Initiate the ADC
 void WindVane_Control::init(void) {
-  set_standbyFlag();
-  clear_readFlag();
-
-  update_standby();
-  
   MX_DMA_Init();
   MX_ADC1_Init(EXTERNAL_INPUT_SIGNAL);
   HAL_ADCEx_Calibration_Start(&hadc1);
-
-  clear_newDataReady();
-
-  set_readFlag();
 }
 
 
@@ -114,7 +105,6 @@ void WindVane_Control::Data_Processing_Routine(uint16_t* raw_data) {
 // Read the reference voltage for ADC
 void WindVane_Control::read_reference(void) {
   MX_ADC1_Init(INTERNAL_REFERENCE_VOLTAGE);
-  // HAL_ADCEx_Calibration_Start(&hadc1);
 
   HAL_ADC_Start(&hadc1);  
   HAL_ADC_PollForConversion(&hadc1, 100);
@@ -310,7 +300,7 @@ static void MX_ADC1_Init(ADC_INPUT_TYPE input_type)
     */
     hadc1.Instance = ADC1;
     hadc1.Init.ScanConvMode = ADC_SCAN_DISABLE;
-    hadc1.Init.ContinuousConvMode = DISABLE;
+    hadc1.Init.ContinuousConvMode = ENABLE;
     hadc1.Init.DiscontinuousConvMode = DISABLE;
     hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
     hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
@@ -346,7 +336,7 @@ static void MX_ADC1_Init(ADC_INPUT_TYPE input_type)
     */
     sConfig.Channel = ADC_CHANNEL_9;
     sConfig.Rank = ADC_REGULAR_RANK_1;
-    sConfig.SamplingTime = ADC_SAMPLETIME_7CYCLES_5;
+    sConfig.SamplingTime = ADC_SAMPLETIME_239CYCLES_5;
     if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK) {
       while (1);
     }

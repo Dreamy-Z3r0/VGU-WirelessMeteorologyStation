@@ -24,14 +24,14 @@ enum ADC_INPUT_TYPE {INTERNAL_REFERENCE_VOLTAGE, EXTERNAL_INPUT_SIGNAL};
 extern ADC_HandleTypeDef hadc1;
 extern DMA_HandleTypeDef hdma_adc1;
 
-#define numberOfDataPoints 50
+#define numberOfDataPoints 18
 
 #define R 3.3   // k-Ohm
 
 #define NumberOfDirection 16
 const float R_in_given[] = {33.1, 6.57, 8.19, 0.89, 1, 0.69, 2.19, 1.4, 3.88, 3.12, 15.98, 14.1, 119.6, 42.07, 64.9, 21.92};
 
-class WindVane_Control : public Sensor_Base {
+class WindVane_Control : public Sensor_Base { 
   public:
     // Class constructor(s)
     WindVane_Control(unsigned int storage_size = numberOfDataPoints);
