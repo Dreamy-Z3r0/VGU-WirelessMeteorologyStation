@@ -118,24 +118,6 @@ void Sensor_Base::clear_standbyFlag(void) {
 }
 
 
-/* newDataReady */
-
-// Set newDataReady
-void Sensor_Base::set_newDataReady(void) {
-  newDataReady = true;
-}
-
-// Return newDataReady value
-bool Sensor_Base::is_newDataReady_set(void) {
-  return newDataReady;
-}
-
-// Clear newDataReady
-void Sensor_Base::clear_newDataReady(void) {
-  newDataReady = false;
-}
-
-
 
 /*********************************
  *** Device-on-standby routine ***

@@ -38,8 +38,6 @@ void BME280_Control::init(void) {
 
   update_BME280_settings();
 
-  clear_newDataReady();
-
   set_standbyFlag();
   set_readFlag();
 }
@@ -128,8 +126,6 @@ void BME280_Control::update_sensor_data(void) {
     BME280_dataStorage.pressure    = bme280_instance->readPressure() / 100.0F;   // Read barometric data in hPa
     BME280_dataStorage.humidity    = bme280_instance->readHumidity();            // Read relative humidity data in %RH
 
-    set_newDataReady();
-
     // Update timestamp
     update_timestamp();
 
@@ -206,8 +202,6 @@ DS18B20_Control::DS18B20_Control(uint32_t SensorPin, PRECISION thermometerResolu
 void DS18B20_Control::init(void) {
   update_DS18B20_settings(R_10BIT);
   update_standby(Data_Update_Interval);
-
-  clear_newDataReady();
 
   set_standbyFlag();
   set_readFlag();
@@ -348,8 +342,6 @@ void DS18B20_Control::update_sensor_data(uint8_t* present) {
 
     // Calculate temperature in degree Celsius
     temperature = (float)raw / 16.0;
-
-    set_newDataReady();
 
     // Update timestamp
     update_timestamp();

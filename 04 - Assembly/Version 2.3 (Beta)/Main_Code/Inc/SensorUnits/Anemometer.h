@@ -41,6 +41,7 @@ class Anemometer_Control : public Sensor_Base {
     void init(void);
 
     // Public operations
+    void update_sensor_data(void);    // Initiate a read operation of wind speed
     void read_sensor_data(float *external_storage);    // Returns the latest wind speed value
 
     // Internal operations for external interrupt service routine(s)

@@ -31,23 +31,37 @@ void Anemometer_Control::init(void) {
 }
 
 
+/**************************
+ *** Reading operations ***
+ **************************/
+
+void WindVane_Control::update_sensor_data(void) {
+  if (is_readFlag_set() && is_standbyFlag_set()) {
+    // Clear standby flag and enter data update routine
+    clear_standbyFlag();
+
+    // Save, then reset the count variable 
+    int count_temp = count;
+    count = 0;
+
+    // Calculate and return the wind speed from the count variable
+    meanWindSpeed = wind_speed_conversion(count_temp);
+
+    // Set standby flag value at the end of an data update routine
+    set_standbyFlag();
+  }
+}
+
+
 /***********************************
  *** Data-returning operation(s) ***
  ***********************************/
 
 // Returns the latest wind speed value
 void Anemometer_Control::read_sensor_data(float *external_storage) {    // Returns the latest wind direction value
-  if (is_readFlag_set()) {
-    // Clear read request
-    clear_readFlag();
-
-    // Save then reset the count variable 
-    int count_temp = count;
-    count = 0;
-
-    // Calculate and return the wind speed from the count variable
-    meanWindSpeed = wind_speed_conversion(count_temp);
-    *external_storage = meanWindSpeed;
+  if (is_readFlag_set() && is_standbyFlag_set()) {    // Double-check status flags to avoid error(s)
+    *external_storage = meanWindSpeed;      // Return wind speed data
+    clear_readFlag();    // End of reading routine
   }
 }
 

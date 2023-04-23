@@ -28,6 +28,7 @@ WindVane_Control::WindVane_Control(unsigned int storage_size) {
   this->storage_size = storage_size;
   
   clear_readFlag();
+  set_standbyFlag();
 }
 
 // Accept input pin parameter and pre-defined array size for temporary data storages
@@ -36,6 +37,7 @@ WindVane_Control::WindVane_Control(uint32_t ADC_input_pin, unsigned int storage_
   this->storage_size = storage_size;
 
   clear_readFlag();
+  set_standbyFlag();
 }
 
 
@@ -68,7 +70,7 @@ void WindVane_Control::update_sensor_data(void) {
     raw_data = new uint16_t[storage_size];    // Temporary storage for ADC values
     read_raw_ADC(raw_data);    // Take ADC samples
   } else if (sampleReady) {    // A reading routine is on-going
-    Data_Processing_Routine(raw_data);
+    Data_Processing_Routine(raw_data);  // Process for wind direction data, update standbyFlag when done
   }
 }
 
@@ -104,25 +106,31 @@ void WindVane_Control::Data_Processing_Routine(uint16_t* raw_data) {
 
 // Read the reference voltage for ADC
 void WindVane_Control::read_reference(void) {
+  // Switch ADC to internal channel(s)
   MX_ADC1_Init(INTERNAL_REFERENCE_VOLTAGE);
 
+  // Initiate sampling of internal reference voltage
   HAL_ADC_Start(&hadc1);  
   HAL_ADC_PollForConversion(&hadc1, 100);
     
+  // Fetch conversion result
   uint16_t raw_VREFINT = HAL_ADC_GetValue(&hadc1);
   
+  // Calculate reference voltage
   AVref = (VREFINT * (ADC_MAX_VALUE+1) / raw_VREFINT) / 1000.0;   // Take the AVref
-  Vcc = AVref;
+  Vcc = AVref;  // No VADD and VASS, so Vcc = VAref
 }
 
 // Sample input signal from the wind vane
 void WindVane_Control::read_raw_ADC(uint16_t* storage) {  
+  // Switch to external channel(s)
   MX_ADC1_Init(EXTERNAL_INPUT_SIGNAL);
 
-  HAL_ADC_Start(&hadc1);
+  // Sample then discard the first value
+  HAL_ADC_Start(&hadc1);  
   HAL_ADC_PollForConversion(&hadc1, 100);
 
-  // set_samplingFlag();
+  // Initiate ADC sampling in non-blocking mode with DMA
   HAL_ADC_Start_DMA(&hadc1, (uint32_t*)storage, (uint32_t)storage_size);
 }
 
@@ -133,7 +141,7 @@ float WindVane_Control::rawData_to_voltage(uint16_t* raw_data) {
 
 // Apply IIR filter
 void WindVane_Control::IIR_Filter(float *x, float *y) {
-  // IIR Filter direct form II Transposed output function:
+  // IIR Filter direct form II Transposed output function: (highest order: 2)
   //    y[n] = (b0 * x[n] + b1 * x[n-1] + b2 * x[n-2]) - (a1 * y[n-1] + a2 * y[n-2])
 
   y[0] = (float)(b0*x[0] + b1*x[1] + b2*x[2] - (a1*y[1] + a2*y[2]));
@@ -167,13 +175,10 @@ void WindVane_Control::Wind_Direction_Instance(float V_in) {
 
   windDir = 22.5 * output_index; 
 
-  set_newDataReady();
-
   // Update timestamp
   update_timestamp();
 
   // Reset flag values
-  clear_readFlag();
   set_standbyFlag();
   sampleReady = false;
   halfComplete = false;
@@ -184,14 +189,12 @@ void WindVane_Control::Wind_Direction_Instance(float V_in) {
  *** Data-returning operation(s) ***
  ***********************************/
 
-bool WindVane_Control::is_Data_Ready(void) {
-//  return !(sampling|sampleReady);
-  return true;
-}
-
 // Returns the latest wind direction value
 void WindVane_Control::read_sensor_data(float *external_storage) {    // Returns the latest wind direction value
-  *external_storage = windDir;
+  if (is_readFlag_set() && is_standbyFlag_set()) {    // Double-check status flags to avoid error(s)
+    *external_storage = windDir;    // Return wind direction data
+    clear_readFlag();   // End of reading routine
+  }
 }
 
 

@@ -42,11 +42,6 @@ class Sensor_Base {
     bool is_standbyFlag_set(void);   // Return samplingFlag value
     void clear_standbyFlag(void);    // Clear samplingFlag
 
-    // newDataReady operations
-    void set_newDataReady(void);      // Set newDataReady
-    bool is_newDataReady_set(void);   // Return newDataReady value
-    void clear_newDataReady(void);    // Clear newDataReady
-
     // Device-on-standby routine
     void standby_routine(Sensor_Base* Sensor_Instance);
 
@@ -61,8 +56,7 @@ class Sensor_Base {
                  standby_period_max_count;    // Duration of a standby period in milliseconds  
     
     bool readFlag,        // Enable to issue an update of sensor data
-         standbyFlag,     // Indicates a standby period
-         newDataReady;    // Indicates sensor data is available to be accessed externally
+         standbyFlag;     // Indicates a standby period
 };
 
 #endif

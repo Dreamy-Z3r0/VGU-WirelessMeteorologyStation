@@ -43,7 +43,6 @@ class WindVane_Control : public Sensor_Base {
     void update_sensor_data(void);    // Initiate a read operation of wind direction
     void End_Of_Sampling_Routine(bool halfComplete = false);
 
-    bool is_Data_Ready(void);
     void read_sensor_data(float *external_storage);    // Returns the latest wind direction value
 
   private:
