@@ -22,6 +22,9 @@ Precipitation::Precipitation(uint32_t SensorPin, uint32_t Alarm_InputPin) {
   DailyAlarm_Time[0] = 9;
   DailyAlarm_Time[1] = 0;
   DailyAlarm_Time[2] = 0;
+
+  clear_readFlag();
+  set_standbyFlag();
 }
 
 // Accept sensor and alarm inputs; (Optional) accept user-input alarm settings
@@ -36,11 +39,14 @@ Precipitation::Precipitation(uint32_t SensorPin, uint32_t Alarm_InputPin, byte h
   DailyAlarm_Time[0] = hour;
   DailyAlarm_Time[1] = minute;
   DailyAlarm_Time[2] = second;
+
+  clear_readFlag();
+  set_standbyFlag();
 }
 
 
 /*****************************
- *** Device initialization ***
+ *** Device initialisation ***
  *****************************/
 
 // Initial setups for communicating with and managing rain gauge
@@ -72,31 +78,46 @@ void Precipitation::set_DailyAlarm(byte hour, byte minute, byte second) {
 }
 
 
+/****************************
+ *** Reading operation(s) ***
+ ****************************/
+
+// Update the rainfall amount of the previous day
+void Precipitation::update_sensor_data(void) {
+  if (is_readFlag_set() && is_standbyFlag_set()) {
+    clear_standbyFlag();
+  
+    // Store Daily_Counter to a temporary variable to reset the count variable
+    // for the next daily count in case it's still counting (it's raining
+    // when the alarm goes off).
+    unsigned long temp_Daily_Counter = Daily_Counter;   
+    Daily_Counter = 0;                                  
+
+    // Calculate the rainfall amount of the previous day                                                
+    Rainfall_Data = RainfallPerTip * temp_Daily_Counter;    
+
+    // Set standby flag value at the end of an data update routine
+    set_standbyFlag();
+  }
+}
+
+
 /***********************************
  *** Data-returning operation(s) ***
  ***********************************/
 
 // Return the latest calculated rainfall amount
 void Precipitation::read_sensor_data(float *external_storage) {   // Return the latest calculated rainfall amount
-  *external_storage = Rainfall_Data;
+  if (is_readFlag_set() && is_standbyFlag_set()) {    // Double-check status flags to avoid error(s)
+    *external_storage = Rainfall_Data;    // Return precipitation data
+    clear_readFlag();   // Clear read request
+  }
 }
 
 
 /********************************
  *** Internal data processing ***
  ********************************/
-
-// Update the rainfall amount of the previous day
-void Precipitation::Update_Rainfall_Data(void) {    // Update the rainfall amount of the previous day
-  unsigned long temp_Daily_Counter = Daily_Counter;   // Store Daily_Counter to a temporary variable to reset the count variable
-  Daily_Counter = 0;                                  // for the next daily count in case it's still counting (it's raining
-                                                      // when the alarm goes off).
-
-  Rainfall_Data = RainfallPerTip * temp_Daily_Counter;    // Calculate the rainfall amount of the previous day
-
-  // Update timestamp
-  update_timestamp();
-}
 
 // Increment internal count whenever a bucket tip appears
 void Precipitation::Increment_Counter(void) {   
@@ -112,19 +133,9 @@ void Precipitation::Increment_Counter(void) {
 void Precipitation::Alarm_Presence_Processing(void) {   
   DS3231 alarm;
   if (alarm.checkIfAlarm(1)) {    // Check and clear the alarm of Alarm 1 from DS3231; otherwise, Alarm_InputPin would stay LOW.
-    Update_Rainfall_Data();
-    RainGauge_DailyAlarm = true;
+    // Enable a read request for Sensor_Control
+    set_readFlag();
   }
-}
-
-// When there's an alarm for a new day, return TRUE
-bool Precipitation::is_DailyAlarm_available(void) {   
-  return RainGauge_DailyAlarm;
-}
-
-// Clear daily alarm flag after it is used and no longer necessary
-void Precipitation::clear_DailyAlarm(void) {    
-  RainGauge_DailyAlarm = false;
 }
 
 

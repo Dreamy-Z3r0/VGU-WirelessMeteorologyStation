@@ -21,6 +21,9 @@ class Precipitation : public Sensor_Base {
     void init(void);  // Initial setups for communicating with and managing rain gauge
     void set_DailyAlarm(byte hour = 9, byte minute = 0, byte second = 0);   // Set daily alarm (Default: 9 A.M)
 
+    // Update the rainfall amount of the previous day
+    void update_sensor_data(void);
+
     // Data-returning method
     void read_sensor_data(float *external_storage);   // Return the latest calculated rainfall amount
 
@@ -29,8 +32,6 @@ class Precipitation : public Sensor_Base {
 
     // Alarm processing
     void Alarm_Presence_Processing(void);   // When there's an alarm for a new day, clear it then request for an update of rainfall
-    bool is_DailyAlarm_available(void);     // When there's an alarm for a new day, return TRUE
-    void clear_DailyAlarm(void);            // Clear daily alarm flag after it is used and no longer necessary
 
   private:
     // Class variables
@@ -40,9 +41,6 @@ class Precipitation : public Sensor_Base {
 
     uint32_t Alarm_InputPin;      // DS33231 SQW pin serving as alarm trigger
     byte DailyAlarm_Time[3];      // Stores daily alarm value
-    
-    // Internal data processing
-    void Update_Rainfall_Data(void);    // Update the rainfall amount of the previous day
 };
 
 

@@ -175,9 +175,6 @@ void WindVane_Control::Wind_Direction_Instance(float V_in) {
 
   windDir = 22.5 * output_index; 
 
-  // Update timestamp
-  update_timestamp();
-
   // Reset flag values
   set_standbyFlag();
   sampleReady = false;
