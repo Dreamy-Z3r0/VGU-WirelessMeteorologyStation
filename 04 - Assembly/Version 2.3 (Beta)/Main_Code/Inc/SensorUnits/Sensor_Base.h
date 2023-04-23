@@ -60,9 +60,9 @@ class Sensor_Base {
     unsigned int standby_period_count,        // Elapsed time in milliseconds from the beginning of a standby period
                  standby_period_max_count;    // Duration of a standby period in milliseconds  
     
-    bool readFlag,      // Enable to issue an update of sensor data
-         standbyFlag,   // Indicates a standby period
-         newDataReady;     // Indicates sensor data is available to be accessed externally
+    bool readFlag,        // Enable to issue an update of sensor data
+         standbyFlag,     // Indicates a standby period
+         newDataReady;    // Indicates sensor data is available to be accessed externally
 };
 
 #endif

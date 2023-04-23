@@ -13,6 +13,8 @@ Anemometer_Control::Anemometer_Control(void) {
 // Accept input pin parameter
 Anemometer_Control::Anemometer_Control(uint32_t SensorPin) {    
   set_SensorPin(SensorPin);
+
+  clear_readFlag();
 }
 
 
@@ -35,13 +37,18 @@ void Anemometer_Control::init(void) {
 
 // Returns the latest wind speed value
 void Anemometer_Control::read_sensor_data(float *external_storage) {    // Returns the latest wind direction value
-  // Save then reset the count variable 
-  int count_temp = count;
-  count = 0;
+  if (is_readFlag_set()) {
+    // Clear read request
+    clear_readFlag();
 
-  // Calculate and return the wind speed from the count variable
-  meanWindSpeed = wind_speed_conversion(count_temp);
-  *external_storage = meanWindSpeed;
+    // Save then reset the count variable 
+    int count_temp = count;
+    count = 0;
+
+    // Calculate and return the wind speed from the count variable
+    meanWindSpeed = wind_speed_conversion(count_temp);
+    *external_storage = meanWindSpeed;
+  }
 }
 
 // Calculate wind speed from recorded number of edges
@@ -52,7 +59,7 @@ float Anemometer_Control::wind_speed_conversion(int pulseQuantity) {
   As a result, if m pulses are detected over n minutes, the wind speed is then 2.4*(m/(n*60)) km/h, or m/(n*90) m/s.
   */
 
-  // return ((1.0 * pulseQuantity) / (UpdateInterval / 90.0));   // m/s
+  return ((1.0 * pulseQuantity) / (UpdateInterval / 90.0));   // m/s
 
 
   /* Method 2: Using anemometer dimensions 
@@ -62,7 +69,7 @@ float Anemometer_Control::wind_speed_conversion(int pulseQuantity) {
   With the anemometer factor k taken into account, the wind speed is k * (m/2) * (2*pi*R/T).
   */
  
-  return AnemometerFactor * ((pulseQuantity / 2.0) * ((TWO_PI * AnemometerRadius) / (UpdateInterval * 60.0)));   // m/s
+  // return AnemometerFactor * ((pulseQuantity / 2.0) * ((TWO_PI * AnemometerRadius) / (UpdateInterval * 60.0)));   // m/s
 }
 
 
