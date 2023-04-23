@@ -24,8 +24,8 @@
                                // to the outer edge of a cup
 #define AnemometerFactor 1.18
 
-#define UpdateInterval 10   // minutes; Wind speed data is updated every 5 or 10 minutes 
-                            // to minimise the effects of wind gusts.
+#define WindDataUpdateInterval 10   // minutes; Wind speed data is updated every 5 or 10 minutes 
+                                    // to minimise the effects of wind gusts.
 
 
 /***********************************
