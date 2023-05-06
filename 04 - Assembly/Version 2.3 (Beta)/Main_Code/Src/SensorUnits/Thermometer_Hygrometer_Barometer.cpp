@@ -129,9 +129,6 @@ void BME280_Control::update_sensor_data(void) {
     // Update timestamp
     update_timestamp();
 
-    // Clear sensor update request
-    clear_readFlag();
-
     // Reset sketch level standby period
     set_standbyFlag();
   }
@@ -143,9 +140,14 @@ void BME280_Control::update_sensor_data(void) {
  ***********************************/
 
 void BME280_Control::read_sensor_data(float *external_storage) {
-  *external_storage = get_Temperature();
-  *(external_storage + 1) = get_Pressure();
-  *(external_storage + 2) = get_Humidity();
+  if (is_readFlag_set() && is_standbyFlag_set()) {  // Double-check status flags to avoid error(s)
+    *external_storage = get_Temperature();
+    *(external_storage + 1) = get_Pressure();
+    *(external_storage + 2) = get_Humidity();
+
+    // Clear sensor read request
+    clear_readFlag();
+  }
 }
 
 // Only return latest ambient temperature reading  
@@ -453,5 +455,10 @@ void DS18B20_Control::pushCommands_Full(OneWire* device, uint8_t* present,
 
 // Return the latest temperature conversion result
 void DS18B20_Control::read_sensor_data(float *external_storage) {
-  *external_storage = temperature;
+  if (is_readFlag_set() && is_standbyFlag_set()) {  // Double-check status flags to avoid error(s)
+    *external_storage = temperature;
+
+    // Clear sensor read request
+    clear_readFlag();
+  }
 }
