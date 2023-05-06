@@ -1,7 +1,7 @@
 #ifndef _PRECIPITATION_H_
 #define _PRECIPITATION_H_
 
-#include <DS3231.h>
+// #include <DS3231.h>
 #include "Sensor_Base.h"
 
 #define RainfallPerTip  0.2794  // mm
@@ -14,13 +14,11 @@ class Precipitation : public Sensor_Base {
   public:
     // Constructor
     Precipitation(void);
-    Precipitation(uint32_t SensorPin, uint32_t Alarm_InputPin);
-    Precipitation(uint32_t SensorPin, uint32_t Alarm_InputPin, byte hour, byte minute, byte second);
-
+    Precipitation(uint32_t SensorPin);
+    
     // Initialisation
     void init(void);  // Initial setups for communicating with and managing rain gauge
-    void set_DailyAlarm(byte hour = 9, byte minute = 0, byte second = 0);   // Set daily alarm (Default: 9 A.M)
-
+    
     // Update the rainfall amount of the previous day
     void update_sensor_data(void);
 
@@ -37,10 +35,6 @@ class Precipitation : public Sensor_Base {
     // Class variables
     unsigned long Daily_Counter;  // Stores bucker tip counts of a day
     float Rainfall_Data;          // Stores the rainfall amount of the previous day
-    bool RainGauge_DailyAlarm;    // Indicator of a new day for measuring rainfall (from 9am daily)
-
-    uint32_t Alarm_InputPin;      // DS33231 SQW pin serving as alarm trigger
-    byte DailyAlarm_Time[3];      // Stores daily alarm value
 };
 
 
@@ -48,6 +42,5 @@ class Precipitation : public Sensor_Base {
  *** External interrupt service routines ***
  *******************************************/
 void RainGauge_Tipping_Callback(Precipitation* PrecipitationInstance);  // Interrupt service routine when the bucket tips
-void Alarm_Callback(Precipitation* PrecipitationInstance);              // Interrupt service routine when alarm for a new day appears
 
 #endif

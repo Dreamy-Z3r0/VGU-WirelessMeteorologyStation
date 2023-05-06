@@ -39,7 +39,7 @@ DS18B20_Control DS18B20_Device(OneWireBus);
 /******************
  *** Rain gauge ***
  ******************/
-Precipitation RainGauge(RainGauge_InputPin, Alarm_InputPin);
+Precipitation RainGauge(RainGauge_InputPin);
 
 
 /*****************

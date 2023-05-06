@@ -1,14 +1,63 @@
 #include "../Inc/RTC.h"
 
 
-DS3231_Control RTC_DS3231;
+DS3231_Control RTC_DS3231(Alarm_InputPin);
 
 uint8_t counter = 0;
 
 
+/*********************
+ *** Contructor(s) ***
+ *********************/
+
 DS3231_Control::DS3231_Control() {
   readRTC_control_flag = false;
 }
+
+DS3231_Control::DS3231_Control(uint32_t Alarm_InputPin) {
+  this->Alarm_InputPin = Alarm_InputPin;
+  readRTC_control_flag = false;
+}
+
+
+/*****************************
+ *** Device initialisation ***
+ *****************************/
+
+// Initial setups for alarms
+void DS3231_Control::init(void) {
+  pinMode(Alarm_InputPin, INPUT_PULLUP);    // Initialise alarm pin
+
+  DS3231 clock;
+  clock.setA1Time(1, DailyAlarm_Time[0], DailyAlarm_Time[1], DailyAlarm_Time[2], 0x8, false, false, false);    // Set up daily alarm
+  clock.setA2Time(1, 0, 0, 0x7, false, false, false);   // Alarm every minute
+  
+  clock.turnOnAlarm(1);     // Enable alarms
+  clock.turnOnAlarm(2);
+
+  clock.checkIfAlarm(1);    // Make sure there are no alarms present initially
+  clock.checkIfAlarm(2);
+
+  attachInterrupt(digitalPinToInterrupt(Alarm_InputPin), std::bind(Alarm_Callback, this), LOW);    // Enable interrupt from alarm
+}
+
+// Set daily alarm (Default: 9 A.M)
+void DS3231_Control::set_DailyAlarm(byte hour, byte minute, byte second) {
+  DailyAlarm_Time[0] = hour;
+  DailyAlarm_Time[1] = minute;
+  DailyAlarm_Time[2] = second;
+
+  DS3231 clock;
+  clock.turnOffAlarm(1);    // Disable alarms
+  clock.turnOffAlarm(2);
+  clock.setA1Time(1, DailyAlarm_Time[0], DailyAlarm_Time[1], DailyAlarm_Time[2], 0x8, false, false, false);    // Set up new daily alarm
+  clock.turnOnAlarm(1);     // Enable alarms
+  clock.turnOnAlarm(2);
+
+  clock.checkIfAlarm(1);    // Make sure there are no alarms present initially
+  clock.checkIfAlarm(2);
+}
+
 
 // Fetch time kept by the DS3231
 void DS3231_Control::readRTC(void) {
@@ -208,6 +257,10 @@ void DS3231_Control::update_RTC(int type) {
   }
 }
 
+void DS3231_Control::alarm_status(void) {
+  return Runtime_Alarm;
+}
+
 void DS3231_Control::request_from_RTC(void) {
   readRTC_control_flag = true;
 }
@@ -221,13 +274,28 @@ void DS3231_Control::clearRTC_request(void) {
 }
 
 
+/*******************************************
+ *** External interrupt service routines ***
+ *******************************************/
+
+void DS3231_Control::Alarm_Presence_Processing(void) {
+  DS3231 alarm;
+
+  if (alarm.checkIfAlarm(2)) {    // Check and clear the alarm of Alarm 2 from DS3231
+    Runtime_Alarm = MINUTE_ALARM;
+  }
+
+  if (alarm.checkIfAlarm(1)) {    // Check and clear the alarm of Alarm 1 from DS3231
+    Runtime_Alarm = DAILY_ALARM;
+  }
+}
+
+void Alarm_Callback(DS3231_Control* RTC_DS3231) {
+  RTC_DS3231->Alarm_Presence_Processing();
+}
+
+
+/*** Archived ***/
 void request_from_RTC(DS3231_Control* RTC_DS3231) {
-  // counter += 1;
-
-  // if (5 == counter) {
-  //   counter = 0;
-  //   RTC_DS3231->request_from_RTC();
-  // }
-
   RTC_DS3231->request_from_RTC();
 }
