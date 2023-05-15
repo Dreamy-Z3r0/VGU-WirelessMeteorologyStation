@@ -116,19 +116,3 @@ bool Sensor_Base::is_standbyFlag_set(void) {
 void Sensor_Base::clear_standbyFlag(void) {
   standbyFlag = false;
 }
-
-
-
-/*********************************
- *** Device-on-standby routine ***
- *********************************/
-
-void Sensor_Base::standby_routine(Sensor_Base* Sensor_Instance) {
-  if (Sensor_Instance->is_standbyFlag_set()) {
-    Sensor_Instance->increment_standby_count();
-
-    if (Sensor_Instance->get_standby_period() == Sensor_Instance->get_standby_count()) {
-      Sensor_Instance->set_readFlag();
-    }
-  }
-}

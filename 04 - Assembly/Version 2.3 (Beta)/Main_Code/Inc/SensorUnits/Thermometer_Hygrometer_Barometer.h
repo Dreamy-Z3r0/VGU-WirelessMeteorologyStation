@@ -64,7 +64,7 @@ typedef struct {      // Structure for sensor read-out storage
 
 
 /* DS18B20 */
-#define Data_Update_Interval 1000
+#define PARASITE_MODE_TIMER TIM1
 enum PRECISION {R_9BIT = 0x1F, R_10BIT = 0x3F, R_11BIT = 0x5F, R_12BIT = 0x7F};   // Valid DS18B20 thermometer resolution values (9-bit, 10-bit, 11-bit, and 12-bit, respectively)
 enum ROM_COMMAND {SEARCH_ROM = 0xF0, READ_ROM = 0x33, MATCH_ROM = 0x55,   // Valid ROM commands provided in the datasheet
                   SKIP_ROM = 0xCC, ALARM_SEARCH = 0xEC};
@@ -144,6 +144,9 @@ class DS18B20_Control : public Sensor_Base {
     PRECISION thermometerResolution;    // Thermometer resolution setting for DS18B20
     unsigned int Conversion_delayTime;  // Delay time for a temperature conversion to complete, used mostly in parasitic power mode
     
+    TIM_TypeDef* Timer_Instance;
+    HardwareTimer* SensorDelayTimer;    // Timer clocking delay time in parasitic power mode
+
     OneWire* ds;
     uint8_t* powerMode;
     uint8_t data[9];
@@ -171,7 +174,7 @@ class DS18B20_Control : public Sensor_Base {
     void pushCommands_Full(OneWire* device, uint8_t* present, 
                            ROM_COMMAND ROMCommand, uint8_t* ROMdata,
                            FUNCTION_COMMAND functionCommand, uint8_t* data, 
-                           uint8_t option);
+                           uint8_t option = 0);
 };
 
 #endif

@@ -182,7 +182,7 @@ DS18B20_Control::DS18B20_Control(PRECISION thermometerResolution, bool sharedBus
   update_DS18B20_settings(thermometerResolution);
   this->sharedBus = sharedBus;
 
-  ongoing_request = false;
+  // ongoing_request = false;
 }
 
 // Accept input pin for One-Wire bus; (optional) thermometer resolution and shared bus indicator
@@ -192,7 +192,7 @@ DS18B20_Control::DS18B20_Control(uint32_t SensorPin, PRECISION thermometerResolu
 
   this->sharedBus = sharedBus;
 
-  ongoing_request = false;
+  Timer_Instance = PARASITE_MODE_TIMER;
 }
 
 
@@ -260,97 +260,45 @@ PRECISION DS18B20_Control::get_thermometerResolution(void) {
 
 // Enable a temperature conversion
 void DS18B20_Control::update_sensor_data(uint8_t* present) {
-  bool conversion_complete = false;
+  if (is_readFlag_set() && is_standbyFlag_set()) {
+    // Clear standby flag and enter data update routine
+    clear_standbyFlag();
 
-  if (is_readFlag_set()) {
-    if (is_standbyFlag_set()) {
-      clear_standbyFlag();
+    ds = new OneWire(get_SensorPin());
 
-      ds = new OneWire(get_SensorPin());
-      powerMode = new uint8_t;
+    // In case of multiple one-wire devices available, ROM command is set to MATCH_ROM to address a specific address (addr) to avoid conflicts during data communication.
+    ROMCommand = SKIP_ROM;
+    if (sharedBus) ROMCommand = MATCH_ROM;
 
-      // In case of multiple one-wire devices available, ROM command is set to MATCH_ROM to address a specific address (addr) to avoid conflicts during data communication.
-      ROMCommand = SKIP_ROM;
-      if (sharedBus) ROMCommand = MATCH_ROM;
-
-      // Fetch the existing settings of the DS18B20
-      pushCommands_Full(ds, present, ROMCommand, addr, READ_SCRATCHPAD, data, 0);
-      if (0 == *present) {
-        return;
-      }
-
-      // Update thermometer resolution to configuration register
-      if (thermometerResolution != data[4]) {
-        data[4] = thermometerResolution;
-        pushCommands_Full(ds, present, ROMCommand, addr, WRITE_SCRATCHPAD, data+2, 0);
-        if (0 == *present) {
-          return;
-        }
-      }
-
-      // Read power mode to determine the necessity of a delay command following the conversion request
-      pushCommands_Full(ds, present, ROMCommand, addr, READ_POWERSUPPLY, powerMode, 0);
-      if (0 == *present) {
-        return;
-      }
-
-      // Issue a temperature conversion
-      pushCommands_Full(ds, present, ROMCommand, addr, CONVERT_T, data, (*powerMode == EXTERNAL_POWER ? DISABLE_DELAY : ENABLE_DELAY));
-      if (0 == *present) {
-        return;
-      }
-    } else {
-      if (ongoing_request) {
-        clear_standbyFlag();
-        ongoing_request = false;
-
-        update_standby(Data_Update_Interval);
-
-        conversion_complete = true;
-      } else {
-        if (0 != ds->read_bit()) {
-          conversion_complete = true;
-        }
-      }
-    }
-  } 
-
-  if (conversion_complete) {
-    // Verify the updated thermometer resolution and read the temperature conversion result
-    pushCommands_Full(ds, present, ROMCommand, addr, READ_SCRATCHPAD, data, 5);
-    if (data[4] != thermometerResolution) *present = 0;   // Errors may have occurred
+    // Fetch the existing settings of the DS18B20
+    pushCommands_Full(ds, present, ROMCommand, addr, READ_SCRATCHPAD, data);
     if (0 == *present) {
       return;
     }
 
-    // Extract raw data
-    int16_t raw = (data[1] << 8) | data[0];
-    switch (thermometerResolution) {
-      case R_9BIT: {    // 3 least significant bits are invalid in 9-bit resolution mode
-        raw &= ~7;
-        break;
+    // Update thermometer resolution to configuration register
+    if (thermometerResolution != data[4]) {
+      data[4] = thermometerResolution;
+      pushCommands_Full(ds, present, ROMCommand, addr, WRITE_SCRATCHPAD, data+2);
+      if (0 == *present) {
+        return;
       }
-      case R_10BIT: {   // 2 least significant bits are invalid in 10-bit resolution mode
-        raw &= ~3;
-        break;
-      }
-      case R_11BIT: {   // the least significant bit is invalid in 11-bit resolution mode
-        raw &= ~1;
-        break;
-      }
-      default:  // All bits are valid in 12-bit resolution mode
-        break;
     }
 
-    // Calculate temperature in degree Celsius
-    temperature = (float)raw / 16.0;
+    // Read power mode to determine the necessity of a delay command following the conversion request
+    powerMode = new uint8_t;
+    pushCommands_Full(ds, present, ROMCommand, addr, READ_POWERSUPPLY, powerMode);
+    if (0 == *present) {
+      return;
+    }
 
-    // Update timestamp
-    update_timestamp();
+    // Issue a temperature conversion
+    pushCommands_Full(ds, present, ROMCommand, addr, CONVERT_T, data, (*powerMode == EXTERNAL_POWER ? DISABLE_DELAY : ENABLE_DELAY));
+    if (0 == *present) {
+      return;
+    }
+  } else if (is_readFlag_set()) {
 
-    // Free up the heap memory
-    delete ds;
-    delete powerMode;
   }
 }
 
@@ -373,7 +321,7 @@ void DS18B20_Control::pushCommands_Full(OneWire* device, uint8_t* present,
                                         uint8_t option) {
   // Determine power mode of the 1-wire device if temperature conversion is issued and a follow-up delay is requested
   if ((1 == option) && (CONVERT_T == functionCommand)) {  
-    pushCommands_Full(device, present, ROMCommand, ROMdata, READ_POWERSUPPLY, data, 0);
+    pushCommands_Full(device, present, ROMCommand, ROMdata, READ_POWERSUPPLY, data);
   }
 
   // Perform a reset on the 1-wire bus (step 1 of a communication cycle)
@@ -400,18 +348,42 @@ void DS18B20_Control::pushCommands_Full(OneWire* device, uint8_t* present,
   }
 
   // Write function command to the DS18B20 and perform the follow-up operations
-  device->write(functionCommand); 
+  if (CONVERT_T == functionCommand) {
+    device->write(functionCommand, option); 
+  } else {
+    device->write(functionCommand); 
+  }
   switch (functionCommand) {  // Follow-up operations of the function command
     case CONVERT_T: {
       if (1 == option) {  
-        if (0 == data[0]) { // Wait by a pre-determined time for temperature conversion if parasitic power mode is in use
-          ongoing_request = true;
-          update_standby(Conversion_delayTime);
-          clear_readFlag();
-          set_standbyFlag();
-        } else {  // Wait until temperature conversion is complete if the device is externally powered
-          // while (0 == device->read_bit()); 
-          ongoing_request = false;
+        if (0 == data[0]) { // If parasitic power mode is in use, a timer clocks the delay period
+          SensorDelayTimer = new HardwareTimer(Timer_Instance);
+
+          // Use channel 1 of Timer_Instance in output compare mode, no output
+          SensorDelayTimer->setMode(1, TIMER_DISABLED);  
+
+          // Set timer overflow to maximum value
+          // Note: Overflow range is [1, 0x10000]
+          SensorDelayTimer->setOverflow(65536, MICROSEC_FORMAT);  
+
+          // Attach timer overflow routine
+          SensorDelayTimer->attachInterrupt(1, std::bind(Sensor_Control_TIM_Ovf_Callback, this));
+          
+          // Set timer offset:
+          //   + 9-bit resolution: 93.75ms -> 18750us * 5 cycles -> offset = 46786
+          //   + 10-bit resolution: 187.5ms -> 62500us * 3 cycles -> offset = 3036
+          //   + 11-bit resolution: 375ms -> 62500us * 6 cycles -> offset = 3036
+          //   + 12-bit resolution: 750ms -> 62500us * 12 cycles -> offset = 3036
+          if (R_9BIT == thermometerResolution) {
+            SensorDelayTimer->setCount(46786);
+          } else {
+            SensorDelayTimer->setCount(3036);
+          }
+
+          // Start timer
+          SensorDelayTimer->resume();
+        } else {
+          // Do nothing
         }
       }
       break;

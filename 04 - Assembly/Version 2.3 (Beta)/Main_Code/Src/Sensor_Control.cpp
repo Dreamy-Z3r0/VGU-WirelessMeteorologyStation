@@ -55,14 +55,14 @@ void Sensor_Control::init(TIM_TypeDef* AnemometerTimer_Instance) {
 }
 
 void Sensor_Control::init_Timer(TIM_TypeDef* Timer_Instance) {
-    HardwareTimer* ControlTimer = new HardwareTimer(Timer_Instance);
+    // HardwareTimer* ControlTimer = new HardwareTimer(Timer_Instance);
 
-    ControlTimer->setMode(1, TIMER_DISABLED);    // Use channel 1 of Timer_Instance in output compare mode, no output
-    ControlTimer->setOverflow(1000, MICROSEC_FORMAT);   // Timer overflows every 1ms
-    ControlTimer->attachInterrupt(1, std::bind(Sensor_Control_TIM_Ovf_Callback, this));  // ISR run whenever timer overflows for channel 1
+    // ControlTimer->setMode(1, TIMER_DISABLED);    // Use channel 1 of Timer_Instance in output compare mode, no output
+    // ControlTimer->setOverflow(1000, MICROSEC_FORMAT);   // Timer overflows every 1ms
+    // ControlTimer->attachInterrupt(1, std::bind(Sensor_Control_TIM_Ovf_Callback, this));  // ISR run whenever timer overflows for channel 1
 
-    ControlTimer->setCount(0);
-    ControlTimer->resume();
+    // ControlTimer->setCount(0);
+    // ControlTimer->resume();
 }
 
 void Sensor_Control::update_Anemometer_Device(Anemometer_Control *Anemometer_Device) {
@@ -211,14 +211,4 @@ void Sensor_Control::Timer_Callback(void) {
     WindVane_Device->standby_routine(WindVane_Device);
     BME280_Device->standby_routine(BME280_Device);
     DS18B20_Device->standby_routine(DS18B20_Device);
-}
-
-
-/*********************************************
- *** External interrupt service routine(s) ***
- *********************************************/
-
-// Interrupt service routine when a timer counter overflows
-void Sensor_Control_TIM_Ovf_Callback(Sensor_Control* Sensor_Control_Instance) {
-  Sensor_Control_Instance->Timer_Callback();
 }

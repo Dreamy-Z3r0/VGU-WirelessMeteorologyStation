@@ -42,9 +42,6 @@ class Sensor_Base {
     bool is_standbyFlag_set(void);   // Return samplingFlag value
     void clear_standbyFlag(void);    // Clear samplingFlag
 
-    // Device-on-standby routine
-    void standby_routine(Sensor_Base* Sensor_Instance);
-
   protected:
     int RTC_data[6];    // Date and time data holder: day - month - year - hour - minute - second
     void update_timestamp(void);
