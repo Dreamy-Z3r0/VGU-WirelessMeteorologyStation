@@ -142,7 +142,6 @@ class DS18B20_Control : public Sensor_Base {
     uint8_t addr[8];        // Device ROM code
     
     PRECISION thermometerResolution;    // Thermometer resolution setting for DS18B20
-    unsigned int Conversion_delayTime;  // Delay time for a temperature conversion to complete, used mostly in parasitic power mode
     
     TIM_TypeDef* Timer_Instance;
     HardwareTimer* SensorDelayTimer;    // Timer clocking delay time in parasitic power mode
@@ -153,7 +152,7 @@ class DS18B20_Control : public Sensor_Base {
 
     ROM_COMMAND ROMCommand;
 
-    bool ongoing_request;
+    bool ongoing_conversion;
     float temperature;      // Temperature output of the last conversion
 
     
