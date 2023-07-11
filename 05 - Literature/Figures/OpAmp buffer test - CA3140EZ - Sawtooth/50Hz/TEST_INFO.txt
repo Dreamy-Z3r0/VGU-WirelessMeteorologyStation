@@ -1,0 +1,3 @@
+Device in test: CA3140EZ
+Test wave: Sawtooth wave, 50Hz, A = 3.3Vpp, 1.65V offset, 100% symmetry
+Variable: OpAmp supply voltage

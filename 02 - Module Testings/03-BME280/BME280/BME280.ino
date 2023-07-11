@@ -45,10 +45,11 @@
 //#define default_SCLK_Pin PB13
 //#define default_SSEL_Pin PB12
 
-#define BME_CS PA4
+//#define BME_CS PA4
 #define SEALEVELPRESSURE_HPA (1013.25)
 
-Adafruit_BME280 bme(BME_CS); // hardware SPI
+//Adafruit_BME280 bme(BME_CS); // hardware SPI
+Adafruit_BME280 bme;
 
 typedef struct {
   float temperature;
@@ -61,6 +62,8 @@ bool BME280_readFlag = false;
 
 void setup() {
   Serial.begin(9600);
+  delay(2000);
+  Serial.println("begin...");
 
 //  SPI.setMOSI(default_MOSI_Pin);
 //  SPI.setMISO(default_MISO_Pin);
@@ -68,10 +71,13 @@ void setup() {
 //  SPI.setSSEL(default_SSEL_Pin);
 
   unsigned status;
-  status = bme.begin();
+  status = bme.begin(0x76);
   if (!status) {
+    Serial.println("status = false");
     while (1);
   }
+
+  read_BME280(&BME280_dataStorage, &BME280_readFlag);
 
   HardwareTimer *sensorRoutine = new HardwareTimer(TIM4);
   sensorRoutine->setOverflow(1, HERTZ_FORMAT);
@@ -97,6 +103,8 @@ void loop() {
 
     Serial.println();
   }
+
+  delay(1000);
 }
 
 void read_BME280(BME280_Data* storage, bool* controlFlag) {

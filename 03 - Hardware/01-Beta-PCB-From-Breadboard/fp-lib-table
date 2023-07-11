@@ -1,3 +1,3 @@
 (fp_lib_table
-  (lib (name "STM32-BluePill")(type "KiCad")(uri "G:/Personal Work/Designs/PCBs/KiCAD_ext_libs/Kicad-STM32-master/Footprints")(options "")(descr ""))
+  (lib (name "STM32-BluePill")(type "KiCad")(uri "E:/KiCAD/Kicad-STM32-master/Footprints")(options "")(descr ""))
 )

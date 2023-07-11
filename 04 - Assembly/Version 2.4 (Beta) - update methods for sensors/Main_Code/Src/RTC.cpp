@@ -1,4 +1,4 @@
-#include "RTC_DS3231.h"
+#include "../Inc/RTC.h"
 
 
 DS3231_Control RTC_DS3231(Alarm_InputPin);

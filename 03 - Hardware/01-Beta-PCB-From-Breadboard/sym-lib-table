@@ -1,3 +1,3 @@
 (sym_lib_table
-  (lib (name "STM32_BluePill")(type "Legacy")(uri "G:/Personal Work/Designs/PCBs/KiCAD_ext_libs/Kicad-STM32-master/Symbols/YAAJ_BluePill.lib")(options "")(descr ""))
+  (lib (name "STM32_BluePill")(type "Legacy")(uri "E:/KiCAD/Kicad-STM32-master/Symbols/YAAJ_BluePill.lib")(options "")(descr ""))
 )

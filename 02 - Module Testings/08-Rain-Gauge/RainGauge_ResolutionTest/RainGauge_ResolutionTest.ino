@@ -51,10 +51,10 @@ void loop() {
       detachInterrupt(digitalPinToInterrupt(rainGaugeInput));
 
       // Input the amount of water used in the current test cycle
+      Serial.print("Amount of water to buckets: ");
       while (!Serial.available());
       serialInput = Serial.readStringUntil('\n');
       float waterAmount = serialInput.toFloat();
-      Serial.print("Amount of water to buckets: ");
       Serial.print(waterAmount);
       Serial.println(" ml");
 
@@ -70,6 +70,8 @@ void loop() {
       if (0 == bucketResolution) {
         Serial.println("Error occurred.");
       } else {
+        Serial.print("Count: ");
+        Serial.println(rainGaugeCounter);
         Serial.print("Resolution of the rain gauge: ");
         Serial.print(bucketResolution);
         Serial.println(" ml per tip");
