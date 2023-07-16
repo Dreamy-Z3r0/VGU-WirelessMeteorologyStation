@@ -1,0 +1,52 @@
+Source:,H:\OneDrive\Senior Project & Bachelor Thesis\Personal works\VGU-WirelessMeteorologyStation\03 - Hardware\05-Prototype-UpdatedComponents\05-Prototype-UpdatedComponents.kicad_sch,,,,,
+Date:,16/07/2023 10:35,,,,,
+Tool:,Eeschema (6.0.4),,,,,
+Generator:,C:\Program Files\KiCad\6.0\bin\scripting\plugins/bom_csv_grouped_by_value.py,,,,,
+Component Count:,21,,,,,
+,,,,,,
+Individual Components:,,,,,,
+,,,,,,
+Item,Qty,Reference(s),Value,LibPart,Footprint,Datasheet
+,,C1,10n,Device:C,Custom_Libs:C_Radial_W5.5mm_H9.0mm_T3.0mm_P4.3mm,~
+,,C2,4.7n,Device:C,Custom_Libs:C_Radial_W5.5mm_H9.0mm_T3.0mm_P4.3mm,~
+,,C3,3.3n,Device:C,Custom_Libs:C_Radial_W5.5mm_H9.0mm_T3.0mm_P4.3mm,~
+,,C4,2.2n,Device:C,Custom_Libs:C_Radial_W5.5mm_H9.0mm_T3.0mm_P4.3mm,~
+,,C5,220n,Device:C,Custom_Libs:C_Radial_W5.5mm_H9.0mm_T3.0mm_P4.3mm,~
+,,C6,220n,Device:C,Custom_Libs:C_Radial_W5.5mm_H9.0mm_T3.0mm_P4.3mm,~
+,,J1,4P4C,RJ11-Connectors:4P4C,RJ11-Connectors:4P4C,
+,,J2,4P4C,RJ11-Connectors:4P4C,RJ11-Connectors:4P4C,
+,,J3,Conn_01x03_Male,Connector:Conn_01x03_Male,Connector_PinSocket_2.54mm:PinSocket_1x03_P2.54mm_Vertical,~
+,,R1,3.3k,Device:R,Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal,~
+,,R2,680,Device:R,Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal,~
+,,R3,3.3k,Device:R,Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal,~
+,,R4,4.7k,Device:R,Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal,~
+,,R5,3.3k,Device:R,Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal,~
+,,R6,3.3k,Device:R,Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal,~
+,,U1,YAAJ_BluePill,KiCAD_STM32_BluePill:YAAJ_BluePill,KiCAD_STM32_BluePill:YAAJ_BluePill_1,
+,,U2,DS3231_Module_FullAccess,DS3231_Module:DS3231_Module_FullAccess,DS3231_Module:DS3231_Module_FullSize,
+,,U3,BME280_I2C_New_LK888,BME280_Module:BME280_I2C_New_LK888,BME280_Module:BME280_I2C_Small,
+,,U4,SX1278_Minimal,SX1278_Module:SX1278_Minimal,SX1278_Module:SX1278_Minimal,
+,,U5,microSD_Module_3V3_Horizontal,microSD_Module:microSD_Module_3V3_Horizontal,Custom_Libs:microSD_mini,
+,,U6,MCP6002-xP,Amplifier_Operational:MCP6002-xP,Package_DIP:DIP-8_W7.62mm_LongPads,http://ww1.microchip.com/downloads/en/DeviceDoc/21733j.pdf
+,,,,,,
+,,,,,,
+,,,,,,
+Collated Components:,,,,,,
+,,,,,,
+Item,Qty,Reference(s),Value,LibPart,Footprint,Datasheet
+1,1,C1,10n,Device:C,Custom_Libs:C_Radial_W5.5mm_H9.0mm_T3.0mm_P4.3mm,~
+2,1,C2,4.7n,Device:C,Custom_Libs:C_Radial_W5.5mm_H9.0mm_T3.0mm_P4.3mm,~
+3,1,C3,3.3n,Device:C,Custom_Libs:C_Radial_W5.5mm_H9.0mm_T3.0mm_P4.3mm,~
+4,1,C4,2.2n,Device:C,Custom_Libs:C_Radial_W5.5mm_H9.0mm_T3.0mm_P4.3mm,~
+5,2,"C5, C6",220n,Device:C,Custom_Libs:C_Radial_W5.5mm_H9.0mm_T3.0mm_P4.3mm,~
+6,2,"J1, J2",4P4C,RJ11-Connectors:4P4C,RJ11-Connectors:4P4C,
+7,1,J3,Conn_01x03_Male,Connector:Conn_01x03_Male,Connector_PinSocket_2.54mm:PinSocket_1x03_P2.54mm_Vertical,~
+8,4,"R1, R3, R5, R6",3.3k,Device:R,Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal,~
+9,1,R2,680,Device:R,Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal,~
+10,1,R4,4.7k,Device:R,Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal,~
+11,1,U1,YAAJ_BluePill,KiCAD_STM32_BluePill:YAAJ_BluePill,KiCAD_STM32_BluePill:YAAJ_BluePill_1,
+12,1,U2,DS3231_Module_FullAccess,DS3231_Module:DS3231_Module_FullAccess,DS3231_Module:DS3231_Module_FullSize,
+13,1,U3,BME280_I2C_New_LK888,BME280_Module:BME280_I2C_New_LK888,BME280_Module:BME280_I2C_Small,
+14,1,U4,SX1278_Minimal,SX1278_Module:SX1278_Minimal,SX1278_Module:SX1278_Minimal,
+15,1,U5,microSD_Module_3V3_Horizontal,microSD_Module:microSD_Module_3V3_Horizontal,Custom_Libs:microSD_mini,
+16,1,U6,MCP6002-xP,Amplifier_Operational:MCP6002-xP,Package_DIP:DIP-8_W7.62mm_LongPads,http://ww1.microchip.com/downloads/en/DeviceDoc/21733j.pdf
