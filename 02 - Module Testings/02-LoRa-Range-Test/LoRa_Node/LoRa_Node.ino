@@ -16,7 +16,7 @@
  ***    + Spreading factor: 12    
  ***    + Signal bandwidth: 500 kHz    
  ***    + Coding rate: 4/5 
- ***    + Sync word: 0x12     
+ ***    + Sync word: 0x92     
  *** 
  ***      Hardware connections
  ***  STM32  | SX1278 |  Function
@@ -56,7 +56,7 @@ const int irqPin = PA11;   // Interrupt by LoRa
 int spreadingFactor = 12;
 long signalBandwidth = 500E3;
 int codingRate4 = 8;
-int syncWord = 0x12;
+int syncWord = 0x92;
 
 bool new_sf = false,
      new_sb = false,

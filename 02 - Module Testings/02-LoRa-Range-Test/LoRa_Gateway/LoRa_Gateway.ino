@@ -1,7 +1,7 @@
 /***
  *** LoRa connectivity test - Simple gateway
  *** 
- *** Microcontroller: ESP32 on NodeMCU-32S
+ *** Microcontroller: ESP8266 on WeMos D1R2
  *** LoRa module: SX1278
  *** LoRa settings are input via Serial and updated with LoRaSettings(..)
  *** Initial LoRa settings:
@@ -9,15 +9,15 @@
  ***    + Spreading factor: 12    
  ***    + Signal bandwidth: 500 kHz    
  ***    + Coding rate: 4/5 
- ***    + Sync word: 0x12 
+ ***    + Sync word: 0x92 
  ***
  ***      Hardware connections
- ***      ESP32    | SX1278 |  Function
+ ***     ESP8266   | SX1278 |  Function
  *** --------------|--------|----------------
- ***     GPIO23    |  MOSI  | VSPI MOSI
- ***     GPIO19    |  MISO  | VSPI MISO
- ***     GPIO18    |  SCK   | VSPI CLK
- ***     GPIO5     |  NSS   | VSPI CS0
+ ***       D7      |  MOSI  | VSPI MOSI
+ ***       D6      |  MISO  | VSPI MISO
+ ***       D5      |  SCK   | VSPI CLK
+ ***       D8      |  NSS   | VSPI CS0
  *** --------------|--------|----------------
  ***  GPIO16 / RX2 |  RST   | LoRa Reset
  ***  GPIO17 / TX2 |  DIO0  | EXTI from LoRa
@@ -40,7 +40,7 @@ const int irqPin = 17;    // Interrupt by LoRa
 int spreadingFactor = 12;
 long signalBandwidth = 500E3;
 int codingRate4 = 8;
-int syncWord = 0x12;
+int syncWord = 0x92;
 
 bool new_sf = false,
      new_sb = false,

@@ -38,20 +38,15 @@ void setup() {
   
   cardData = SD.open("folder/data.csv", FILE_WRITE);
   if (cardData) {
-    String firstRow_Meteorological = "Time,Rainfall amount,Wind speed,Wind direction,";
-    String firstRow_Temperature = "Ambient temperature (ground),Ambient temprature (1m),";
-    String firstRow_Unverifiable = "Relative humidity,Barometric pressure";
-
-    cardData.print(firstRow_Meteorological);
-    cardData.print(firstRow_Temperature);
-    cardData.println(firstRow_Unverifiable);
-
     cardData.println(testString);
-    cardData.print(testInt);
-    cardData.print(",");
-    cardData.print(testInt, HEX);
-    cardData.print(",");
+    cardData.print("testInt,");
+    cardData.println(testInt);
+    cardData.print("testInt (HEX),");
+    cardData.println(testInt, HEX);
+    cardData.print("testFloat,");
     cardData.println(testFloat);
+    cardData.print("testFloat (4th decimal),");
+    cardData.println(testFloat, 4);
 
     cardData.close();
   }
