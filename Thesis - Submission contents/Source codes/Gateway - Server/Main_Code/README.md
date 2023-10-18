@@ -23,5 +23,5 @@ _This source code is built using Arduino IDE version 1.8.19_
 + Non-32-Bit Access: "Use pgm_read macros for IRAM/PROGREM"
 
 ## Library dependencies
-+ [thingspeak-arduino](https://github.com/mathworks/thingspeak-arduino) by ***mathworks***
-+ [arduino-LoRa](https://github.com/sandeepmistry/arduino-LoRa) by ***Sandeep Mistry***
++ [thingspeak-arduino](https://github.com/mathworks/thingspeak-arduino) *by* **mathworks**, version 2.0.1
++ [arduino-LoRa](https://github.com/sandeepmistry/arduino-LoRa) *by* **Sandeep Mistry**, version 0.8.0
