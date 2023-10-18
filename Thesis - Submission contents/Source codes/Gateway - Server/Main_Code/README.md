@@ -22,6 +22,6 @@ _This source code is built using Arduino IDE version 1.8.19_
 + MMU: "32KB cache + 32KB IRAM (balanced)"
 + Non-32-Bit Access: "Use pgm_read macros for IRAM/PROGREM"
 
-## Librariy dependencies
+## Library dependencies
 + [thingspeak-arduino](https://github.com/mathworks/thingspeak-arduino) by ***mathworks***
 + [arduino-LoRa](https://github.com/sandeepmistry/arduino-LoRa) by ***Sandeep Mistry***
