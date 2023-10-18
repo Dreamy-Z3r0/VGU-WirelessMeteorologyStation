@@ -63,6 +63,10 @@ typedef struct {      // Structure for sensor read-out storage
   float pressure;
 } BME280_Data;
 
+#define BME280_TEMPERATURE_CALIBRATION -1.99    // ℃
+#define BME280_HUMIDITY_CALIBRATION    -4.46    // %RH
+#define BME280_PRESSURE_CALIBRATION    -0       // hPa
+
 
 /* DS18B20 */
 #define PARASITE_MODE_TIMER TIM1
@@ -75,6 +79,7 @@ enum FUNCTION_COMMAND {CONVERT_T = 0x44, WRITE_SCRATCHPAD = 0x4E, READ_SCRATCHPA
 enum POWER_SUPPLY_MODE {EXTERNAL_POWER = 0x01, PARASITIC_POWER = 0x00};   // Values for power mode variable
 enum CONVERT_T_DELAY {ENABLE_DELAY = 1, DISABLE_DELAY = 0};     // Valid values for flag requesting a delay after issuing a temperature conversion
 
+#define DS18B20_TEMPERATURE_CALIBRATION -1.99    // ℃
 
 
 /*************************

@@ -126,6 +126,11 @@ void BME280_Control::update_sensor_data(void) {
     BME280_dataStorage.pressure    = bme280_instance->readPressure() / 100.0F;   // Read barometric data in hPa
     BME280_dataStorage.humidity    = bme280_instance->readHumidity();            // Read relative humidity data in %RH
 
+    // Apply calibration data
+    BME280_dataStorage.temperature += BME280_TEMPERATURE_CALIBRATION;
+    BME280_dataStorage.pressure    += BME280_PRESSURE_CALIBRATION;
+    BME280_dataStorage.humidity    += BME280_HUMIDITY_CALIBRATION;
+
     // Reset sketch level standby period
     set_standbyFlag();
   }
@@ -320,6 +325,9 @@ void DS18B20_Control::update_sensor_data(uint8_t* present) {
 
     // Calculate temperature in degree Celsius
     temperature = (float)raw / 16.0;
+
+    // Apply calibration data
+    temperature += DS18B20_TEMPERATURE_CALIBRATION;
 
     // Free up the heap memory
     delete ds;
