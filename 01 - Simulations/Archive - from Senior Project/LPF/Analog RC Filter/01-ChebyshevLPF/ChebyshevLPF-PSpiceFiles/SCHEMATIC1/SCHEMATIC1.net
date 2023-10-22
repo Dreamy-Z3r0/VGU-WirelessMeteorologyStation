@@ -1,5 +1,4 @@
 * source CHEBYSHEVLPF
-L_L1         VIN VOUT  1uH  
-C_C1         0 VIN  470p  TC=0,0 
-C_C2         0 VOUT  470p  TC=0,0 
+C_C2         0 VOUT  20.2n  TC=0,0 
 V_V1         VIN 0 DC 0Vdc AC 1Vac 
+R_R1         VIN VOUT  680 TC=0,0 

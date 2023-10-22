@@ -1,0 +1,44 @@
+M48
+; DRILL file {KiCad (6.0.4)} date Mon Aug 28 23:05:47 2023
+; FORMAT={-:-/ absolute / metric / decimal}
+; #@! TF.CreationDate,2023-08-28T23:05:47+07:00
+; #@! TF.GenerationSoftware,Kicad,Pcbnew,(6.0.4)
+; #@! TF.FileFunction,MixedPlating,1,2
+FMAT,2
+METRIC
+; #@! TA.AperFunction,Plated,PTH,ComponentDrill
+T1C0.800
+; #@! TA.AperFunction,Plated,PTH,ComponentDrill
+T2C1.000
+; #@! TA.AperFunction,Plated,PTH,ComponentDrill
+T3C1.100
+; #@! TA.AperFunction,NonPlated,NPTH,ComponentDrill
+T4C3.500
+%
+G90
+G05
+T1
+X182.88Y-86.36
+X182.88Y-93.98
+X183.42Y-74.93
+X183.42Y-81.28
+X185.42Y-74.93
+X185.42Y-81.28
+X186.69Y-86.36
+X186.69Y-93.98
+X195.58Y-87.63
+X197.58Y-87.63
+T2
+X190.5Y-100.33
+X193.04Y-100.33
+X195.58Y-100.33
+T3
+X190.5Y-82.89
+X190.5Y-86.36
+X190.5Y-96.52
+X193.04Y-82.89
+X195.58Y-82.89
+T4
+X193.04Y-66.23
+T0
+M30

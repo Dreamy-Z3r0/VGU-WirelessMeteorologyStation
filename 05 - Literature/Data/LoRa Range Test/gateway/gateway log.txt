@@ -1,0 +1,244 @@
+14:20:48.097 LoRa init succeeded.
+14:21:37.660 Attempting to connect
+14:21:47.645 Connected.
+14:21:47.645 
+14:23:19.484 (Latitude, Longtitude) = (11.055887,106.669041)
+14:23:19.516 RSSI = -48 dBi
+14:23:19.550 SNR = 6.50 dB
+14:23:19.550 Frequency error = -4669 Hz
+14:23:21.245 TxDone
+14:23:21.245 
+14:23:58.566 (Latitude, Longtitude) = (11.055929,106.669117)
+14:23:58.599 RSSI = -65 dBi
+14:23:58.632 SNR = 6.50 dB
+14:23:58.632 Frequency error = -4686 Hz
+14:24:00.186 TxDone
+14:24:00.186 
+14:24:33.154 (Latitude, Longtitude) = (11.055904,106.669131)
+14:24:33.188 RSSI = -76 dBi
+14:24:33.221 SNR = 6.25 dB
+14:24:33.221 Frequency error = -4744 Hz
+14:24:34.768 TxDone
+14:24:34.768 
+14:25:02.958 (Latitude, Longtitude) = (11.055904,106.669946)
+14:25:02.991 RSSI = -84 dBi
+14:25:03.025 SNR = 7.00 dB
+14:25:03.025 Frequency error = -4774 Hz
+14:25:04.566 TxDone
+14:25:04.566 
+14:25:36.932 (Latitude, Longtitude) = (11.056005,106.669446)
+14:25:36.965 RSSI = -89 dBi
+14:25:36.999 SNR = 6.75 dB
+14:25:36.999 Frequency error = -4832 Hz
+14:25:38.357 TxDone
+14:25:38.357 
+14:26:11.153 (Latitude, Longtitude) = (11.055999,106.669488)
+14:26:11.187 RSSI = -107 dBi
+14:26:11.220 SNR = -1.50 dB
+14:26:11.220 Frequency error = -4851 Hz
+14:26:12.664 TxDone
+14:26:12.664 
+14:26:41.674 (Latitude, Longtitude) = (11.056077,106.669772)
+14:26:41.707 RSSI = -88 dBi
+14:26:41.740 SNR = 6.00 dB
+14:26:41.740 Frequency error = -4809 Hz
+14:26:43.382 TxDone
+14:26:43.382 
+14:27:19.000 (Latitude, Longtitude) = (11.055875,106.669907)
+14:27:19.033 RSSI = -96 dBi
+14:27:19.067 SNR = 5.75 dB
+14:27:19.067 Frequency error = -4870 Hz
+14:27:20.499 TxDone
+14:27:20.499 
+14:27:54.334 (Latitude, Longtitude) = (11.055959,106.669924)
+14:27:54.368 RSSI = -91 dBi
+14:27:54.401 SNR = 6.25 dB
+14:27:54.401 Frequency error = -4855 Hz
+14:27:55.696 TxDone
+14:27:55.696 
+14:28:40.528 (Latitude, Longtitude) = (11.056128,106.670162)
+14:28:40.562 RSSI = -99 dBi
+14:28:40.595 SNR = 3.50 dB
+14:28:40.595 Frequency error = -4902 Hz
+14:28:42.413 TxDone
+14:28:42.413 
+14:29:18.618 (Latitude, Longtitude) = (11.056172,106.670407)
+14:29:18.651 RSSI = -101 dBi
+14:29:18.685 SNR = 4.00 dB
+14:29:18.685 Frequency error = -4849 Hz
+14:29:20.256 TxDone
+14:29:20.256 
+14:29:55.599 (Latitude, Longtitude) = (11.056193,106.670696)
+14:29:55.632 RSSI = -102 dBi
+14:29:55.665 SNR = 3.25 dB
+14:29:55.665 Frequency error = -4782 Hz
+14:29:57.324 TxDone
+14:29:57.324 
+14:30:31.480 (Latitude, Longtitude) = (11.056214,106.670708)
+14:30:31.514 RSSI = -104 dBi
+14:30:31.547 SNR = 1.25 dB
+14:30:31.547 Frequency error = -4772 Hz
+14:30:33.164 TxDone
+14:30:33.164 
+14:31:11.017 (Latitude, Longtitude) = (11.056376,106.671063)
+14:31:11.051 RSSI = -105 dBi
+14:31:11.084 SNR = 1.00 dB
+14:31:11.084 Frequency error = -4772 Hz
+14:31:12.588 TxDone
+14:31:12.588 
+14:31:48.741 (Latitude, Longtitude) = (11.05638,106.671284)
+14:31:48.775 RSSI = -109 dBi
+14:31:48.808 SNR = -3.75 dB
+14:31:48.808 Frequency error = -4772 Hz
+14:31:50.066 TxDone
+14:31:50.066 
+14:32:29.444 (Latitude, Longtitude) = (11.056388,106.671329)
+14:32:29.478 RSSI = -104 dBi
+14:32:29.511 SNR = 1.25 dB
+14:32:29.511 Frequency error = -4753 Hz
+14:32:30.923 TxDone
+14:32:30.923 
+14:33:02.484 (Latitude, Longtitude) = (11.056491,106.671586)
+14:33:02.516 RSSI = -107 dBi
+14:33:02.549 SNR = -1.50 dB
+14:33:02.549 Frequency error = -4738 Hz
+14:33:03.998 TxDone
+14:33:03.998 
+14:33:38.981 (Latitude, Longtitude) = (11.056461,106.671733)
+14:33:39.013 RSSI = -108 dBi
+14:33:39.046 SNR = -3.25 dB
+14:33:39.046 Frequency error = -4711 Hz
+14:33:40.656 TxDone
+14:33:40.656 
+14:34:08.934 (Latitude, Longtitude) = (11.056548,106.671893)
+14:34:08.968 RSSI = -108 dBi
+14:34:09.001 SNR = -3.75 dB
+14:34:09.001 Frequency error = -4656 Hz
+14:34:10.454 TxDone
+14:34:10.454 
+14:34:47.989 (Latitude, Longtitude) = (11.056641,106.672299)
+14:34:48.021 RSSI = -110 dBi
+14:34:48.054 SNR = -13.00 dB
+14:34:48.054 Frequency error = -4688 Hz
+14:34:49.570 TxDone
+14:34:49.570 
+14:35:18.841 (Latitude, Longtitude) = (11.056602,106.672413)
+14:35:18.873 RSSI = -109 dBi
+14:35:18.907 SNR = -5.75 dB
+14:35:18.907 Frequency error = -4721 Hz
+14:35:20.290 TxDone
+14:35:20.290 
+14:35:59.189 (Latitude, Longtitude) = (11.056656,106.672675)
+14:35:59.222 RSSI = -111 dBi
+14:35:59.255 SNR = -12.50 dB
+14:35:59.255 Frequency error = -4698 Hz
+14:36:00.636 TxDone
+14:36:00.636 
+14:36:34.574 (Latitude, Longtitude) = (11.056731,106.672825)
+14:36:34.607 RSSI = -111 dBi
+14:36:34.640 SNR = -16.50 dB
+14:36:34.640 Frequency error = -4721 Hz
+14:36:36.064 TxDone
+14:36:36.064 
+14:37:10.455 (Latitude, Longtitude) = (11.056715,106.673019)
+14:37:10.489 RSSI = -110 dBi
+14:37:10.522 SNR = -6.75 dB
+14:37:10.522 Frequency error = -4763 Hz
+14:37:11.835 TxDone
+14:37:11.835 
+14:37:45.241 (Latitude, Longtitude) = (11.056764,106.673138)
+14:37:45.274 RSSI = -110 dBi
+14:37:45.308 SNR = -8.25 dB
+14:37:45.308 Frequency error = -4728 Hz
+14:37:47.035 TxDone
+14:37:47.035 
+14:38:21.607 (Latitude, Longtitude) = (11.056897,106.673409)
+14:38:21.641 RSSI = -111 dBi
+14:38:21.674 SNR = -11.75 dB
+14:38:21.674 Frequency error = -4776 Hz
+14:38:22.903 TxDone
+14:38:22.903 
+14:38:59.730 (Latitude, Longtitude) = (11.056891,106.673534)
+14:38:59.763 RSSI = -111 dBi
+14:38:59.797 SNR = -9.00 dB
+14:38:59.797 Frequency error = -4742 Hz
+14:39:01.370 TxDone
+14:39:01.370 
+14:39:30.267 (Latitude, Longtitude) = (11.056922,106.673565)
+14:39:30.301 RSSI = -111 dBi
+14:39:30.334 SNR = -15.50 dB
+14:39:30.334 Frequency error = -4780 Hz
+14:39:31.783 TxDone
+14:39:31.783 
+14:40:10.433 (Latitude, Longtitude) = (11.056991,106.674068)
+14:40:10.466 RSSI = -112 dBi
+14:40:10.500 SNR = -15.25 dB
+14:40:10.500 Frequency error = -4734 Hz
+14:40:11.706 TxDone
+14:40:11.706 
+14:40:50.351 (Latitude, Longtitude) = (11.057044,106.674277)
+14:40:50.384 RSSI = -111 dBi
+14:40:50.418 SNR = -17.75 dB
+14:40:50.418 Frequency error = -4755 Hz
+14:40:51.988 TxDone
+14:40:51.988 
+14:41:30.154 (Latitude, Longtitude) = (11.057174,106.674437)
+14:41:30.187 RSSI = -109 dBi
+14:41:30.220 SNR = -14.50 dB
+14:41:30.220 Frequency error = -4660 Hz
+14:41:31.692 TxDone
+14:41:31.692 
+14:42:06.186 (Latitude, Longtitude) = (66.;5�0�7,106.674�<2)
+14:42:06.218 RSSI = -110 dBi
+14:42:06.251 SNR = -23.25 dB
+14:42:06.251 Frequency error = -4763 Hz
+14:42:07.532 TxDone
+14:42:07.532 
+14:42:45.772 (Latitude, Longtitude) = (11.057232,106.674745)
+14:42:45.805 RSSI = -111 dBi
+14:42:45.839 SNR = -12.50 dB
+14:42:45.839 Frequency error = -4612 Hz
+14:42:47.263 TxDone
+14:42:47.263 
+14:43:27.017 (Latitude, Longtitude) = (11.057179,106.675211)
+14:43:27.050 RSSI = -111 dBi
+14:43:27.083 SNR = -9.00 dB
+14:43:27.083 Frequency error = -4579 Hz
+14:43:28.835 TxDone
+14:43:28.835 
+14:44:03.131 (Latitude, Longtitude) = (11.057219,106.675343)
+14:44:03.164 RSSI = -112 dBi
+14:44:03.197 SNR = -10.00 dB
+14:44:03.197 Frequency error = -4545 Hz
+14:44:04.675 TxDone
+14:44:04.675 
+14:44:34.681 (Latitude, Longtitude) = (11.057246,106.67�428)
+14:44:34.713 RSSI = -111 dBi
+14:44:34.747 SNR = -20.75 dB
+14:44:34.747 Frequency error = -4545 Hz
+14:44:36.009 TxDone
+14:44:36.009 
+14:45:08.770 (Latitude, Longtitude) = (11.057264,106.675587)
+14:45:08.803 RSSI = -112 dBi
+14:45:08.836 SNR = -16.25 dB
+14:45:08.836 Frequency error = -4591 Hz
+14:45:11.235 TxDone
+14:45:11.235 
+14:45:42.161 (Latitude, Longtitude) = (11.057148,106.675811)
+14:45:42.194 RSSI = -110 dBi
+14:45:42.227 SNR = -15.25 dB
+14:45:42.227 Frequency error = -4577 Hz
+14:45:46.153 TxDone
+14:45:46.153 
+14:46:23.689 (Latitude, Longtitude) = (11.057244,106.675908)
+14:46:23.722 RSSI = -112 dBi
+14:46:23.756 SNR = -18.00 dB
+14:46:23.756 Frequency error = -4579 Hz
+14:46:25.425 TxDone
+14:46:25.425 
+14:49:01.235 (Latitude, Longtitude) = (11.057171,106.675876)
+14:49:01.268 RSSI = -112 dBi
+14:49:01.302 SNR = -23.25 dB
+14:49:01.302 Frequency error = -4532 Hz
+14:49:02.555 TxDone
+14:49:02.555 

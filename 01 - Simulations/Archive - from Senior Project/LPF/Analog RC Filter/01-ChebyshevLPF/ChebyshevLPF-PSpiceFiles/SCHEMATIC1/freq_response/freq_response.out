@@ -1,7 +1,7 @@
 
-**** 11/11/22 12:18:28 ***** PSpice 16.6.0 (October 2012) ***** ID# 0 ********
+**** 09/11/23 04:49:41 ***** PSpice 16.6.0 (October 2012) ***** ID# 0 ********
 
- ** Profile: "SCHEMATIC1-freq_response"  [ G:\Personal Work\Designs\Simulations\LPF\Analog RC Filter\01-ChebyshevLPF\ChebyshevLPF-PSp
+ ** Profile: "SCHEMATIC1-freq_response"  [ H:\OneDrive\Senior Project & Bachelor Thesis\Personal works\VGU-WirelessMeteorologyStation
 
 
  ****     CIRCUIT DESCRIPTION
@@ -31,17 +31,16 @@
 
 **** INCLUDING SCHEMATIC1.net ****
 * source CHEBYSHEVLPF
-L_L1         VIN VOUT  1uH  
-C_C1         0 VIN  470p  TC=0,0 
-C_C2         0 VOUT  470p  TC=0,0 
+C_C2         0 VOUT  20.2n  TC=0,0 
 V_V1         VIN 0 DC 0Vdc AC 1Vac 
+R_R1         VIN VOUT  680 TC=0,0 
 
 **** RESUMING freq_response.cir ****
 .END
 
-**** 11/11/22 12:18:28 ***** PSpice 16.6.0 (October 2012) ***** ID# 0 ********
+**** 09/11/23 04:49:41 ***** PSpice 16.6.0 (October 2012) ***** ID# 0 ********
 
- ** Profile: "SCHEMATIC1-freq_response"  [ G:\Personal Work\Designs\Simulations\LPF\Analog RC Filter\01-ChebyshevLPF\ChebyshevLPF-PSp
+ ** Profile: "SCHEMATIC1-freq_response"  [ H:\OneDrive\Senior Project & Bachelor Thesis\Personal works\VGU-WirelessMeteorologyStation
 
 
  ****     SMALL SIGNAL BIAS SOLUTION       TEMPERATURE =   27.000 DEG C
@@ -70,9 +69,9 @@ V_V1         VIN 0 DC 0Vdc AC 1Vac
 
           JOB CONCLUDED
 
-**** 11/11/22 12:18:28 ***** PSpice 16.6.0 (October 2012) ***** ID# 0 ********
+**** 09/11/23 04:49:41 ***** PSpice 16.6.0 (October 2012) ***** ID# 0 ********
 
- ** Profile: "SCHEMATIC1-freq_response"  [ G:\Personal Work\Designs\Simulations\LPF\Analog RC Filter\01-ChebyshevLPF\ChebyshevLPF-PSp
+ ** Profile: "SCHEMATIC1-freq_response"  [ H:\OneDrive\Senior Project & Bachelor Thesis\Personal works\VGU-WirelessMeteorologyStation
 
 
  ****     JOB STATISTICS SUMMARY

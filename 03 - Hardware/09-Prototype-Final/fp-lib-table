@@ -1,0 +1,4 @@
+(fp_lib_table
+  (lib (name "Custom_Libs")(type "KiCad")(uri "E:/KiCAD/Custom")(options "")(descr ""))
+  (lib (name "KiCAD_STM32_BluePill")(type "KiCad")(uri "E:/KiCAD/Kicad-STM32-master/Footprints")(options "")(descr ""))
+)

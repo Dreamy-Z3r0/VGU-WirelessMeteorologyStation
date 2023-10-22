@@ -1,0 +1,191 @@
+14:20:12.848 USB device detected
+14:20:22.573 Connected to CP210x device
+14:23:19.989 Input: 11.055887,106.669041
+14:23:20.017 Index: 0
+14:23:20.026   Latitude = 11.055887; Longtitude = 106.669041 
+14:23:20.448   Coordinations sent.
+14:23:59.072 Input: 11.055929,106.669117
+14:23:59.100 Index: 1
+14:23:59.109   Latitude = 11.055929; Longtitude = 106.669117
+14:23:59.531   Coordinations sent.
+14:24:33.659 Input: 11.055904,106.669131
+14:24:33.688 Index: 2
+14:24:33.696   Latitude = 11.055904; Longtitude = 106.669131
+14:24:34.119   Coordinations sent.
+14:25:03.464 Input: 11.055904,106.669946
+14:25:03.491 Index: 3
+14:25:03.501   Latitude = 11.055904; Longtitude = 106.669946
+14:25:03.924   Coordinations sent.
+14:25:37.438 Input: 11.056005,106.669446
+14:25:37.466 Index: 4
+14:25:37.475   Latitude = 11.056005; Longtitude = 106.669446
+14:25:37.898   Coordinations sent.
+14:26:11.659 Input: 11.055999,106.669488
+14:26:11.688 Index: 5
+14:26:11.696   Latitude = 11.055999; Longtitude = 106.669488
+14:26:12.118   Coordinations sent.
+14:26:42.179 Input: 11.056077,106.669772
+14:26:42.208 Index: 6
+14:26:42.216   Latitude = 11.056077; Longtitude = 106.669772
+14:26:42.638   Coordinations sent.
+14:27:19.506 Input: 11.055875,106.669907
+14:27:19.534 Index: 7
+14:27:19.542   Latitude = 11.055875; Longtitude = 106.669907
+14:27:19.965   Coordinations sent.
+14:27:54.840 Input: 11.055959,106.669924
+14:27:54.868 Index: 8
+14:27:54.877   Latitude = 11.055959; Longtitude = 106.669924
+14:27:55.300   Coordinations sent.
+14:28:41.034 Input: 11.056128,106.670162
+14:28:41.062 Index: 9
+14:28:41.071   Latitude = 11.056128; Longtitude = 106.670162
+14:28:41.493   Coordinations sent.
+14:29:19.124 Input: 11.056172,106.670407
+14:29:19.151 Index: 10
+14:29:19.160   Latitude = 11.056172; Longtitude = 106.670407
+14:29:19.583   Coordinations sent.
+14:29:56.104 Input: 11.056193,106.670696
+14:29:56.132 Index: 11
+14:29:56.142   Latitude = 11.056193; Longtitude = 106.670696
+14:29:56.564   Coordinations sent.
+14:30:31.986 Input: 11.056214,106.670708
+14:30:32.014 Index: 12
+14:30:32.023   Latitude = 11.056214; Longtitude = 106.67070
+14:30:32.445   Coordinations sent.
+14:31:11.523 Input: 11.056376,106.671063
+14:31:11.551 Index: 13
+14:31:11.560   Latitude = 11.056376; Longtitude = 106.671063
+14:31:11.982   Coordinations sent.
+14:31:49.314 Input: 11.05638,106.671284
+14:31:49.341 Index: 14
+14:31:49.350   Latitude = 11.05638; Longtitude = 106.671284
+14:31:49.706   Coordinations sent.
+14:32:29.950 Input: 11.056388,106.671329
+14:32:29.978 Index: 15
+14:32:29.987   Latitude = 11.056388; Longtitude = 106.671329
+14:32:30.409   Coordinations sent.
+14:33:02.989 Input: 11.056491,106.671586
+14:33:03.017 Index: 16
+14:33:03.025   Latitude = 11.056491; Longtitude = 106.671586
+14:33:03.448   Coordinations sent.
+14:33:39.486 Input: 11.056461,106.671733
+14:33:39.514 Index: 17
+14:33:39.522   Latitude = 11.056461; Longtitude = 106.671733
+14:33:39.945   Coordinations sent.
+14:34:09.441 Input: 11.056548,106.671893
+14:34:09.468 Index: 18
+14:34:09.477   Latitude = 11.056548; Longtitude = 106.671893
+14:34:09.900   Coordinations sent.
+14:34:48.494 Input: 11.056641,106.672299
+14:34:48.521 Index: 19
+14:34:48.530   Latitude = 11.056641; Longtitude = 106.672299
+14:34:48.953   Coordinations sent.
+14:35:19.346 Input: 11.056602,106.672413
+14:35:19.374 Index: 20
+14:35:19.383   Latitude = 11.056602; Longtitude = 106.672413
+14:35:19.805   Coordinations sent.
+14:35:59.694 Input: 11.056656,106.672675
+14:35:59.723 Index: 21
+14:35:59.731   Latitude = 11.056656; Longtitude = 106.672675
+14:36:00.154   Coordinations sent.
+14:36:35.079 Input: 11.056731,106.672825
+14:36:35.108 Index: 22
+14:36:35.117   Latitude = 11.056731; Longtitude = 106.672825
+14:36:35.539   Coordinations sent.
+14:37:10.961 Input: 11.056715,106.673019
+14:37:10.989 Index: 23
+14:37:10.999   Latitude = 11.056715; Longtitude = 106.673019
+14:37:11.421   Coordinations sent.
+14:37:45.747 Input: 11.056764,106.673138
+14:37:45.775 Index: 24
+14:37:45.784   Latitude = 11.056764; Longtitude = 106.673138
+14:37:46.206   Coordinations sent.
+14:38:22.112 Input: 11.056897,106.673409
+14:38:22.141 Index: 25
+14:38:22.151   Latitude = 11.056897; Longtitude = 106.673409
+14:38:22.572   Coordinations sent.
+14:39:00.236 Input: 11.056891,106.673534
+14:39:00.264 Index: 26
+14:39:00.273   Latitude = 11.056891; Longtitude = 106.673534
+14:39:00.695   Coordinations sent.
+14:39:30.772 Input: 11.056922,106.673565
+14:39:30.801 Index: 27
+14:39:30.810   Latitude = 11.056922; Longtitude = 106.673565
+14:39:31.232   Coordinations sent.
+14:40:10.938 Input: 11.056991,106.674068
+14:40:10.967 Index: 28
+14:40:10.975   Latitude = 11.056991; Longtitude = 106.674068
+14:40:11.398   Coordinations sent.
+14:40:50.857 Input: 11.057044,106.674277
+14:40:50.884 Index: 29
+14:40:50.893   Latitude = 11.057044; Longtitude = 106.674277
+14:40:51.316   Coordinations sent.
+14:41:30.659 Input: 11.057174,106.674437
+14:41:30.687 Index: 30
+14:41:30.695   Latitude = 11.057174; Longtitude = 106.674437
+14:41:31.118   Coordinations sent.
+14:42:06.691 Input: 11.057097,106.674482
+14:42:06.719 Index: 31
+14:42:06.728   Latitude = 11.057097; Longtitude = 106.674482
+14:42:07.150   Coordinations sent.
+14:42:46.277 Input: 11.057232,106.674745
+14:42:46.305 Index: 32
+14:42:46.314   Latitude = 11.057232; Longtitude = 106.674745
+14:42:46.736   Coordinations sent.
+14:43:27.521 Input: 11.057179,106.675211
+14:43:27.550 Index: 33
+14:43:27.559   Latitude = 11.057179; Longtitude = 106.675211
+14:43:27.982   Coordinations sent.
+14:44:03.636 Input: 11.057219,106.675343
+14:44:03.664 Index: 34
+14:44:03.673   Latitude = 11.057219; Longtitude = 106.675343
+14:44:04.094   Coordinations sent.
+14:44:35.186 Input: 11.057246,106.675428
+14:44:35.214 Index: 35
+14:44:35.223   Latitude = 11.057246; Longtitude = 106.675428
+14:44:35.645   Coordinations sent.
+14:45:09.276 Input: 11.057264,106.675587
+14:45:09.303 Index: 36
+14:45:09.312   Latitude = 11.057264; Longtitude = 106.675587
+14:45:09.735   Coordinations sent.
+14:45:42.666 Input: 11.057148,106.675811
+14:45:42.693 Index: 37
+14:45:42.703   Latitude = 11.057148; Longtitude = 106.675811
+14:45:43.125   Coordinations sent.
+14:46:24.195 Input: 11.057244,106.675908
+14:46:24.223 Index: 38
+14:46:24.232   Latitude = 11.057244; Longtitude = 106.675908
+14:46:24.654   Coordinations sent.
+14:47:08.745 Input: 11.057171,106.675876
+14:47:08.773 Index: 39
+14:47:08.783   Latitude = 11.057171; Longtitude = 106.675876
+14:47:09.205   Coordinations sent.
+14:47:57.281 Input: 11.057233,106.675914
+14:47:57.309 Index: 40
+14:47:57.318   Latitude = 11.057233; Longtitude = 106.675914
+14:47:57.740   Coordinations sent.
+14:48:16.773 Input: 11.057233,106.675914
+14:48:16.802 Index: 41
+14:48:16.810   Latitude = 11.057233; Longtitude = 106.675914
+14:48:17.233   Coordinations sent.
+14:48:26.918 Input: 11.057233,106.675914
+14:48:26.946 Index: 42
+14:48:26.956   Latitude = 11.057233; Longtitude = 106.675914
+14:48:27.378   Coordinations sent.
+14:48:41.547 Input: 11.057233,106.675914
+14:48:41.575 Index: 43
+14:48:41.583   Latitude = 11.057233; Longtitude = 106.675914
+14:48:42.006   Coordinations sent.
+14:48:55.262 Input: 11.057233,106.675914
+14:48:55.289 Index: 44
+14:48:55.299   Latitude = 11.057233; Longtitude = 106.675914
+14:48:55.722   Coordinations sent.
+14:49:01.740 Input: 11.057233,106.675914
+14:49:01.768 Index: 45
+14:49:01.778   Latitude = 11.057233; Longtitude = 106.675914
+14:49:02.200   Coordinations sent.
+14:49:52.150 Input: 11.057233,106.675914
+14:49:52.178 Index: 46
+14:49:52.187   Latitude = 11.057233; Longtitude = 106.675914
+14:49:52.609   Coordinations sent.
+14:50:51.511 Disconnected
