@@ -1,1 +1,0 @@
-#define HAL_ADC_MODULE_ONLY
